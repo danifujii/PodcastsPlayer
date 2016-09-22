@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PodcastPlayer</string>
+    <string name="tab_search">Search</string>
+    <string name="tab_new">New</string>
+    <string name="tab_subscriptions">Subscriptions</string>
+
+    <string name="hello_blank_fragment">Search fragment</string>
+</resources>

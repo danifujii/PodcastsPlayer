@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs>
+    <tab id="@+id/tab_search"
+        icon="@drawable/ic_search_black_24dp"
+        title="@string/tab_search"/>
+
+    <tab id="@+id/tab_new"
+        icon="@drawable/ic_new_releases_black_24dp"
+        title="@string/tab_new" />
+
+    <tab id="@+id/tab_subscriptions"
+        icon="@drawable/ic_subscriptions_black_24dp"
+        title="@string/tab_subscriptions"/>
+
+</tabs>
