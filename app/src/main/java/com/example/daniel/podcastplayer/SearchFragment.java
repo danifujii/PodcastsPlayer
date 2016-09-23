@@ -59,7 +59,7 @@ public class SearchFragment extends Fragment {
                         @Override
                         protected void onPostExecute(String s) {
                             super.onPostExecute(s);
-                            rv.setAdapter(new PodResAdapter(ResultParser.parse(s,rv)));
+                            rv.setAdapter(new PodResAdapter(ResultParser.getInstance().parseSearch(s,rv)));
                         }
                     }.execute(query.replace(' ','+'));
                     return true;

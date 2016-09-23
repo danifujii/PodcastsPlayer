@@ -11,8 +11,10 @@
         android:id="@+id/fragment_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/activity_medium_margin"
-        android:paddingBottom="@dimen/bottom_bar_height"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_medium_margin"
+        android:layout_marginBottom="@dimen/bottom_bar_height"
         />
 
     <com.roughike.bottombar.BottomBar
@@ -21,5 +23,6 @@
         android:layout_height="@dimen/bottom_bar_height"
         android:layout_alignParentBottom="true"
         app:bb_tabXmlResource="@xml/bottombar_tabs"
+        android:paddingBottom="0dp"
         />
 </RelativeLayout>

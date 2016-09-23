@@ -3,7 +3,8 @@
 <LinearLayout android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:id="@+id/search_result_layout">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal" android:layout_width="match_parent"
@@ -12,7 +13,7 @@
         android:paddingBottom="@dimen/activity_medium_margin">
 
         <ImageView
-            android:id="@+id/artwork_image_view"
+            android:id="@+id/search_artwork_image_view"
             android:layout_width="@dimen/image_size"
             android:layout_height="@dimen/image_size"
             android:layout_gravity="center_vertical"/>
@@ -25,7 +26,7 @@
             android:layout_gravity="center_vertical">
 
             <TextView
-                android:id="@+id/pod_title_tv"
+                android:id="@+id/search_pod_title_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
@@ -34,7 +35,7 @@
                 android:maxLines="1"/>
 
             <TextView
-                android:id="@+id/pod_artist_tv"
+                android:id="@+id/search_pod_artist_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
