@@ -2,25 +2,17 @@ package com.example.daniel.podcastplayer.adapter;
 
 import android.app.DownloadManager;
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.daniel.podcastplayer.PodcastActivity;
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.Episode;
-import com.example.daniel.podcastplayer.data.PodcastRes;
 
 import java.util.List;
 

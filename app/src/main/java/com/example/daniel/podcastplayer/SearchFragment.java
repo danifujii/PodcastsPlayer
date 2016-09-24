@@ -14,23 +14,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
-import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.adapter.PodResAdapter;
-import com.example.daniel.podcastplayer.data.PodcastRes;
 import com.example.daniel.podcastplayer.data.ResultParser;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 
 public class SearchFragment extends Fragment {
@@ -98,7 +90,8 @@ public class SearchFragment extends Fragment {
                 try { if (reader != null) reader.close(); }
                 catch (IOException ie){ ie.printStackTrace(); }
             }
-        } else //Snackbar, say there is no connection
+        } else
+            //TODO Snackbar, say there is no connection
             Log.d("NO INTERNET","Sorry, there is no connection. Try again later");
         return null;
     }

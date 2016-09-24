@@ -11,6 +11,7 @@ public class Episode {
     private String epTitle;
     private String epDate;
     private String epURL;
+    private long length;
 
     public Episode(){   }
 
@@ -24,6 +25,14 @@ public class Episode {
 
     public String getEpURL() {
         return epURL;
+    }
+
+    public long getLength() {
+        return length;
+    }
+
+    public void setLength(long length) {
+        this.length = length;
     }
 
     public void setEpTitle(String epTitle) {

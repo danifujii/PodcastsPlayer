@@ -1,18 +1,22 @@
 package com.example.daniel.podcastplayer;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.ImageButton;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
-import com.example.daniel.podcastplayer.adapter.PodResAdapter;
+import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
-import com.example.daniel.podcastplayer.data.PodcastRes;
+import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.data.ResultParser;
 
 import java.io.IOException;
@@ -24,13 +28,16 @@ import java.util.List;
 public class PodcastActivity extends AppCompatActivity {
 
     private RecyclerView rv;
+    private Button subsButton;
 
+    private String desc;
+    private Podcast podcast;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_podcast);
 
-        PodcastRes podcast = (PodcastRes)getIntent().getParcelableExtra(PodcastRes.class.getName());
+        podcast = (Podcast)getIntent().getParcelableExtra(Podcast.class.getName());
 
         TextView titleTV = (TextView)findViewById(R.id.pod_title_tv);
         if (titleTV != null) titleTV.setText(podcast.getPodcastName());
@@ -41,31 +48,68 @@ public class PodcastActivity extends AppCompatActivity {
         ImageView artwork = (ImageView)findViewById(R.id.pod_artwork);
         if (artwork!=null) artwork.setImageBitmap(podcast.getArtwork());
 
-        //Download the feed data
-        new AsyncTask<URL,Void,List<Episode>>(){
-            @Override
-            protected List<Episode> doInBackground(URL... params) {
-                HttpURLConnection conn = null;
-                InputStream stream = null;
-                try{
-                    conn = (HttpURLConnection) (params[0]).openConnection();
-                    conn.connect();
-                    stream = conn.getInputStream();
-                } catch (IOException e){e.printStackTrace();}
-                List<Episode> result = ResultParser.getInstance().parseFeed(stream);
-                if (conn != null) conn.disconnect();
-                return result;
-            }
+        //NetworkInfo networkInfo = ((ConnectivityManager)
+          //      getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        //if (networkInfo != null && networkInfo.isConnected())
+            //Download the feed data
+            new AsyncTask<URL,Void,List<Episode>>(){
+                @Override
+                protected List<Episode> doInBackground(URL... params) {
+                    HttpURLConnection conn = null;
+                    InputStream stream = null;
+                    try{
+                        conn = (HttpURLConnection) (params[0]).openConnection();
+                        conn.connect();
+                        stream = conn.getInputStream();
+                    } catch (IOException e){e.printStackTrace();}
+                    List<Episode> result = ResultParser.getInstance().parseFeed(stream, 1);
+                    desc = ResultParser.getInstance().getDesc();
+                    try {stream.close();}
+                    catch (IOException e) {e.printStackTrace();}
+                    if (conn != null) conn.disconnect();
+                    return result;
+                }
 
-            @Override
-            protected void onPostExecute(List<Episode> episodes) {
-                super.onPostExecute(episodes);
-                EpisodeAdapter adapter = new EpisodeAdapter(episodes);
-                rv.setAdapter(adapter);
-            }
-        }.execute(podcast.getFeedUrl());
+                @Override
+                protected void onPostExecute(List<Episode> episodes) {
+                    super.onPostExecute(episodes);
+                    EpisodeAdapter adapter = new EpisodeAdapter(episodes);
+                    rv.setAdapter(adapter);
+                    TextView descTV = (TextView)findViewById(R.id.pod_desc_tv);
+                    descTV.setText(desc);
+                }
+            }.execute(podcast.getFeedUrl());
 
+        //Setup the Subscribe button
+        subsButton = (Button)findViewById(R.id.subscribe_button);
+        if (subsButton != null) {
+            changeSubButtonText(DbHelper.getInstance(this).existsPodcast(podcast.getPodcastId()));
+
+            subsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DbHelper db = DbHelper.getInstance(v.getContext());
+                    boolean isSubscribed = false;
+                    if (((Button)v).getText().equals(getString(R.string.unsubscribe_button)))
+                        db.deletePodcast(podcast.getPodcastId());
+                    else {
+                        db.insertPodcast(podcast);
+                        isSubscribed = true;
+                    }
+                    changeSubButtonText(isSubscribed);
+                }
+            });
+        }
+
+        //Initial setup for RecyclerView
         rv = (RecyclerView)findViewById(R.id.episodes_rv);
         rv.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    //Get the appropiate text if user is or not subscribed. If it is, then you should show Unsubs.
+    private void changeSubButtonText(boolean isSubscribed){
+        String text = (isSubscribed) ?
+                getString(R.string.unsubscribe_button) : getString(R.string.subscribe_button);
+        subsButton.setText(text);
     }
 }

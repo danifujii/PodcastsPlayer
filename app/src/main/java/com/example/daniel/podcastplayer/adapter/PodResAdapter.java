@@ -2,7 +2,6 @@ package com.example.daniel.podcastplayer.adapter;
 
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +11,14 @@ import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.PodcastActivity;
 import com.example.daniel.podcastplayer.R;
-import com.example.daniel.podcastplayer.data.PodcastRes;
+import com.example.daniel.podcastplayer.data.Podcast;
 
 import java.util.List;
 
 public class PodResAdapter extends RecyclerView.Adapter<PodResAdapter.PodResViewHolder> {
-    private List<PodcastRes> data;
+    private List<Podcast> data;
 
-    public PodResAdapter(List<PodcastRes> data){
+    public PodResAdapter(List<Podcast> data){
         this.data = data;
     }
 
@@ -34,7 +33,7 @@ public class PodResAdapter extends RecyclerView.Adapter<PodResAdapter.PodResView
 
     @Override
     public void onBindViewHolder(final PodResViewHolder holder, int position) {
-        PodcastRes item = data.get(position);
+        Podcast item = data.get(position);
 
         holder.artistTV.setText(item.getPodcastArtist());
         holder.nameTV.setText(item.getPodcastName());
@@ -45,7 +44,7 @@ public class PodResAdapter extends RecyclerView.Adapter<PodResAdapter.PodResView
             public void onClick(View v) {
                 int pos = holder.getAdapterPosition();
                 Intent i = new Intent(v.getContext(), PodcastActivity.class);
-                i.putExtra(PodcastRes.class.getName(),data.get(pos));
+                i.putExtra(Podcast.class.getName(),data.get(pos));
                 v.getContext().startActivity(i);
             }
         });
