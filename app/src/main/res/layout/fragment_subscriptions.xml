@@ -4,7 +4,14 @@
     android:layout_height="match_parent"
     tools:context="com.example.daniel.podcastplayer.SubscriptionsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
+    <GridView
+        android:id="@+id/subs_gv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="auto_fit"
+        android:columnWidth="100dp"
+        android:gravity="center"
+        android:stretchMode="columnWidth"
+        />
 
 </FrameLayout>

@@ -6,6 +6,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
+
+import com.example.daniel.podcastplayer.adapter.ImageAdapter;
+import com.example.daniel.podcastplayer.data.DbHelper;
 
 
 /**
@@ -23,7 +27,10 @@ public class SubscriptionsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_subscriptions, container, false);
+        View v = inflater.inflate(R.layout.fragment_subscriptions, container, false);
+        GridView gv = (GridView)v.findViewById(R.id.subs_gv);
+        gv.setAdapter(new ImageAdapter(getContext(), DbHelper.getInstance(getContext()).getPodcasts()));
+        return v;
     }
 
 }

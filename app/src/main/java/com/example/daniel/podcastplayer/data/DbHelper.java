@@ -2,6 +2,7 @@ package com.example.daniel.podcastplayer.data;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -65,6 +66,11 @@ public class DbHelper extends SQLiteOpenHelper{
         return (getWritableDatabase().rawQuery("SELECT 1 FROM "
             + Tbls.NAME_PODCAST + " WHERE " + Tbls.COLUMN_ID + "='" + String.valueOf(podcastId) + "'"
                 ,null).getCount())>0;
+    }
+
+    public Cursor getPodcasts(){
+        return getWritableDatabase().rawQuery("SELECT * FROM "
+            + Tbls.NAME_PODCAST, null);
     }
 
     public void deletePodcast(long podcastId){

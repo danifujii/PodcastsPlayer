@@ -140,14 +140,19 @@ public class PodcastActivity extends AppCompatActivity implements Downloader.Dow
             if (artwork != null) {
                 Bitmap art = ((BitmapDrawable) artwork.getDrawable()).getBitmap();
                 art.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-                fOut.flush();
-                fOut.close();
             }
+            fOut.flush();
+            fOut.close();
         } catch (IOException e) { e.printStackTrace(); }
     }
 
     @Override
     public void receiveImage(Bitmap bitmap) {
-        if (artwork!=null) artwork.setImageBitmap(bitmap);
+        if (artwork!=null){
+            artwork.setImageBitmap(bitmap);
+            //in case sub button was pressed before download finished
+            if (subsButton.getText().equals(getString(R.string.unsubscribe_button)))
+                saveArtwork();
+        }
     }
 }

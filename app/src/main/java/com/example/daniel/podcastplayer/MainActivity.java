@@ -42,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         }
                         case R.id.tab_subscriptions:{
+                            if (findViewById(R.id.fragment_layout) != null)
+                                getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.fragment_layout, new SubscriptionsFragment()).commit();
                             break;
                         }
                         default:{
