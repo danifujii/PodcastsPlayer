@@ -1,6 +1,8 @@
 package com.example.daniel.podcastplayer;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -8,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -18,17 +21,22 @@ import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.data.ResultParser;
+import com.example.daniel.podcastplayer.download.Downloader;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-public class PodcastActivity extends AppCompatActivity {
+public class PodcastActivity extends AppCompatActivity implements Downloader.DownloadReceiver{
 
     private RecyclerView rv;
     private Button subsButton;
+    private ImageView artwork;
 
     private String desc;
     private Podcast podcast;
@@ -45,7 +53,7 @@ public class PodcastActivity extends AppCompatActivity {
         TextView artistTV = (TextView)findViewById(R.id.pod_artist_tv);
         if (artistTV != null) artistTV.setText(podcast.getPodcastArtist());
 
-        ImageView artwork = (ImageView)findViewById(R.id.pod_artwork);
+        artwork = (ImageView)findViewById(R.id.pod_artwork);
         if (artwork!=null) artwork.setImageBitmap(podcast.getArtwork());
 
         //NetworkInfo networkInfo = ((ConnectivityManager)
@@ -95,6 +103,7 @@ public class PodcastActivity extends AppCompatActivity {
                     else {
                         db.insertPodcast(podcast);
                         isSubscribed = true;
+                        saveArtwork();
                     }
                     changeSubButtonText(isSubscribed);
                 }
@@ -104,6 +113,11 @@ public class PodcastActivity extends AppCompatActivity {
         //Initial setup for RecyclerView
         rv = (RecyclerView)findViewById(R.id.episodes_rv);
         rv.setLayoutManager(new LinearLayoutManager(this));
+
+        //Dowload high res image
+        try{
+            Downloader.downloadImage(new URL(podcast.getArtworkURL()),this);
+        } catch (MalformedURLException me) { me.printStackTrace(); }
     }
 
     //Get the appropiate text if user is or not subscribed. If it is, then you should show Unsubs.
@@ -111,5 +125,29 @@ public class PodcastActivity extends AppCompatActivity {
         String text = (isSubscribed) ?
                 getString(R.string.unsubscribe_button) : getString(R.string.subscribe_button);
         subsButton.setText(text);
+    }
+
+    public void saveArtwork(){
+        try {
+            //TODO remove Artwork directory hardcoded. Save such name in a static string somewhere
+            File dir = new File(getApplicationInfo().dataDir + "/Artwork");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            File image = new File(dir, String.valueOf(podcast.getPodcastId()) + ".png");
+            FileOutputStream fOut = new FileOutputStream(image);
+
+            if (artwork != null) {
+                Bitmap art = ((BitmapDrawable) artwork.getDrawable()).getBitmap();
+                art.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                fOut.flush();
+                fOut.close();
+            }
+        } catch (IOException e) { e.printStackTrace(); }
+    }
+
+    @Override
+    public void receiveImage(Bitmap bitmap) {
+        if (artwork!=null) artwork.setImageBitmap(bitmap);
     }
 }

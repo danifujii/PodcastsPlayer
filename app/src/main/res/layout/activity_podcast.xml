@@ -63,17 +63,37 @@
         android:id="@+id/latest_ep_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/latest_ep"/>
+        android:text="@string/latest_ep"
+        android:textStyle="bold"
+        android:textColor="@color/darkGray"
+        android:textSize="17sp"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_medium_margin"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/episodes_rv"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/show_desc"
+        android:textStyle="bold"
+        android:textColor="@color/darkGray"
+        android:textSize="17sp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"/>
 
     <TextView
         android:id="@+id/pod_desc_tv"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:textColor="@color/mediumGray"
+        android:paddingTop="@dimen/activity_medium_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"/>
 
 </LinearLayout>

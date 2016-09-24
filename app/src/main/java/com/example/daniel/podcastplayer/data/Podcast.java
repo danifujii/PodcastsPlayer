@@ -23,6 +23,7 @@ public class Podcast implements Parcelable{
     private String podcastName;
     private String podcastArtist;
     private Bitmap artwork;
+    private String artworkURL; //in order to download higher res-version
     private URL feedUrl;
     private RecyclerView searchRecyclerView;
 
@@ -34,11 +35,12 @@ public class Podcast implements Parcelable{
             podcastId = json.getLong("collectionId");
             feedUrl = new URL(json.getString("feedUrl"));
             //Download the artwork
-            downloadImage(json);
+            downloadImage(json.getString("artworkUrl100"));
+            artworkURL = json.getString("artworkUrl600");
         }catch (JSONException | MalformedURLException je) { je.printStackTrace(); }
     }
 
-    public void downloadImage(JSONObject json) throws JSONException{
+    public void downloadImage(String url) throws JSONException{
         new AsyncTask<String,Void,Bitmap>(){
             @Override
             protected Bitmap doInBackground(String... params) {
@@ -67,7 +69,7 @@ public class Podcast implements Parcelable{
                 artwork = bitmap;
                 searchRecyclerView.getAdapter().notifyDataSetChanged();
             }
-        }.execute(json.getString("artworkUrl100"));
+        }.execute(url);
     }
 
     public String getPodcastName() {
@@ -88,6 +90,10 @@ public class Podcast implements Parcelable{
         return podcastId;
     }
 
+    public String getArtworkURL() {
+        return artworkURL;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -99,6 +105,7 @@ public class Podcast implements Parcelable{
         podcastArtist = in.readString();
         try { feedUrl = new URL(in.readString()); }
         catch (MalformedURLException me) { me.printStackTrace(); }
+        artworkURL = in.readString();
         artwork = Bitmap.CREATOR.createFromParcel(in);
     }
 
@@ -108,6 +115,7 @@ public class Podcast implements Parcelable{
         dest.writeString(podcastName);
         dest.writeString(podcastArtist);
         dest.writeString(feedUrl.toString());
+        dest.writeString(artworkURL);
         if (artwork != null)
             artwork.writeToParcel(dest,flags);
     }

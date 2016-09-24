@@ -38,6 +38,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         Episode item = data.get(position);
         holder.nameTV.setText(item.getEpTitle());
         holder.dateTV.setText(item.getEpDate());
+        if (data.size() <= 1)
+            holder.downloadButton.setVisibility(View.INVISIBLE);
 
         holder.downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
