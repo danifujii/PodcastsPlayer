@@ -1,5 +1,10 @@
 package com.example.daniel.podcastplayer;
 
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +21,8 @@ import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.Podcast;
+import com.example.daniel.podcastplayer.download.Downloader;
+import com.example.daniel.podcastplayer.receiver.DownloadReceiver;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -24,6 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PodcastActivity extends AppCompatActivity {
+
+    private BroadcastReceiver downloadReceiver;
+    private Downloader.DownloadReceiver dr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +68,30 @@ public class PodcastActivity extends AppCompatActivity {
             epsRV.setLayoutManager(new LinearLayoutManager(this));
             epsRV.setAdapter(new EpisodeAdapter(episodes));
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setDownloadReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(downloadReceiver);
+    }
+
+    private void setDownloadReceiver(){
+        downloadReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction()))
+                    Log.d("POD ACT","Download completed");
+            }
+        };
+        registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        registerReceiver(new DownloadReceiver(), new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
     private List<Episode> buildEpisodes(Cursor c){

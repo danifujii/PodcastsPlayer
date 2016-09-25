@@ -12,6 +12,7 @@ public class Episode {
     private String epDate;
     private String epURL;
     private long length;
+    private boolean downloaded; //used for UI purposes mainly
 
     public Episode(){   }
 
@@ -30,6 +31,8 @@ public class Episode {
     public long getLength() {
         return length;
     }
+
+    public boolean getDownloaded() { return downloaded; }
 
     public void setLength(long length) {
         this.length = length;
@@ -53,4 +56,7 @@ public class Episode {
         } catch (ParseException e){e.printStackTrace();}
     }
 
+    public void setDownloaded(boolean downloaded) {
+        this.downloaded = downloaded;
+    }
 }
