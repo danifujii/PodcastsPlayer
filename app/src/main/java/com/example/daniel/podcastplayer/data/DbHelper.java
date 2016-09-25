@@ -99,6 +99,16 @@ public class DbHelper extends SQLiteOpenHelper{
                 null);
     }
 
+    //Get latest, non listened episodes from each podcast
+    public Cursor getLatestEpisodes(){
+        return getReadableDatabase().rawQuery("SELECT e1.* FROM " + Tbls.NAME_EPISODE + " e1"
+                + " JOIN (SELECT " + Tbls.COLUMN_ID + ", MAX( " + Tbls.COLUMN_DATE + ") date "
+                + " FROM " +Tbls.NAME_EPISODE + " WHERE " + Tbls.COLUMN_LISTENED + "=0 "
+                + " GROUP BY " + Tbls.COLUMN_FK_POD +" ) e2"
+                + " ON e1." + Tbls.COLUMN_ID+"=e2."+Tbls.COLUMN_ID
+                + " AND e1."+ Tbls.COLUMN_DATE+"=e2.date", null);
+    }
+
     public void deletePodcast(long podcastId){
         delete(Tbls.NAME_PODCAST, Tbls.COLUMN_ID, String.valueOf(podcastId));
     }

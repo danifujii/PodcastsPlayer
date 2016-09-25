@@ -101,8 +101,8 @@ public class PodcastActivity extends AppCompatActivity {
         registerReceiver(new DownloadReceiver(), new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
-    private List<Episode> buildEpisodes(Cursor c){
-        Log.d("Podcast Act", String.valueOf(c.getCount()));
+    public static List<Episode> buildEpisodes(Cursor c){
+        //TODO Separate this into another class, so it can be used from NewPodcastsFragment
         List<Episode> episodes = new ArrayList<>();
         while (c.moveToNext()){
             Episode e = new Episode(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_FK_POD)));

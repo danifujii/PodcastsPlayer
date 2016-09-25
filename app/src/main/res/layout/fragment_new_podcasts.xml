@@ -4,11 +4,11 @@
     android:layout_height="match_parent"
     tools:context="com.example.daniel.podcastplayer.NewPodcastsFragment">
 
-    <TextView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/new_episodes_rv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="New podcasts fragment"
-        android:textSize="20sp"
-        android:gravity="center_horizontal"/>
+        android:layout_height="wrap_content">
+
+    </android.support.v7.widget.RecyclerView>
 
 </FrameLayout>
