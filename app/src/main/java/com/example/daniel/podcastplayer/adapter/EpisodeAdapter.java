@@ -4,26 +4,21 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.daniel.podcastplayer.PodcastPlayer;
+import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.Episode;
 
 import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeViewHolder>{
@@ -81,6 +76,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
     }
 
     private void setPlayerSheet(final Episode e){
+        //TODO change this, now there is a PlayerSheetManager to handle this UI
         activity.findViewById(R.id.splayer_layout).setVisibility(View.VISIBLE);
         ((TextView)activity.findViewById(R.id.splayer_ep_tv)).setText(e.getEpTitle());
         final ImageButton playButton = (ImageButton)activity.findViewById(R.id.splayer_play_button);
@@ -90,14 +86,13 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
             playButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    PodcastPlayer player = PodcastPlayer.getInstance();
+                    PodcastPlayerService player = PodcastPlayerService.getInstance();
                     if (player.isPlaying()) {
                         player.pausePlayback();
                         playButton.setImageBitmap(BitmapFactory.decodeResource(v.getResources(),
                                 R.drawable.ic_play_arrow_black_24dp));
                     }else {
-                        player.startPlayback(URLUtil.guessFileName(e.getEpURL(), null, null)
-                                , activity);
+                        player.startPlayback(e , activity);
                         playButton.setImageBitmap(BitmapFactory.decodeResource(v.getResources(),
                                 R.drawable.ic_pause_black_24dp));
                     }

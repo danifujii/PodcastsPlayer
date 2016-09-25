@@ -105,7 +105,7 @@ public class PodcastActivity extends AppCompatActivity {
         Log.d("Podcast Act", String.valueOf(c.getCount()));
         List<Episode> episodes = new ArrayList<>();
         while (c.moveToNext()){
-            Episode e = new Episode();
+            Episode e = new Episode(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_FK_POD)));
             e.setEpTitle(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_TITLE)));
             e.setEpDate(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_DATE)));
             e.setLength(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_LENGTH)));

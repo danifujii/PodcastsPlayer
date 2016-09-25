@@ -40,11 +40,11 @@ public class ResultParser {
         return result;
     }
 
-    public List<Episode> parseFeed(InputStream is){
-        return parseFeed(is, Integer.MAX_VALUE);
+    public List<Episode> parseFeed(InputStream is, long podcastId){
+        return parseFeed(is, Integer.MAX_VALUE, podcastId);
     }
 
-    public List<Episode> parseFeed(InputStream is, int limit){
+    public List<Episode> parseFeed(InputStream is, int limit, long podcastId){
         List<Episode> result = new ArrayList<>();
         try{
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -58,7 +58,7 @@ public class ResultParser {
             //Parse episodes from RSS
             NodeList episodes = d.getElementsByTagName("item");
             for (int i = 0; i < episodes.getLength(); i++) {
-                Episode e = new Episode();
+                Episode e = new Episode(podcastId);
                 Element n = (Element)episodes.item(i);
                 e.setEpTitle(n.getElementsByTagName("title").item(0).getTextContent());
                 e.setEpDate(n.getElementsByTagName("pubDate").item(0).getTextContent());

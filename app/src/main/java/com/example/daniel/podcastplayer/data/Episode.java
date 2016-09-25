@@ -12,9 +12,12 @@ public class Episode {
     private String epDate;
     private String epURL;
     private long length;
+    private long podcastId;
     private boolean downloaded; //used for UI purposes mainly
 
-    public Episode(){   }
+    public Episode(long podcast){
+        podcastId = podcast;
+    }
 
     public String getEpTitle() {
         return epTitle;
@@ -31,6 +34,8 @@ public class Episode {
     public long getLength() {
         return length;
     }
+
+    public long getPodcastId() { return podcastId; }
 
     public boolean getDownloaded() { return downloaded; }
 

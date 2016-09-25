@@ -68,7 +68,8 @@ public class PodcastSearchActivity extends AppCompatActivity implements Download
                         conn.connect();
                         stream = conn.getInputStream();
                     } catch (IOException e){e.printStackTrace();}
-                    List<Episode> result = ResultParser.getInstance().parseFeed(stream);
+                    List<Episode> result = ResultParser.getInstance().parseFeed(stream,
+                            podcast.getPodcastId());
                     desc = ResultParser.getInstance().getDesc();
                     try {stream.close();}
                     catch (IOException e) {e.printStackTrace();}

@@ -3,8 +3,12 @@ package com.example.daniel.podcastplayer;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
 
+import com.example.daniel.podcastplayer.player.PlayerSheetManager;
+import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
@@ -53,5 +57,18 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        PodcastPlayerService pps = PodcastPlayerService.getInstance();
+        if (pps.isPlaying()){
+            Log.d("MAIN ACT","IS PLAYING");
+            findViewById(R.id.splayer).setVisibility(View.VISIBLE);
+            PlayerSheetManager psm = new PlayerSheetManager();
+            psm.setSheetInterface(pps.getEpisode(),this);
+        }
     }
 }
