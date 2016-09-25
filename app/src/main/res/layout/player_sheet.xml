@@ -1,17 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/player_sheet_height"
+    android:background="@color/lightGray"
+    android:paddingRight="@dimen/activity_horizontal_margin">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin">
 
-    <ImageView
-        android:id="@+id/splayer_art_iv"
-        android:layout_width="@dimen/small_image_size"
-        android:layout_height="@dimen/small_image_size" />
+        <ImageView
+            android:id="@+id/splayer_art_iv"
+            android:layout_width="@dimen/small_image_size"
+            android:layout_height="@dimen/small_image_size"
+            android:layout_gravity="center_vertical" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="" />
+        <TextView
+            android:id="@+id/splayer_ep_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/darkGray"
+            android:textSize="17sp"
+            android:layout_gravity="center_vertical"
+            android:paddingLeft="@dimen/activity_medium_margin"/>
 
-</LinearLayout>
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/splayer_play_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_pause_black_24dp"
+        android:background="@null"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:padding="@dimen/activity_medium_margin"
+        android:layout_centerVertical="true"
+        android:clickable="true"
+        />
+
+</RelativeLayout>
+

@@ -1,5 +1,6 @@
 package com.example.daniel.podcastplayer.adapter;
 
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.graphics.BitmapFactory;
@@ -13,8 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.daniel.podcastplayer.PodcastPlayer;
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.Episode;
 
@@ -26,6 +29,7 @@ import java.util.List;
 public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeViewHolder>{
 
     private List<Episode> data;
+    private Activity activity;  //save the activity that uses this to set the player layout as visible
 
     public EpisodeAdapter(List<Episode> data){
         this.data = data;
@@ -36,6 +40,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         View itemView = LayoutInflater.
                 from(parent.getContext()).
                 inflate(R.layout.episode_layout, parent, false);
+        activity = (Activity)parent.getContext();
 
         return new EpisodeAdapter.EpisodeViewHolder(itemView);
     }
@@ -61,6 +66,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
                                     , v.getContext().getFilesDir().getAbsolutePath()
                                     , URLUtil.guessFileName(ep.getEpURL(), null, null)));
                 }
+                else setPlayerSheet(ep);
             }
         });
 
@@ -69,6 +75,36 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
             holder.downloadButton.setImageBitmap(BitmapFactory.decodeResource(c.getResources(),
                     R.drawable.ic_play_circle_outline_black_24dp));
             item.setDownloaded(true);
+        }
+        else holder.downloadButton.setImageBitmap(BitmapFactory.decodeResource(c.getResources(),
+                R.drawable.ic_file_download_black_24dp));
+    }
+
+    private void setPlayerSheet(final Episode e){
+        activity.findViewById(R.id.splayer_layout).setVisibility(View.VISIBLE);
+        ((TextView)activity.findViewById(R.id.splayer_ep_tv)).setText(e.getEpTitle());
+        final ImageButton playButton = (ImageButton)activity.findViewById(R.id.splayer_play_button);
+        //TODO change layout in PodcastActivity so that there is no RecyclerView at the end, because the button behind the Play/pause in the sheet
+        // is capturing the play event too. Starting download or playback.
+        if (playButton != null) {
+            playButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PodcastPlayer player = PodcastPlayer.getInstance();
+                    if (player.isPlaying()) {
+                        player.pausePlayback();
+                        playButton.setImageBitmap(BitmapFactory.decodeResource(v.getResources(),
+                                R.drawable.ic_play_arrow_black_24dp));
+                    }else {
+                        player.startPlayback(URLUtil.guessFileName(e.getEpURL(), null, null)
+                                , activity);
+                        playButton.setImageBitmap(BitmapFactory.decodeResource(v.getResources(),
+                                R.drawable.ic_pause_black_24dp));
+                    }
+                }
+            });
+            //TODO revisar esto ya que genera que el boton fuera del PlayerSheet pueda pausar la reproducción actual.
+            playButton.performClick();
         }
     }
 

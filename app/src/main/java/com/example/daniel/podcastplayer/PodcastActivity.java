@@ -13,7 +13,9 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -67,6 +69,11 @@ public class PodcastActivity extends AppCompatActivity {
         if (epsRV != null){
             epsRV.setLayoutManager(new LinearLayoutManager(this));
             epsRV.setAdapter(new EpisodeAdapter(episodes));
+        }
+
+        ImageView playerArtwork = (ImageView)findViewById(R.id.splayer_art_iv);
+        if (playerArtwork != null){
+            playerArtwork.setImageBitmap(bitmap);
         }
     }
 
