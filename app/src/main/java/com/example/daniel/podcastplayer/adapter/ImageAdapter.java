@@ -24,8 +24,7 @@ public class ImageAdapter extends CursorAdapter{
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         ImageView iv = new ImageView(context);
-        iv.setLayoutParams(new GridView.LayoutParams(450, 450));
-        iv.setPadding(5, 5, 5, 5);
+        iv.setAdjustViewBounds(true);
         return iv;
     }
 

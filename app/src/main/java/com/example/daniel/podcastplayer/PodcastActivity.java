@@ -1,17 +1,13 @@
 package com.example.daniel.podcastplayer;
 
-import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,139 +16,77 @@ import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.Podcast;
-import com.example.daniel.podcastplayer.data.ResultParser;
-import com.example.daniel.podcastplayer.download.Downloader;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
-public class PodcastActivity extends AppCompatActivity implements Downloader.DownloadReceiver{
+public class PodcastActivity extends AppCompatActivity {
 
-    private RecyclerView rv;
-    private Button subsButton;
-    private ImageView artwork;
-
-    private String desc;
-    private Podcast podcast;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_podcast);
 
-        podcast = (Podcast)getIntent().getParcelableExtra(Podcast.class.getName());
+        long podcastId = Long.valueOf(getIntent().getExtras().getString(DbHelper.Tbls.COLUMN_ID));
+        Podcast p = buildPodcast(DbHelper.getInstance(this).getPodcast(podcastId));
 
-        TextView titleTV = (TextView)findViewById(R.id.pod_title_tv);
-        if (titleTV != null) titleTV.setText(podcast.getPodcastName());
+        //Set podcast data
+        TextView title = (TextView)findViewById(R.id.pod_title_tv);
+        if (title != null) title.setText(p.getPodcastName());
 
-        TextView artistTV = (TextView)findViewById(R.id.pod_artist_tv);
-        if (artistTV != null) artistTV.setText(podcast.getPodcastArtist());
+        TextView artist = (TextView)findViewById(R.id.pod_artist_tv);
+        if (artist != null) artist.setText(p.getPodcastArtist());
 
-        artwork = (ImageView)findViewById(R.id.pod_artwork);
-        if (artwork!=null) artwork.setImageBitmap(podcast.getArtwork());
-
-        //NetworkInfo networkInfo = ((ConnectivityManager)
-          //      getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-        //if (networkInfo != null && networkInfo.isConnected())
-            //Download the feed data
-            new AsyncTask<URL,Void,List<Episode>>(){
-                @Override
-                protected List<Episode> doInBackground(URL... params) {
-                    HttpURLConnection conn = null;
-                    InputStream stream = null;
-                    try{
-                        conn = (HttpURLConnection) (params[0]).openConnection();
-                        conn.connect();
-                        stream = conn.getInputStream();
-                    } catch (IOException e){e.printStackTrace();}
-                    List<Episode> result = ResultParser.getInstance().parseFeed(stream, 1);
-                    desc = ResultParser.getInstance().getDesc();
-                    try {stream.close();}
-                    catch (IOException e) {e.printStackTrace();}
-                    if (conn != null) conn.disconnect();
-                    return result;
-                }
-
-                @Override
-                protected void onPostExecute(List<Episode> episodes) {
-                    super.onPostExecute(episodes);
-                    EpisodeAdapter adapter = new EpisodeAdapter(episodes);
-                    rv.setAdapter(adapter);
-                    TextView descTV = (TextView)findViewById(R.id.pod_desc_tv);
-                    descTV.setText(desc);
-                }
-            }.execute(podcast.getFeedUrl());
-
-        //Setup the Subscribe button
-        subsButton = (Button)findViewById(R.id.subscribe_button);
-        if (subsButton != null) {
-            changeSubButtonText(DbHelper.getInstance(this).existsPodcast(podcast.getPodcastId()));
-
-            subsButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    DbHelper db = DbHelper.getInstance(v.getContext());
-                    boolean isSubscribed = false;
-                    if (((Button)v).getText().equals(getString(R.string.unsubscribe_button)))
-                        db.deletePodcast(podcast.getPodcastId());
-                    else {
-                        db.insertPodcast(podcast);
-                        isSubscribed = true;
-                        saveArtwork();
-                    }
-                    changeSubButtonText(isSubscribed);
-                }
-            });
+        File image = new File(getApplicationInfo().dataDir + "/Artwork", p.getPodcastId() + ".png");
+        Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
+        if (bitmap != null) {
+            ImageView iv = (ImageView)findViewById(R.id.pod_artwork);
+            if (iv!=null) iv.setImageBitmap(bitmap);
         }
 
-        //Initial setup for RecyclerView
-        rv = (RecyclerView)findViewById(R.id.episodes_rv);
-        rv.setLayoutManager(new LinearLayoutManager(this));
+        Button b = (Button) findViewById(R.id.subscribe_button);
+        if (b != null)
+            b.setText(getString(R.string.unsubscribe_button));
+            //TODO open alert and then delete podcast and close activity
 
-        //Dowload high res image
-        try{
-            Downloader.downloadImage(new URL(podcast.getArtworkURL()),this);
-        } catch (MalformedURLException me) { me.printStackTrace(); }
-    }
-
-    //Get the appropiate text if user is or not subscribed. If it is, then you should show Unsubs.
-    private void changeSubButtonText(boolean isSubscribed){
-        String text = (isSubscribed) ?
-                getString(R.string.unsubscribe_button) : getString(R.string.subscribe_button);
-        subsButton.setText(text);
-    }
-
-    public void saveArtwork(){
-        try {
-            //TODO remove Artwork directory hardcoded. Save such name in a static string somewhere
-            File dir = new File(getApplicationInfo().dataDir + "/Artwork");
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-            File image = new File(dir, String.valueOf(podcast.getPodcastId()) + ".png");
-            FileOutputStream fOut = new FileOutputStream(image);
-
-            if (artwork != null) {
-                Bitmap art = ((BitmapDrawable) artwork.getDrawable()).getBitmap();
-                art.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-            }
-            fOut.flush();
-            fOut.close();
-        } catch (IOException e) { e.printStackTrace(); }
-    }
-
-    @Override
-    public void receiveImage(Bitmap bitmap) {
-        if (artwork!=null){
-            artwork.setImageBitmap(bitmap);
-            //in case sub button was pressed before download finished
-            if (subsButton.getText().equals(getString(R.string.unsubscribe_button)))
-                saveArtwork();
+        List<Episode> episodes = buildEpisodes(DbHelper.getInstance(this).getEpisodes(podcastId));
+        RecyclerView epsRV = (RecyclerView)findViewById(R.id.episodes_rv);
+        if (epsRV != null){
+            epsRV.setLayoutManager(new LinearLayoutManager(this));
+            epsRV.setAdapter(new EpisodeAdapter(episodes));
         }
+    }
+
+    private List<Episode> buildEpisodes(Cursor c){
+        Log.d("Podcast Act", String.valueOf(c.getCount()));
+        List<Episode> episodes = new ArrayList<>();
+        while (c.moveToNext()){
+            Episode e = new Episode();
+            e.setEpTitle(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_TITLE)));
+            e.setEpDate(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_DATE)));
+            e.setLength(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_LENGTH)));
+            e.setEpURL(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_EP_URL)));
+            episodes.add(e);
+        }
+        c.close();
+        return episodes;
+    }
+
+    private Podcast buildPodcast(Cursor c){
+        Podcast p = null;
+        if (c.getCount() > 0){
+            c.moveToFirst();
+            p = new Podcast();
+            p.setPodcastId(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_ID)));
+            p.setPodcastName(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_TITLE)));
+            p.setPodcastArtist(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_ARTIST)));
+            try { p.setFeedUrl(new URL(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_FEED)))); }
+            catch (MalformedURLException me) { me.printStackTrace(); }
+        }
+        c.close();
+        return p;
     }
 }

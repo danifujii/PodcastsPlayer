@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.daniel.podcastplayer.PodcastActivity;
+import com.example.daniel.podcastplayer.PodcastSearchActivity;
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.Podcast;
 
@@ -43,7 +43,7 @@ public class PodResAdapter extends RecyclerView.Adapter<PodResAdapter.PodResView
             @Override
             public void onClick(View v) {
                 int pos = holder.getAdapterPosition();
-                Intent i = new Intent(v.getContext(), PodcastActivity.class);
+                Intent i = new Intent(v.getContext(), PodcastSearchActivity.class);
                 i.putExtra(Podcast.class.getName(),data.get(pos));
                 v.getContext().startActivity(i);
             }

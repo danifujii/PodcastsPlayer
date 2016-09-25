@@ -46,6 +46,7 @@ public class Episode {
     public void setEpDate(String epDate) {
         try {
             SimpleDateFormat ogFormat = new java.text.SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss");
+            //TODO change this, and just look, from the end, the first space and then delete
             Date ogDate = ogFormat.parse(epDate.substring(0, epDate.length()-6));
             SimpleDateFormat epFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
             this.epDate = epFormat.format(ogDate);

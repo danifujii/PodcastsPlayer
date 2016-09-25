@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 
 import com.example.daniel.podcastplayer.adapter.PodResAdapter;
-import com.example.daniel.podcastplayer.data.ResultParser;
+import com.example.daniel.podcastplayer.download.ResultParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -74,6 +74,7 @@ public class SearchFragment extends Fragment {
             BufferedReader reader = null;
             HttpURLConnection huc = null;
             try {
+                //TODO Just audio podcasts
                 URL myurl = new URL("https://itunes.apple.com/search?term=" + term + "&media=podcast");
                 huc = (HttpURLConnection) myurl.openConnection();
                 huc.connect();

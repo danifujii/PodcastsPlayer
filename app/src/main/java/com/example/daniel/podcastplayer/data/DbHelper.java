@@ -5,11 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
-/**
- * Created by Daniel on 23/9/2016.
- */
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class DbHelper extends SQLiteOpenHelper{
 
@@ -62,22 +60,50 @@ public class DbHelper extends SQLiteOpenHelper{
         db.close();
     }
 
+    public void insertEpisode(Episode e, long podcastId){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(Tbls.COLUMN_TITLE,e.getEpTitle());
+        values.put(Tbls.COLUMN_DATE,e.getEpDate());
+        values.put(Tbls.COLUMN_EP_URL,e.getEpURL());
+        values.put(Tbls.COLUMN_LENGTH,e.getLength());
+        values.put(Tbls.COLUMN_DOWNLOADED,false);
+        values.put(Tbls.COLUMN_LISTENED,"0.0");
+        values.put(Tbls.COLUMN_FK_POD,podcastId);
+        db.insert(Tbls.NAME_EPISODE, null, values);
+        db.close();
+    }
+
     public boolean existsPodcast(long podcastId){
         return (getWritableDatabase().rawQuery("SELECT 1 FROM "
             + Tbls.NAME_PODCAST + " WHERE " + Tbls.COLUMN_ID + "='" + String.valueOf(podcastId) + "'"
                 ,null).getCount())>0;
     }
 
+    public Cursor getPodcast(long podcastId){
+        return getWritableDatabase().rawQuery("SELECT * FROM "
+                + Tbls.NAME_PODCAST + " WHERE " + Tbls.COLUMN_ID + "='"
+                + String.valueOf(podcastId) + "'"
+                , null);
+    }
+
     public Cursor getPodcasts(){
         return getWritableDatabase().rawQuery("SELECT * FROM "
-            + Tbls.NAME_PODCAST, null);
+            + Tbls.NAME_PODCAST + " ORDER BY " + Tbls.COLUMN_TITLE, null);
+    }
+
+    public Cursor getEpisodes(long podcastId){
+        return getReadableDatabase().rawQuery("SELECT * FROM "
+                + Tbls.NAME_EPISODE + " WHERE " + Tbls.COLUMN_FK_POD + "='"
+                + String.valueOf(podcastId) + "' ORDER BY " + Tbls.COLUMN_DATE,
+                null);
     }
 
     public void deletePodcast(long podcastId){
         delete(Tbls.NAME_PODCAST, Tbls.COLUMN_ID, String.valueOf(podcastId));
     }
 
-    public void delete(String tableName, String columnName, String value){
+    private void delete(String tableName, String columnName, String value){
         String[] selectionArgs = { value };
         SQLiteDatabase db = getWritableDatabase();
         db.delete(tableName,

@@ -27,6 +27,8 @@ public class Podcast implements Parcelable{
     private URL feedUrl;
     private RecyclerView searchRecyclerView;
 
+    public Podcast(){}
+
     public Podcast(JSONObject json, RecyclerView rv){
         searchRecyclerView = rv;
         try {
@@ -94,6 +96,30 @@ public class Podcast implements Parcelable{
         return artworkURL;
     }
 
+    public void setPodcastId(long podcastId) {
+        this.podcastId = podcastId;
+    }
+
+    public void setPodcastName(String podcastName) {
+        this.podcastName = podcastName;
+    }
+
+    public void setPodcastArtist(String podcastArtist) {
+        this.podcastArtist = podcastArtist;
+    }
+
+    public void setFeedUrl(URL feedUrl) {
+        this.feedUrl = feedUrl;
+    }
+
+    public void setArtworkURL(String artworkURL) {
+        this.artworkURL = artworkURL;
+    }
+
+    public void setArtwork(Bitmap artwork) {
+        this.artwork = artwork;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -106,7 +132,9 @@ public class Podcast implements Parcelable{
         try { feedUrl = new URL(in.readString()); }
         catch (MalformedURLException me) { me.printStackTrace(); }
         artworkURL = in.readString();
-        artwork = Bitmap.CREATOR.createFromParcel(in);
+        int value = in.readInt();
+        if (value > 0)
+            artwork = Bitmap.CREATOR.createFromParcel(in);
     }
 
     @Override
@@ -116,8 +144,11 @@ public class Podcast implements Parcelable{
         dest.writeString(podcastArtist);
         dest.writeString(feedUrl.toString());
         dest.writeString(artworkURL);
-        if (artwork != null)
-            artwork.writeToParcel(dest,flags);
+        if (artwork != null) {
+            dest.writeInt(1);
+            artwork.writeToParcel(dest, flags);
+        }
+        else dest.writeInt(0);      //0 means no artwork is available to save
     }
 
     public static final Parcelable.Creator<Podcast> CREATOR

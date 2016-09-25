@@ -1,6 +1,9 @@
-package com.example.daniel.podcastplayer.data;
+package com.example.daniel.podcastplayer.download;
 
 import android.support.v7.widget.RecyclerView;
+
+import com.example.daniel.podcastplayer.data.Episode;
+import com.example.daniel.podcastplayer.data.Podcast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,7 +12,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
