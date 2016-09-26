@@ -15,6 +15,9 @@ import java.io.IOException;
 
 public class PodcastPlayerService {
 
+    private final static int skipForward = 30000;   //30 seconds
+    private final static int rewind = 10000;   //10 seconds
+
     private MediaPlayer mp = null;
     private Episode episode = null;
 
@@ -48,6 +51,18 @@ public class PodcastPlayerService {
 
     public void pausePlayback(){
         mp.pause();
+    }
+
+    public void forwardPlayback() {
+        if (mp.getCurrentPosition() + skipForward <= mp.getDuration())
+            mp.seekTo(mp.getCurrentPosition() + skipForward);
+        else mp.seekTo(mp.getDuration());
+    }
+
+    public void rewindPlayback(){
+        if (mp.getCurrentPosition() - rewind >= 0)
+            mp.seekTo(mp.getCurrentPosition()-rewind);
+        else mp.seekTo(0);
     }
 
     public boolean isPlaying(){

@@ -38,6 +38,10 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void setupPlayerUI(){
+        progressTV = (TextView) findViewById(R.id.player_progress_tv);
+        progressBar = (SeekBar)findViewById(R.id.player_progress_bar);
+        final ImageButton play = (ImageButton)findViewById(R.id.player_play_button);
+
         service = PodcastPlayerService.getInstance();
         Episode e = service.getEpisode();
 
@@ -48,7 +52,10 @@ public class PlayerActivity extends AppCompatActivity {
             artwork.setImageBitmap(bitmap);
         }
 
-        final ImageButton play = (ImageButton)findViewById(R.id.player_play_button);
+        TextView epTV = (TextView) findViewById(R.id.player_ep_tv);
+        if (epTV != null)
+            epTV.setText(e.getEpTitle());
+
         if (play != null){
             if (service.isPlaying())
                 play.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.ic_pause_black_48dp));
@@ -66,11 +73,7 @@ public class PlayerActivity extends AppCompatActivity {
             });
         }
 
-        TextView epTV = (TextView) findViewById(R.id.player_ep_tv);
-        if (epTV != null)
-            epTV.setText(e.getEpTitle());
-
-        progressBar = (SeekBar)findViewById(R.id.player_progress_bar);
+        //TODO Cuando termina la reproducción, no funciona muy bien el progress bar ni se cambia el boton.
         progressBar.setMax(service.getEpisode().getLength());
         progressBar.setProgress(service.getProgress() / 1000);
         progressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -97,6 +100,8 @@ public class PlayerActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 progressTV.setText(getTime(service.getProgress() / 1000) + divider + length);
+                                if (service.getProgress()==service.getEpisode().getLength())
+                                    changeButtonIcon(play);
                             }
                         });
                         try {
@@ -108,7 +113,29 @@ public class PlayerActivity extends AppCompatActivity {
             }
         }).start();
 
-        progressTV = (TextView) findViewById(R.id.player_progress_tv);
+
+        ImageButton rewindButton = (ImageButton) findViewById(R.id.player_rewind_button);
+        if (rewindButton !=  null)
+            rewindButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    service.rewindPlayback();
+                    progressBar.setProgress(service.getProgress() / 1000);
+                    progressTV.setText(getTime(service.getProgress() / 1000) + divider + length);
+                }
+            });
+
+        ImageButton forwardButton = (ImageButton) findViewById(R.id.player_forward_button);
+        if (forwardButton != null)
+            forwardButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    service.forwardPlayback();
+                    progressBar.setProgress(service.getProgress() / 1000);
+                    progressTV.setText(getTime(service.getProgress() / 1000) + divider + length);
+                }
+            });
+
         length = getTime(service.getEpisode().getLength());
         if (progressTV != null)
             progressTV.setText(getTime(service.getProgress() / 1000) + divider + length);
@@ -130,11 +157,11 @@ public class PlayerActivity extends AppCompatActivity {
             minutes = minutes % 60;
             builder.append(hours);
             builder.append(':');
-            builder.append(minutes);
         }
-        else
-            builder.append(minutes);
+        if (minutes < 10) builder.append('0');
+        builder.append(minutes);
         builder.append(":");
+        if (seconds < 10) builder.append('0');
         builder.append(seconds);
         return builder.toString();
     }

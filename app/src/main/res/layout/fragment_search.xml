@@ -9,7 +9,8 @@
         android:id="@+id/search_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:iconifiedByDefault="false" />
+        android:iconifiedByDefault="false"
+        android:paddingTop="@dimen/activity_small_margin"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/search_recycler_view"
