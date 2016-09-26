@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_player"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.daniel.podcastplayer.activity.PlayerActivity">
+
+    <LinearLayout
+        android:id="@+id/player_episode_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/activity_big_margin"
+        android:paddingBottom="@dimen/activity_big_margin"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:background="@color/colorPrimaryDark">
+
+        <ImageView
+            android:id="@+id/player_artwork_iv"
+            android:layout_width="@dimen/player_image_size"
+            android:layout_height="@dimen/player_image_size"
+            />
+
+        <TextView
+            android:id="@+id/player_ep_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingTop="@dimen/activity_horizontal_margin"
+            android:textColor="@color/white"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="20sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/player_controls_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/activity_big_margin"
+        android:paddingBottom="@dimen/activity_horizontal_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:layout_below="@+id/player_episode_layout">
+
+        <SeekBar
+            android:id="@+id/player_progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/player_progress_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="00:22/22:22"/>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:paddingTop="@dimen/activity_big_margin">
+            
+            <ImageButton
+                android:id="@+id/player_rewind_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_fast_rewind_black_48dp"
+                android:background="@null"/>
+
+            <ImageButton
+                android:id="@+id/player_play_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_play_arrow_black_48dp"
+                android:background="@null"
+                android:layout_marginRight="@dimen/activity_medium_margin"
+                android:layout_marginLeft="@dimen/activity_medium_margin"/>
+
+            <ImageButton
+                android:id="@+id/player_forward_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_fast_forward_black_48dp"
+                android:background="@null"/>
+            
+        </LinearLayout>
+
+    </LinearLayout>
+    
+</RelativeLayout>

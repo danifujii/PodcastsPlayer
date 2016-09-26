@@ -11,7 +11,7 @@ public class Episode {
     private String epTitle;
     private String epDate;
     private String epURL;
-    private long length;
+    private int length;
     private long podcastId;
     private boolean downloaded; //used for UI purposes mainly
 
@@ -31,7 +31,7 @@ public class Episode {
         return epURL;
     }
 
-    public long getLength() {
+    public int getLength() {
         return length;
     }
 
@@ -39,7 +39,7 @@ public class Episode {
 
     public boolean getDownloaded() { return downloaded; }
 
-    public void setLength(long length) {
+    public void setLength(int length) {
         this.length = length;
     }
 

@@ -1,16 +1,20 @@
 package com.example.daniel.podcastplayer.player;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
+import com.example.daniel.podcastplayer.activity.PlayerActivity;
 import com.example.daniel.podcastplayer.data.Episode;
 
 import java.io.File;
@@ -20,9 +24,11 @@ import java.io.File;
  */
 
 public class PlayerSheetManager {
+
     //containter activity has the UI
     public void setSheetInterface(Episode e, Activity container){
-        if (container.findViewById(R.id.splayer) != null){
+        ViewGroup splayerLayout = (ViewGroup)container.findViewById(R.id.splayer_layout);
+        if (splayerLayout != null){
             File image = new File(container.getApplicationInfo().dataDir + "/Artwork", e.getPodcastId() + ".png");
             Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
             ImageView artworkIV = (ImageView)container.findViewById(R.id.splayer_art_iv);
@@ -34,7 +40,14 @@ public class PlayerSheetManager {
                 episodeTV.setText(e.getEpTitle());
 
             setPlayButton(container);
-        } else Log.d("Player sheet man", "Is null");
+
+            splayerLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    v.getContext().startActivity(new Intent(v.getContext(),PlayerActivity.class));
+                }
+            });
+        }
     }
 
     private void setPlayButton(Activity container){

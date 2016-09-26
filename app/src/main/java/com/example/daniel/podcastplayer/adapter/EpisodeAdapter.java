@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,6 +110,9 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
                 Environment.getExternalStorageDirectory().getAbsolutePath()
                     + "/Android/data/com.example.daniel.podcastplayer/files/"
                     + context.getFilesDir().getAbsolutePath() + "/" + fileName);
+        Log.d("Episode adapter", Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/Android/data/com.example.daniel.podcastplayer/files/"
+                + context.getFilesDir().getAbsolutePath() + "/" + fileName);
         return f.isFile();
     }
 

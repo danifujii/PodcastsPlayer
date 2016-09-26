@@ -1,4 +1,4 @@
-package com.example.daniel.podcastplayer;
+package com.example.daniel.podcastplayer.activity;
 
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
@@ -108,7 +109,7 @@ public class PodcastActivity extends AppCompatActivity {
             Episode e = new Episode(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_FK_POD)));
             e.setEpTitle(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_TITLE)));
             e.setEpDate(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_DATE)));
-            e.setLength(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_LENGTH)));
+            e.setLength(c.getInt(c.getColumnIndex(DbHelper.Tbls.COLUMN_LENGTH)));
             e.setEpURL(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_EP_URL)));
             episodes.add(e);
         }

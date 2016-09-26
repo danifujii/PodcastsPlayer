@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.daniel.podcastplayer.PodcastSearchActivity;
+import com.example.daniel.podcastplayer.activity.PodcastSearchActivity;
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.Podcast;
 

@@ -1,6 +1,7 @@
 package com.example.daniel.podcastplayer.download;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.Podcast;
@@ -18,6 +19,8 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import static android.R.attr.duration;
 
 public class ResultParser {
 
@@ -62,8 +65,10 @@ public class ResultParser {
                 Element n = (Element)episodes.item(i);
                 e.setEpTitle(n.getElementsByTagName("title").item(0).getTextContent());
                 e.setEpDate(n.getElementsByTagName("pubDate").item(0).getTextContent());
+                e.setLength(getSeconds(n.getElementsByTagName("itunes:duration").item(0)
+                        .getTextContent()));
                 Element url = (Element)n.getElementsByTagName("enclosure").item(0);
-                e.setLength(Long.valueOf(url.getAttribute("length")));
+                //e.setLength(Integer.valueOf(url.getAttribute("length")));
                 e.setEpURL(url.getAttribute("url"));
 
                 result.add(e);
@@ -72,6 +77,30 @@ public class ResultParser {
         } catch (Exception e) { e.printStackTrace(); }
 
         return result;
+    }
+
+    private int getSeconds(String duration){
+        int result = 0;
+        for (int i = 2 ; i >= 0 ; i--){
+            result = result + getTimeComponent(duration) * (int)Math.pow(60,i);
+            duration = duration.substring(duration.indexOf(':')+1);
+            Log.d("ResultParser",duration);
+        }
+        Log.d("ResultParser","Duration:"+duration);
+        Log.d("ResultParser","Result:"+String.valueOf(result));
+        return result;
+    }
+
+    //get either hour, minute or second, adding until finding a :
+    private int getTimeComponent(String time){
+        int index = 0;
+        StringBuilder aux = new StringBuilder();
+        while (index < time.length() && time.charAt(index)!=':'){
+            aux.append(time.charAt(index));
+            index++;
+        }
+        Log.d("ResultParser",String.valueOf(Integer.parseInt(aux.toString())));
+        return Integer.parseInt(aux.toString());
     }
 
     public String getDesc() {

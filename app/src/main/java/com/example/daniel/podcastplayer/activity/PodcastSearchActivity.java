@@ -1,4 +1,4 @@
-package com.example.daniel.podcastplayer;
+package com.example.daniel.podcastplayer.activity;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.Podcast;
@@ -103,6 +104,7 @@ public class PodcastSearchActivity extends AppCompatActivity implements Download
                     DbHelper db = DbHelper.getInstance(v.getContext());
                     boolean isSubscribed = false;
                     if (((Button)v).getText().equals(getString(R.string.unsubscribe_button)))
+                        //TODO probar esto bien, me parece que no funciona bien. Lo probe y quedaron los episodios 2 veces. Habria que borrar los podcasts bajados tmb
                         db.deletePodcast(podcast.getPodcastId());
                     else {
                         db.insertPodcast(podcast);

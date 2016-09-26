@@ -68,6 +68,18 @@ public class PodcastPlayerService {
         return episode;
     }
 
+    public int getProgress(){
+        if (mp != null){
+            return mp.getCurrentPosition();
+        }
+        return -1;
+    }
+
+    public void setProgress(int progress){
+        mp.seekTo(progress);
+        mp.start();
+    }
+
     private File getEpisodeFile(String filename, Context context){
         File f = new File(
                 Environment.getExternalStorageDirectory().getAbsolutePath()
