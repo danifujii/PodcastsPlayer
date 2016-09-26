@@ -56,6 +56,10 @@ public class PodcastPlayerService {
             return mp.isPlaying();
     }
 
+    public boolean isStarted(){
+        return (mp!=null);
+    }
+
     public void releasePlayer(){
         //TODO use this in every activity that could be stopped with this playing: Podcast and Main Act for sure
         if (mp != null) {

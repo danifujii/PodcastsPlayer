@@ -55,8 +55,7 @@
             android:id="@+id/player_progress_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="00:22/22:22"/>
+            android:layout_gravity="center_horizontal" />
         
         <LinearLayout
             android:layout_width="match_parent"

@@ -68,8 +68,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         PodcastPlayerService pps = PodcastPlayerService.getInstance();
-        if (pps.isPlaying()){
-            Log.d("MAIN ACT","IS PLAYING");
+        if (pps.isStarted()){
             findViewById(R.id.splayer_layout).setVisibility(View.VISIBLE);
             PlayerSheetManager psm = new PlayerSheetManager();
             psm.setSheetInterface(pps.getEpisode(),this);

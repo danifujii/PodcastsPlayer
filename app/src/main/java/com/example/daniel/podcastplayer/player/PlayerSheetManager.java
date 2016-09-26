@@ -68,6 +68,13 @@ public class PlayerSheetManager {
                     }
                 }
             });
+
+            //Setup the icon accordingly
+            if (PodcastPlayerService.getInstance().isPlaying())
+                playButton.setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
+                        R.drawable.ic_pause_black_24dp));
+            else playButton.setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
+                    R.drawable.ic_play_arrow_black_24dp));
         }
     }
 }
