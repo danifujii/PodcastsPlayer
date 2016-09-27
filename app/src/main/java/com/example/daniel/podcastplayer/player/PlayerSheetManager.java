@@ -29,6 +29,8 @@ public class PlayerSheetManager {
     public void setSheetInterface(Episode e, Activity container){
         ViewGroup splayerLayout = (ViewGroup)container.findViewById(R.id.splayer_layout);
         if (splayerLayout != null){
+            splayerLayout.setVisibility(View.VISIBLE);
+
             File image = new File(container.getApplicationInfo().dataDir + "/Artwork", e.getPodcastId() + ".png");
             Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
             ImageView artworkIV = (ImageView)container.findViewById(R.id.splayer_art_iv);
@@ -70,11 +72,16 @@ public class PlayerSheetManager {
             });
 
             //Setup the icon accordingly
-            if (PodcastPlayerService.getInstance().isPlaying())
+            if (PodcastPlayerService.getInstance().isPlaying()) {
                 playButton.setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
                         R.drawable.ic_pause_black_24dp));
-            else playButton.setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
-                    R.drawable.ic_play_arrow_black_24dp));
+                Log.d("TAG","Playing!");
+            }
+            else {
+                playButton.setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
+                        R.drawable.ic_play_arrow_black_24dp));
+                Log.d("TAG","Not Playing!");
+            }
         }
     }
 }

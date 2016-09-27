@@ -28,7 +28,8 @@
             android:textColor="@color/darkGray"
             android:textSize="17sp"
             android:layout_gravity="center_vertical"
-            android:paddingLeft="@dimen/activity_medium_margin"/>
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/player_sheet_tv_margin"/>
 
     </LinearLayout>
 

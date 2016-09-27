@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
+import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.Podcast;
@@ -85,7 +86,8 @@ public class PodcastSearchActivity extends AppCompatActivity implements Download
                     //rv.setAdapter(adapter);
                     if (episodes.size() > 0){
                         ((TextView)findViewById(R.id.ep_title_tv)).setText(episodes.get(0).getEpTitle());
-                        ((TextView)findViewById(R.id.ep_date_tv)).setText(episodes.get(0).getEpDate());
+                        ((TextView)findViewById(R.id.ep_date_tv)).
+                                setText(EpisodeAdapter.getDateFormat(episodes.get(0).getEpDate()));
                     }
                     TextView descTV = (TextView)findViewById(R.id.pod_desc_tv);
                     descTV.setText(desc);
@@ -112,7 +114,6 @@ public class PodcastSearchActivity extends AppCompatActivity implements Download
                         saveArtwork();
                         //TODO consider if episodes where not downloaded before subscribing
                         if (parsedEpisodes != null) {
-                            Log.d("PODCAST SEARCH", String.valueOf(parsedEpisodes.size()));
                             for (Episode e : parsedEpisodes)
                                 db.insertEpisode(e, podcast.getPodcastId());
                         }

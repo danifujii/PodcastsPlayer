@@ -12,7 +12,7 @@ import java.net.URL;
 public class DbHelper extends SQLiteOpenHelper{
 
     private static final int DATABASE_VERSION = 2;
-    private static final String DATABASE_NAME = "PodcastPlayerMov.db";
+    public static final String DATABASE_NAME = "PodcastPlayerMov.db";
     private static DbHelper mInstance;
 
     //CREATION SCRIPTS
@@ -92,10 +92,11 @@ public class DbHelper extends SQLiteOpenHelper{
             + Tbls.NAME_PODCAST + " ORDER BY " + Tbls.COLUMN_TITLE, null);
     }
 
+    //TODO no muestra en orden bien esto. Algo esta mal
     public Cursor getEpisodes(long podcastId){
         return getReadableDatabase().rawQuery("SELECT * FROM "
                 + Tbls.NAME_EPISODE + " WHERE " + Tbls.COLUMN_FK_POD + "='"
-                + String.valueOf(podcastId) + "' ORDER BY " + Tbls.COLUMN_DATE,
+                + String.valueOf(podcastId) + "' ORDER BY " + Tbls.COLUMN_DATE + " DESC",
                 null);
     }
 

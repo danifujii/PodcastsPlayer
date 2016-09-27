@@ -25,6 +25,8 @@ import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.download.Downloader;
+import com.example.daniel.podcastplayer.player.PlayerSheetManager;
+import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 import com.example.daniel.podcastplayer.receiver.DownloadReceiver;
 
 import java.io.File;
@@ -76,6 +78,10 @@ public class PodcastActivity extends AppCompatActivity {
         if (playerArtwork != null){
             playerArtwork.setImageBitmap(bitmap);
         }
+
+        PodcastPlayerService service = PodcastPlayerService.getInstance();
+        if (service.isStarted())
+            (new PlayerSheetManager()).setSheetInterface(service.getEpisode(),this);
     }
 
     @Override

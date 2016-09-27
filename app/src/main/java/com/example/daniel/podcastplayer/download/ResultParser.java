@@ -14,8 +14,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,7 +51,7 @@ public class ResultParser {
         return parseFeed(is, Integer.MAX_VALUE, podcastId);
     }
 
-    public List<Episode> parseFeed(InputStream is, int limit, long podcastId){
+    private List<Episode> parseFeed(InputStream is, int limit, long podcastId){
         List<Episode> result = new ArrayList<>();
         try{
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -64,7 +68,7 @@ public class ResultParser {
                 Episode e = new Episode(podcastId);
                 Element n = (Element)episodes.item(i);
                 e.setEpTitle(n.getElementsByTagName("title").item(0).getTextContent());
-                e.setEpDate(n.getElementsByTagName("pubDate").item(0).getTextContent());
+                e.setEpDate(getDate(n.getElementsByTagName("pubDate").item(0).getTextContent()));
                 e.setLength(getSeconds(n.getElementsByTagName("itunes:duration").item(0)
                         .getTextContent()));
                 Element url = (Element)n.getElementsByTagName("enclosure").item(0);
@@ -86,8 +90,6 @@ public class ResultParser {
             duration = duration.substring(duration.indexOf(':')+1);
             Log.d("ResultParser",duration);
         }
-        Log.d("ResultParser","Duration:"+duration);
-        Log.d("ResultParser","Result:"+String.valueOf(result));
         return result;
     }
 
@@ -99,11 +101,31 @@ public class ResultParser {
             aux.append(time.charAt(index));
             index++;
         }
-        Log.d("ResultParser",String.valueOf(Integer.parseInt(aux.toString())));
         return Integer.parseInt(aux.toString());
     }
 
     public String getDesc() {
         return desc;
+    }
+
+    //Remove the timezone data and hour
+    private String getDate(String pubDate){
+        Log.d("TAG2", pubDate);
+        int index = pubDate.length() - 1;
+        int ammount = 2;
+        while (ammount > 0){
+            index--;
+            if (pubDate.charAt(index)==' ')
+                ammount = ammount - 1;
+        }
+
+        String result = pubDate.substring(5,index);//.replace(' ','-');
+        SimpleDateFormat ogFormat = new SimpleDateFormat("dd MMM yyyy", Locale.US);
+        Date d = null;
+        try{
+            d = ogFormat.parse(result);
+        } catch(ParseException e){ e.printStackTrace(); }
+        SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        return dbFormat.format(d);
     }
 }

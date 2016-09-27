@@ -36,6 +36,12 @@ public class PodcastPlayerService {
         if (episode==null || !episode.getEpURL().equals(e.getEpURL()))
             try {
                 mp.reset();
+                mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mp) {
+                        mp.start();
+                    }
+                });
                 mp.setDataSource(context,
                         Uri.parse(getEpisodeFile(URLUtil.guessFileName(e.getEpURL(),null,null)
                                 , context).getAbsolutePath()));
@@ -43,7 +49,8 @@ public class PodcastPlayerService {
             } catch (IOException excep) {
                 excep.printStackTrace();
             }
-        mp.start();
+            //if same episode, already prepared so resume playback
+        else if (episode.getEpURL().equals(e.getEpURL())) mp.start();
         this.episode = e;
     }
 

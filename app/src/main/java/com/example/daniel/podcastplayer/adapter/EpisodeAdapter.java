@@ -15,12 +15,17 @@ import android.webkit.URLUtil;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.Episode;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeViewHolder>{
 
@@ -45,7 +50,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
     public void onBindViewHolder(final EpisodeAdapter.EpisodeViewHolder holder, int position) {
         Episode item = data.get(position);
         holder.nameTV.setText(item.getEpTitle());
-        holder.dateTV.setText(item.getEpDate());
+        holder.dateTV.setText(getDateFormat(item.getEpDate()));
 
         holder.downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,7 +67,14 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
                                     , v.getContext().getFilesDir().getAbsolutePath()
                                     , URLUtil.guessFileName(ep.getEpURL(), null, null)));
                 }
-                else setPlayerSheet(ep);
+                else{
+                    PodcastPlayerService player = PodcastPlayerService.getInstance();
+                    //if (player.getEpisode() != ep || !player.isPlaying())    //avoid restarting an episode already playing
+                        player.startPlayback(ep,activity);
+
+                    PlayerSheetManager psm = new PlayerSheetManager();
+                    psm.setSheetInterface(ep, activity);
+                }
             }
         });
 
@@ -132,6 +144,16 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
             nameTV = (TextView)itemView.findViewById(R.id.ep_title_tv);
             downloadButton = (ImageButton)itemView.findViewById(R.id.ep_download_button);
         }
+    }
+
+    public static String getDateFormat(String ogDate){
+        SimpleDateFormat format = new java.text.SimpleDateFormat("E, MM dd yyyy", Locale.US);
+        SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        try{
+            Date d = dbFormat.parse(ogDate);
+            return format.format(d);
+        } catch (ParseException e) { e.printStackTrace(); }
+        return null;
     }
 
 }

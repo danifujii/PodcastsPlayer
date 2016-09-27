@@ -11,6 +11,7 @@ import com.example.daniel.podcastplayer.NewPodcastsFragment;
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.SearchFragment;
 import com.example.daniel.podcastplayer.SubscriptionsFragment;
+import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 import com.roughike.bottombar.BottomBar;
