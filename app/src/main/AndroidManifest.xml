@@ -22,14 +22,7 @@
         </activity>
         <activity android:name=".activity.PodcastSearchActivity" />
         <activity android:name=".activity.PodcastActivity" />
-
-        <receiver android:name=".receiver.DownloadReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.AIRPLANE_MODE" />
-            </intent-filter>
-        </receiver>
-
-        <activity android:name=".activity.PlayerActivity"></activity>
+        <activity android:name=".activity.PlayerActivity"/>
     </application>
 
 </manifest>
