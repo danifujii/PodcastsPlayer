@@ -23,6 +23,7 @@ import java.util.List;
  */
 public class NewPodcastsFragment extends Fragment {
 
+    private RecyclerView rv;
 
     public NewPodcastsFragment() {
         // Required empty public constructor
@@ -34,12 +35,16 @@ public class NewPodcastsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_new_podcasts, container, false);
 
-        RecyclerView rv = (RecyclerView)v.findViewById(R.id.new_episodes_rv);
+        rv = (RecyclerView)v.findViewById(R.id.new_episodes_rv);
         rv.setLayoutManager(new LinearLayoutManager(v.getContext()));
-        List<Episode> latest = DbHelper.getInstance(v.getContext()).getLatestEpisodes();
-        rv.setAdapter(new EpisodeAdapter(latest));
-
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        List<Episode> latest = DbHelper.getInstance(getContext()).getLatestEpisodes();
+        rv.setAdapter(new EpisodeAdapter(latest));
+    }
 }

@@ -82,8 +82,6 @@ public class PodcastSearchActivity extends AppCompatActivity implements Download
                 @Override
                 protected void onPostExecute(List<Episode> episodes) {
                     super.onPostExecute(episodes);
-                    //EpisodeAdapter adapter = new EpisodeAdapter(episodes);
-                    //rv.setAdapter(adapter);
                     if (episodes.size() > 0){
                         ((TextView)findViewById(R.id.ep_title_tv)).setText(episodes.get(0).getEpTitle());
                         ((TextView)findViewById(R.id.ep_date_tv)).
@@ -92,6 +90,7 @@ public class PodcastSearchActivity extends AppCompatActivity implements Download
                     TextView descTV = (TextView)findViewById(R.id.pod_desc_tv);
                     descTV.setText(desc);
                     parsedEpisodes = episodes;
+                    subsButton.setEnabled(true);
                 }
             }.execute(podcast.getFeedUrl());
 
@@ -111,7 +110,6 @@ public class PodcastSearchActivity extends AppCompatActivity implements Download
                         db.insertPodcast(podcast);
                         isSubscribed = true;
                         saveArtwork();
-                        //TODO consider if episodes where not downloaded before subscribing
                         if (parsedEpisodes != null) {
                             for (Episode e : parsedEpisodes)
                                 db.insertEpisode(e, podcast.getPodcastId());
@@ -136,6 +134,8 @@ public class PodcastSearchActivity extends AppCompatActivity implements Download
         String text = (isSubscribed) ?
                 getString(R.string.unsubscribe_button) : getString(R.string.subscribe_button);
         subsButton.setText(text);
+        if (text.equals(getString(R.string.subscribe_button)))
+            subsButton.setEnabled(false);
     }
 
     public void saveArtwork(){
