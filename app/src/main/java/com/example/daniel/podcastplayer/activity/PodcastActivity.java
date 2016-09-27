@@ -27,7 +27,6 @@ import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.download.Downloader;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
-import com.example.daniel.podcastplayer.receiver.DownloadReceiver;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -46,7 +45,7 @@ public class PodcastActivity extends AppCompatActivity {
         setContentView(R.layout.activity_podcast);
 
         long podcastId = Long.valueOf(getIntent().getExtras().getString(DbHelper.Tbls.COLUMN_ID));
-        Podcast p = buildPodcast(DbHelper.getInstance(this).getPodcast(podcastId));
+        Podcast p = DbHelper.getInstance(this).getPodcast(podcastId);
 
         //Set podcast data
         TextView title = (TextView)findViewById(R.id.pod_title_tv);
@@ -67,7 +66,7 @@ public class PodcastActivity extends AppCompatActivity {
             b.setText(getString(R.string.unsubscribe_button));
             //TODO open alert and then delete podcast and close activity
 
-        List<Episode> episodes = buildEpisodes(DbHelper.getInstance(this).getEpisodes(podcastId));
+        List<Episode> episodes = DbHelper.getInstance(this).getEpisodes(podcastId);
         RecyclerView epsRV = (RecyclerView)findViewById(R.id.episodes_rv);
         if (epsRV != null){
             epsRV.setLayoutManager(new LinearLayoutManager(this));
@@ -105,36 +104,6 @@ public class PodcastActivity extends AppCompatActivity {
             }
         };
         registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-        registerReceiver(new DownloadReceiver(), new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
-    public static List<Episode> buildEpisodes(Cursor c){
-        //TODO Separate this into another class, so it can be used from NewPodcastsFragment
-        List<Episode> episodes = new ArrayList<>();
-        while (c.moveToNext()){
-            Episode e = new Episode(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_FK_POD)));
-            e.setEpTitle(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_TITLE)));
-            e.setEpDate(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_DATE)));
-            e.setLength(c.getInt(c.getColumnIndex(DbHelper.Tbls.COLUMN_LENGTH)));
-            e.setEpURL(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_EP_URL)));
-            episodes.add(e);
-        }
-        c.close();
-        return episodes;
-    }
-
-    private Podcast buildPodcast(Cursor c){
-        Podcast p = null;
-        if (c.getCount() > 0){
-            c.moveToFirst();
-            p = new Podcast();
-            p.setPodcastId(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_ID)));
-            p.setPodcastName(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_TITLE)));
-            p.setPodcastArtist(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_ARTIST)));
-            try { p.setFeedUrl(new URL(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_FEED)))); }
-            catch (MalformedURLException me) { me.printStackTrace(); }
-        }
-        c.close();
-        return p;
-    }
 }

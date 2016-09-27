@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper{
 
@@ -80,11 +82,12 @@ public class DbHelper extends SQLiteOpenHelper{
                 ,null).getCount())>0;
     }
 
-    public Cursor getPodcast(long podcastId){
-        return getWritableDatabase().rawQuery("SELECT * FROM "
+    public Podcast getPodcast(long podcastId){
+        Cursor c =getWritableDatabase().rawQuery("SELECT * FROM "
                 + Tbls.NAME_PODCAST + " WHERE " + Tbls.COLUMN_ID + "='"
                 + String.valueOf(podcastId) + "'"
                 , null);
+        return buildPodcast(c);
     }
 
     public Cursor getPodcasts(){
@@ -92,26 +95,58 @@ public class DbHelper extends SQLiteOpenHelper{
             + Tbls.NAME_PODCAST + " ORDER BY " + Tbls.COLUMN_TITLE, null);
     }
 
-    //TODO no muestra en orden bien esto. Algo esta mal
-    public Cursor getEpisodes(long podcastId){
-        return getReadableDatabase().rawQuery("SELECT * FROM "
+    public Podcast buildPodcast(Cursor c){
+        Podcast p = null;
+        if (c.getCount() > 0){
+            c.moveToFirst();
+            p = new Podcast();
+            p.setPodcastId(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_ID)));
+            p.setPodcastName(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_TITLE)));
+            p.setPodcastArtist(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_ARTIST)));
+            try { p.setFeedUrl(new URL(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_FEED)))); }
+            catch (MalformedURLException me) { me.printStackTrace(); }
+        }
+        c.close();
+        return p;
+    }
+
+    public List<Episode> getEpisodes(long podcastId){
+        Cursor c = getReadableDatabase().rawQuery("SELECT * FROM "
                 + Tbls.NAME_EPISODE + " WHERE " + Tbls.COLUMN_FK_POD + "='"
                 + String.valueOf(podcastId) + "' ORDER BY " + Tbls.COLUMN_DATE + " DESC",
                 null);
+        return buildEpisodes(c);
     }
 
     //Get latest, non listened episodes from each podcast
-    public Cursor getLatestEpisodes(){
-        return getReadableDatabase().rawQuery("SELECT e1.* FROM " + Tbls.NAME_EPISODE + " e1"
+    public List<Episode> getLatestEpisodes(){
+        Cursor c = getReadableDatabase().rawQuery("SELECT e1.* FROM " + Tbls.NAME_EPISODE + " e1"
                 + " JOIN (SELECT " + Tbls.COLUMN_ID + ", MAX( " + Tbls.COLUMN_DATE + ") date "
                 + " FROM " +Tbls.NAME_EPISODE + " WHERE " + Tbls.COLUMN_LISTENED + "=0 "
                 + " GROUP BY " + Tbls.COLUMN_FK_POD +" ) e2"
                 + " ON e1." + Tbls.COLUMN_ID+"=e2."+Tbls.COLUMN_ID
                 + " AND e1."+ Tbls.COLUMN_DATE+"=e2.date", null);
+        return buildEpisodes(c);
+    }
+
+    private List<Episode> buildEpisodes(Cursor c)
+    {
+        List<Episode> episodes = new ArrayList<>();
+        while (c.moveToNext()){
+            Episode e = new Episode(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_FK_POD)));
+            e.setEpTitle(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_TITLE)));
+            e.setEpDate(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_DATE)));
+            e.setLength(c.getInt(c.getColumnIndex(DbHelper.Tbls.COLUMN_LENGTH)));
+            e.setEpURL(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_EP_URL)));
+            episodes.add(e);
+        }
+        c.close();
+        return episodes;
     }
 
     public void deletePodcast(long podcastId){
         delete(Tbls.NAME_PODCAST, Tbls.COLUMN_ID, String.valueOf(podcastId));
+        delete(Tbls.NAME_EPISODE, Tbls.COLUMN_FK_POD, String.valueOf(podcastId));
     }
 
     private void delete(String tableName, String columnName, String value){

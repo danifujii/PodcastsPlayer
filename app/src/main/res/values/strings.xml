@@ -9,4 +9,6 @@
     <string name="unsubscribe_button">Unsubscribe</string>
     <string name="latest_ep">Latest episode</string>
     <string name="show_desc">Show description</string>
+
+    <string name="error_no_connection">No network connection!</string>
 </resources>

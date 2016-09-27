@@ -141,7 +141,6 @@ public class PodcastSearchActivity extends AppCompatActivity implements Download
 
     public void saveArtwork(){
         try {
-            //TODO remove Artwork directory hardcoded. Save such name in a static string somewhere
             File dir = new File(getApplicationInfo().dataDir + "/Artwork");
             if (!dir.exists()) {
                 dir.mkdirs();

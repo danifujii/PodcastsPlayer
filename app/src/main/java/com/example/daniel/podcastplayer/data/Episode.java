@@ -51,23 +51,7 @@ public class Episode {
         this.epURL = epURL;
     }
 
-    public void setEpDate(String epDate) {
-        SimpleDateFormat ogFormat = new java.text.SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss");
-        SimpleDateFormat epFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
-        //Log.d("TAG",epDate);
-        //this.epDate = epFormat.format(epDate);
-        this.epDate = epDate;
-        //TODO change this, and just look, from the end, the first space and then delete
-        //Date ogDate = ogFormat.parse(epDate.substring(0, epDate.length()-6));
-        //try{
-          //  Date ogDate = ogFormat.parse(epDate);
-          //  this.epDate = epFormat.format(ogDate);
-        //}
-        //catch (ParseException pe) {
-          //  Log.d("TAG",epDate);
-          //  this.epDate = epFormat.format(epDate);
-        //}
-    }
+    public void setEpDate(String epDate) { this.epDate = epDate; }
 
     public void setDownloaded(boolean downloaded) {
         this.downloaded = downloaded;

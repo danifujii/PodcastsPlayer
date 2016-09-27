@@ -71,7 +71,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
                     PodcastPlayerService player = PodcastPlayerService.getInstance();
                     //if (player.getEpisode() != ep || !player.isPlaying())    //avoid restarting an episode already playing
                         player.startPlayback(ep,activity);
-
+                    //TODO Como el comienzo del player ahora es async, puede terminar luego de que se setea la interfaz
+                    //haciendo que el boton no aparezca como Pause y quede como Play
                     PlayerSheetManager psm = new PlayerSheetManager();
                     psm.setSheetInterface(ep, activity);
                 }
@@ -88,43 +89,12 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
                 R.drawable.ic_file_download_black_24dp));
     }
 
-    private void setPlayerSheet(final Episode e){
-        //TODO change this, now there is a PlayerSheetManager to handle this UI
-        activity.findViewById(R.id.splayer_layout).setVisibility(View.VISIBLE);
-        ((TextView)activity.findViewById(R.id.splayer_ep_tv)).setText(e.getEpTitle());
-        final ImageButton playButton = (ImageButton)activity.findViewById(R.id.splayer_play_button);
-        //TODO change layout in PodcastActivity so that there is no RecyclerView at the end, because the button behind the Play/pause in the sheet
-        // is capturing the play event too. Starting download or playback.
-        if (playButton != null) {
-            playButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    PodcastPlayerService player = PodcastPlayerService.getInstance();
-                    if (player.isPlaying()) {
-                        player.pausePlayback();
-                        playButton.setImageBitmap(BitmapFactory.decodeResource(v.getResources(),
-                                R.drawable.ic_play_arrow_black_24dp));
-                    }else {
-                        player.startPlayback(e , activity);
-                        playButton.setImageBitmap(BitmapFactory.decodeResource(v.getResources(),
-                                R.drawable.ic_pause_black_24dp));
-                    }
-                }
-            });
-            //TODO revisar esto ya que genera que el boton fuera del PlayerSheet pueda pausar la reproducción actual.
-            playButton.performClick();
-        }
-    }
-
     private boolean existsFile(String fileName, Context context){
         //TODO see if you can change this hardcoded route
         File f = new File(
                 Environment.getExternalStorageDirectory().getAbsolutePath()
                     + "/Android/data/com.example.daniel.podcastplayer/files/"
                     + context.getFilesDir().getAbsolutePath() + "/" + fileName);
-        Log.d("Episode adapter", Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/Android/data/com.example.daniel.podcastplayer/files/"
-                + context.getFilesDir().getAbsolutePath() + "/" + fileName);
         return f.isFile();
     }
 

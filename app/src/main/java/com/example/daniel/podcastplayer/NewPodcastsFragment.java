@@ -34,11 +34,9 @@ public class NewPodcastsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_new_podcasts, container, false);
 
-        //TODO already downloaded episodes dont show up
         RecyclerView rv = (RecyclerView)v.findViewById(R.id.new_episodes_rv);
         rv.setLayoutManager(new LinearLayoutManager(v.getContext()));
-        Cursor c = DbHelper.getInstance(v.getContext()).getLatestEpisodes();
-        List<Episode> latest = PodcastActivity.buildEpisodes(c);
+        List<Episode> latest = DbHelper.getInstance(v.getContext()).getLatestEpisodes();
         rv.setAdapter(new EpisodeAdapter(latest));
 
         return v;

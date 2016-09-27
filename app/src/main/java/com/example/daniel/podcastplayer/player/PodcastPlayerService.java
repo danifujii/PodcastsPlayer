@@ -96,7 +96,7 @@ public class PodcastPlayerService {
 
     public int getProgress(){
         if (mp != null){
-            return mp.getCurrentPosition();
+            return mp.getCurrentPosition() / 1000;  //return in seconds
         }
         return -1;
     }

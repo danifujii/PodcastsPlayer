@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -51,7 +52,8 @@ public class SearchFragment extends Fragment {
                         @Override
                         protected void onPostExecute(String s) {
                             super.onPostExecute(s);
-                            rv.setAdapter(new PodResAdapter(ResultParser.getInstance().parseSearch(s,rv)));
+                            if (s != null)
+                                rv.setAdapter(new PodResAdapter(ResultParser.getInstance().parseSearch(s,rv)));
                         }
                     }.execute(query.replace(' ','+'));
                     return true;
@@ -74,7 +76,6 @@ public class SearchFragment extends Fragment {
             BufferedReader reader = null;
             HttpURLConnection huc = null;
             try {
-                //TODO Just audio podcasts
                 URL myurl = new URL("https://itunes.apple.com/search?term=" + term + "&media=podcast");
                 huc = (HttpURLConnection) myurl.openConnection();
                 huc.connect();
@@ -92,13 +93,11 @@ public class SearchFragment extends Fragment {
                 catch (IOException ie){ ie.printStackTrace(); }
             }
         } else
-            //TODO Snackbar, say there is no connection
-            Log.d("NO INTERNET","Sorry, there is no connection. Try again later");
+            Snackbar.make(getView(), getString(R.string.error_no_connection),Snackbar.LENGTH_SHORT).show();
         return null;
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }

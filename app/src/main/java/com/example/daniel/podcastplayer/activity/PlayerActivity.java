@@ -75,13 +75,13 @@ public class PlayerActivity extends AppCompatActivity {
 
         //TODO Cuando termina la reproducción, no funciona muy bien el progress bar ni se cambia el boton.
         progressBar.setMax(service.getEpisode().getLength());
-        progressBar.setProgress(service.getProgress() / 1000);
+        progressBar.setProgress(service.getProgress());
         progressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    service.setProgress(progress * 1000);
-                    progressTV.setText(getTime(service.getProgress() / 1000) + divider + length);
+                    service.setProgress(progress);
+                    progressTV.setText(getTime(service.getProgress()) + divider + length);
                 }
             }
 
@@ -90,7 +90,6 @@ public class PlayerActivity extends AppCompatActivity {
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        //TODO capaz cambiar esta mezcla entre miliseconds del MediaPlayer y mi length en seconds
         new Thread(new Runnable() { //TODO preguntar si esta bien este approach
             @Override
             public void run() {
@@ -99,7 +98,7 @@ public class PlayerActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                progressTV.setText(getTime(service.getProgress() / 1000) + divider + length);
+                                progressTV.setText(getTime(service.getProgress()) + divider + length);
                                 if (service.getProgress()==service.getEpisode().getLength())
                                     changeButtonIcon(play);
                             }
@@ -120,8 +119,8 @@ public class PlayerActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     service.rewindPlayback();
-                    progressBar.setProgress(service.getProgress() / 1000);
-                    progressTV.setText(getTime(service.getProgress() / 1000) + divider + length);
+                    progressBar.setProgress(service.getProgress());
+                    progressTV.setText(getTime(service.getProgress()) + divider + length);
                 }
             });
 
@@ -131,14 +130,14 @@ public class PlayerActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     service.forwardPlayback();
-                    progressBar.setProgress(service.getProgress() / 1000);
-                    progressTV.setText(getTime(service.getProgress() / 1000) + divider + length);
+                    progressBar.setProgress(service.getProgress());
+                    progressTV.setText(getTime(service.getProgress()) + divider + length);
                 }
             });
 
         length = getTime(service.getEpisode().getLength());
         if (progressTV != null)
-            progressTV.setText(getTime(service.getProgress() / 1000) + divider + length);
+            progressTV.setText(getTime(service.getProgress()) + divider + length);
     }
 
     @Override

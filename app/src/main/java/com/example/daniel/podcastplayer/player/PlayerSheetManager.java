@@ -75,12 +75,10 @@ public class PlayerSheetManager {
             if (PodcastPlayerService.getInstance().isPlaying()) {
                 playButton.setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
                         R.drawable.ic_pause_black_24dp));
-                Log.d("TAG","Playing!");
             }
             else {
                 playButton.setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
                         R.drawable.ic_play_arrow_black_24dp));
-                Log.d("TAG","Not Playing!");
             }
         }
     }

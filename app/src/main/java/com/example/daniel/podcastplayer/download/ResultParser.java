@@ -74,8 +74,11 @@ public class ResultParser {
                 Element url = (Element)n.getElementsByTagName("enclosure").item(0);
                 //e.setLength(Integer.valueOf(url.getAttribute("length")));
                 e.setEpURL(url.getAttribute("url"));
+                if (url.getAttribute("type").matches("audio/(.*)"))
+                    result.add(e);
+                else Log.d("TAG","NO Matches"); //TODO mostrar error al usuario, indicando que el formato no es soportado
 
-                result.add(e);
+
                 if (result.size() == limit) break;
             }
         } catch (Exception e) { e.printStackTrace(); }
