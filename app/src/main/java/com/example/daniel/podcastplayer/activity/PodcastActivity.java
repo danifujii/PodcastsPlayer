@@ -9,13 +9,18 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -90,6 +95,17 @@ public class PodcastActivity extends AppCompatActivity {
         PodcastPlayerService service = PodcastPlayerService.getInstance();
         if (service.isStarted())
             (new PlayerSheetManager()).setSheetInterface(service.getEpisode(),this);
+
+        int artworkColor = ColorPicker.getArtworkColor(bitmap);
+        if (artworkColor != 0x000000) {
+            //((ViewGroup)findViewById(R.id.header_layout)).setBackgroundColor(artworkColor);
+            Toolbar toolbar = (Toolbar)findViewById(R.id.podcast_act_toolbar);
+            toolbar.setTitle(p.getPodcastName());
+            toolbar.setBackgroundColor(artworkColor);
+
+            if (Build.VERSION.SDK_INT >= 21)
+                getWindow().setStatusBarColor(ColorPicker.getDarkerColor(artworkColor));
+        }
     }
 
     private void showAlertDialog(){
@@ -130,5 +146,4 @@ public class PodcastActivity extends AppCompatActivity {
         };
         registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
-
 }

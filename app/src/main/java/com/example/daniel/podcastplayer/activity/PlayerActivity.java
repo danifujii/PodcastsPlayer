@@ -2,9 +2,12 @@ package com.example.daniel.podcastplayer.activity;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
@@ -15,6 +18,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
+import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
@@ -46,11 +50,9 @@ public class PlayerActivity extends AppCompatActivity {
         Episode e = service.getEpisode();
 
         ImageView artwork = (ImageView)findViewById(R.id.player_artwork_iv);
-        if (artwork != null){
-            File image = new File(getApplicationInfo().dataDir + "/Artwork", e.getPodcastId() + ".png");
-            Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
-            artwork.setImageBitmap(bitmap);
-        }
+        File image = new File(getApplicationInfo().dataDir + "/Artwork", e.getPodcastId() + ".png");
+        Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
+        artwork.setImageBitmap(bitmap);
 
         TextView epTV = (TextView) findViewById(R.id.player_ep_tv);
         if (epTV != null)
@@ -136,6 +138,14 @@ public class PlayerActivity extends AppCompatActivity {
         length = getTime(service.getEpisode().getLength());
         if (progressTV != null)
             progressTV.setText(getTime(service.getProgress()) + divider + length);
+
+        int color = ColorPicker.getArtworkColor(bitmap);
+        //Toolbar toolbar = (Toolbar)findViewById(R.id.player_act_toolbar);
+        //toolbar.setTitle(DbHelper.getInstance(this).getPodcast(e.getPodcastId()).getPodcastName());
+        //toolbar.setBackgroundColor(color);
+        findViewById(R.id.ep_bg_view).setBackgroundColor(ColorPicker.getDarkerColor(color));
+        if (Build.VERSION.SDK_INT >= 21)
+            getWindow().setStatusBarColor(ColorPicker.getDarkerColor(color));
     }
 
     @Override

@@ -22,8 +22,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.PodcastSearchActivity" />
-        <activity android:name=".activity.PodcastActivity" />
-        <activity android:name=".activity.PlayerActivity"/>
+        <activity android:name=".activity.PodcastActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".activity.PlayerActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

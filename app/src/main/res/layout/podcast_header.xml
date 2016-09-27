@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
+    android:id="@+id/header_layout"
     android:layout_width="match_parent"
     android:layout_height="150dp"
     android:background="@color/darkGray"
     android:orientation="horizontal"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:clipToPadding="false">
 
     <ImageView
         android:id="@+id/pod_artwork"
         android:layout_width="@dimen/big_image_size"
         android:layout_height="@dimen/big_image_size"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:elevation="5dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
