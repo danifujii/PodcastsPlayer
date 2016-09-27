@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.daniel.podcastplayer.NewPodcastsFragment">
+    tools:context="com.example.daniel.podcastplayer.fragment.NewPodcastsFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/new_episodes_rv"

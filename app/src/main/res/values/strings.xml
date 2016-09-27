@@ -16,4 +16,8 @@
     <string name="error_no_connection">No network connection!</string>
     <string name="unsubs_title_dialog">Unsubscribe</string>
     <string name="unsubs_message_dialog">Do you want to unsubscribe?</string>
+
+    <string name="listened_setting">listenedSetting</string>
+    <string name="episode_listen_setting">episodeListeningSetting</string>
+    <string name="file_setting">prefsFile</string>
 </resources>

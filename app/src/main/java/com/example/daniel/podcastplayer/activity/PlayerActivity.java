@@ -93,25 +93,23 @@ public class PlayerActivity extends AppCompatActivity {
         new Thread(new Runnable() { //TODO preguntar si esta bien este approach
             @Override
             public void run() {
-                while (progressBar.getProgress() < progressBar.getMax() && service.isPlaying()){
+                while (progressBar.getProgress() < progressBar.getMax()){
+                    if (service.isPlaying()) {
                         progressBar.setProgress(progressBar.getProgress() + 1);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 progressTV.setText(getTime(service.getProgress()) + divider + length);
-                                if (service.getProgress()==service.getEpisode().getLength())
+                                if (service.getProgress() == service.getEpisode().getLength())
                                     changeButtonIcon(play);
                             }
                         });
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    }
+                    try { Thread.sleep(1000); }
+                    catch (InterruptedException e) { e.printStackTrace(); }
                 }
             }
         }).start();
-
 
         ImageButton rewindButton = (ImageButton) findViewById(R.id.player_rewind_button);
         if (rewindButton !=  null)
@@ -147,9 +145,9 @@ public class PlayerActivity extends AppCompatActivity {
         setupPlayerUI();
     }
 
-    private String getTime(int allSeconds){
-        int minutes = allSeconds / 60;
-        int seconds = allSeconds % 60;
+    private String getTime(int miliSeconds){
+        int minutes = (miliSeconds / 1000) / 60;
+        int seconds = (miliSeconds / 1000) % 60;
         StringBuilder builder = new StringBuilder();
         if (minutes > 60){
             int hours = minutes / 60;

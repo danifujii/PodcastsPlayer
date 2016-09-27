@@ -69,7 +69,7 @@ public class ResultParser {
                 Element n = (Element)episodes.item(i);
                 e.setEpTitle(n.getElementsByTagName("title").item(0).getTextContent());
                 e.setEpDate(getDate(n.getElementsByTagName("pubDate").item(0).getTextContent()));
-                e.setLength(getSeconds(n.getElementsByTagName("itunes:duration").item(0)
+                e.setLength(getMiliseconds(n.getElementsByTagName("itunes:duration").item(0)
                         .getTextContent()));
                 Element url = (Element)n.getElementsByTagName("enclosure").item(0);
                 //e.setLength(Integer.valueOf(url.getAttribute("length")));
@@ -86,14 +86,13 @@ public class ResultParser {
         return result;
     }
 
-    private int getSeconds(String duration){
+    private int getMiliseconds(String duration){
         int result = 0;
         for (int i = 2 ; i >= 0 ; i--){
             result = result + getTimeComponent(duration) * (int)Math.pow(60,i);
             duration = duration.substring(duration.indexOf(':')+1);
-            Log.d("ResultParser",duration);
         }
-        return result;
+        return result * 1000;
     }
 
     //get either hour, minute or second, adding until finding a :
@@ -113,7 +112,6 @@ public class ResultParser {
 
     //Remove the timezone data and hour
     private String getDate(String pubDate){
-        Log.d("TAG2", pubDate);
         int index = pubDate.length() - 1;
         int ammount = 2;
         while (ammount > 0){

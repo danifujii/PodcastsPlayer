@@ -1,4 +1,4 @@
-package com.example.daniel.podcastplayer;
+package com.example.daniel.podcastplayer.fragment;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 
+import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.adapter.PodResAdapter;
 import com.example.daniel.podcastplayer.download.ResultParser;
 

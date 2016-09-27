@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -70,7 +71,7 @@ public class DbHelper extends SQLiteOpenHelper{
         values.put(Tbls.COLUMN_EP_URL,e.getEpURL());
         values.put(Tbls.COLUMN_LENGTH,e.getLength());
         values.put(Tbls.COLUMN_DOWNLOADED,false);
-        values.put(Tbls.COLUMN_LISTENED,"0.0");
+        values.put(Tbls.COLUMN_LISTENED,"0");
         values.put(Tbls.COLUMN_FK_POD,podcastId);
         db.insert(Tbls.NAME_EPISODE, null, values);
         db.close();
@@ -118,11 +119,29 @@ public class DbHelper extends SQLiteOpenHelper{
         return buildEpisodes(c);
     }
 
+    public Episode getEpisode(String epUrl){
+        Cursor c = getReadableDatabase().rawQuery("SELECT * FROM " + Tbls.NAME_EPISODE
+                + " WHERE " + Tbls.COLUMN_EP_URL + "='" + epUrl + "'", null);
+        List<Episode> result = buildEpisodes(c);
+        if (result.size() > 0)
+            return result.get(0);
+        return null;
+    }
+
+    public int getEpisodeListened(String epUrl){
+        Cursor c = getReadableDatabase().rawQuery("SELECT * FROM " + Tbls.NAME_EPISODE
+            + " WHERE " + Tbls.COLUMN_EP_URL + "='" + epUrl + "'", null);
+        if (c.moveToFirst()){
+            return c.getInt(c.getColumnIndex(Tbls.COLUMN_LISTENED));
+        }
+        return -1;
+    }
+
     //Get latest, non listened episodes from each podcast
     public List<Episode> getLatestEpisodes(){
         Cursor c = getReadableDatabase().rawQuery("SELECT e1.* FROM " + Tbls.NAME_EPISODE + " e1"
                 + " JOIN (SELECT " + Tbls.COLUMN_ID + ", MAX( " + Tbls.COLUMN_DATE + ") date "
-                + " FROM " +Tbls.NAME_EPISODE + " WHERE " + Tbls.COLUMN_LISTENED + "=0 "
+                + " FROM " +Tbls.NAME_EPISODE + " WHERE " + Tbls.COLUMN_LISTENED + "<" + Tbls.COLUMN_LENGTH
                 + " GROUP BY " + Tbls.COLUMN_FK_POD +" ) e2"
                 + " ON e1." + Tbls.COLUMN_ID+"=e2."+Tbls.COLUMN_ID
                 + " AND e1."+ Tbls.COLUMN_DATE+"=e2.date", null);
@@ -138,6 +157,7 @@ public class DbHelper extends SQLiteOpenHelper{
             e.setEpDate(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_DATE)));
             e.setLength(c.getInt(c.getColumnIndex(DbHelper.Tbls.COLUMN_LENGTH)));
             e.setEpURL(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_EP_URL)));
+            e.setListened(c.getInt(c.getColumnIndex(Tbls.COLUMN_LISTENED)));
             episodes.add(e);
         }
         c.close();
@@ -156,6 +176,13 @@ public class DbHelper extends SQLiteOpenHelper{
                 columnName + "=?",
                 selectionArgs);
         db.close();
+    }
+
+    public void updateEpisode(String epURL, int listened){
+        ContentValues cv = new ContentValues();
+        cv.put(Tbls.COLUMN_LISTENED,String.valueOf(listened));
+        getWritableDatabase().update(Tbls.NAME_EPISODE, cv,
+                Tbls.COLUMN_EP_URL + "='" + epURL + "'", null);
     }
 
     @Override

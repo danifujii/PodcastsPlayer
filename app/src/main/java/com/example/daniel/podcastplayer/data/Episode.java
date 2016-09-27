@@ -12,6 +12,7 @@ public class Episode {
     private String epDate;
     private String epURL;
     private int length;
+    private int listened;
     private long podcastId;
     private boolean downloaded; //used for UI purposes mainly
 
@@ -38,6 +39,10 @@ public class Episode {
     public long getPodcastId() { return podcastId; }
 
     public boolean getDownloaded() { return downloaded; }
+
+    public int getListened() { return listened; }
+
+    public void setListened(int listened){ this.listened = listened; }
 
     public void setLength(int length) {
         this.length = length;

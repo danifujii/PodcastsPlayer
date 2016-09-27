@@ -1,10 +1,10 @@
 package com.example.daniel.podcastplayer.activity;
 
-import android.support.annotation.IdRes;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -12,13 +12,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.TableLayout;
 
-import com.example.daniel.podcastplayer.NewPodcastsFragment;
-import com.example.daniel.podcastplayer.R;
-import com.example.daniel.podcastplayer.SearchFragment;
-import com.example.daniel.podcastplayer.SubscriptionsFragment;
 import com.example.daniel.podcastplayer.data.DbHelper;
+import com.example.daniel.podcastplayer.data.Episode;
+import com.example.daniel.podcastplayer.fragment.NewPodcastsFragment;
+import com.example.daniel.podcastplayer.R;
+import com.example.daniel.podcastplayer.fragment.SearchFragment;
+import com.example.daniel.podcastplayer.fragment.SubscriptionsFragment;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 
@@ -31,11 +31,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //if (findViewById(R.id.fragment_layout) != null)
-        //    getSupportFragmentManager().beginTransaction()
-        //            .add(R.id.fragment_layout, new NewPodcastsFragment()).commit();
-
 
         viewPager = (ViewPager)findViewById(R.id.viewPager);
         viewPager.setAdapter(new TabPagerAdapter(getSupportFragmentManager()));
@@ -50,11 +45,25 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         PodcastPlayerService pps = PodcastPlayerService.getInstance();
-        if (pps.isStarted()){
-            findViewById(R.id.splayer_layout).setVisibility(View.VISIBLE);
-            PlayerSheetManager psm = new PlayerSheetManager();
-            psm.setSheetInterface(pps.getEpisode(),this);
+        if (pps.isStarted())
+            setPlayerSheet(pps);
+        else{
+            SharedPreferences sp = getSharedPreferences(getString(R.string.file_setting),
+                    Context.MODE_PRIVATE);
+            int duration = sp.getInt(getString(R.string.listened_setting),-1);
+            String epUrl = sp.getString(getString(R.string.episode_listen_setting),"");
+            if (!epUrl.isEmpty() && duration>0){
+                Episode e = DbHelper.getInstance(this).getEpisode(epUrl);
+                pps.startPlayback(e, this, false);
+            }
+            setPlayerSheet(pps);
         }
+    }
+
+    private void setPlayerSheet(PodcastPlayerService pps){
+        findViewById(R.id.splayer_layout).setVisibility(View.VISIBLE);
+        PlayerSheetManager psm = new PlayerSheetManager();
+        psm.setSheetInterface(pps.getEpisode(),this);
     }
 
     private class TabPagerAdapter extends FragmentStatePagerAdapter {
