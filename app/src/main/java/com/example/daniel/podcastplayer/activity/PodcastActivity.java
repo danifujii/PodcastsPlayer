@@ -3,11 +3,13 @@ package com.example.daniel.podcastplayer.activity;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -38,6 +40,7 @@ public class PodcastActivity extends AppCompatActivity {
 
     private BroadcastReceiver downloadReceiver;
     private Downloader.DownloadReceiver dr;
+    private Podcast p;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +48,7 @@ public class PodcastActivity extends AppCompatActivity {
         setContentView(R.layout.activity_podcast);
 
         long podcastId = Long.valueOf(getIntent().getExtras().getString(DbHelper.Tbls.COLUMN_ID));
-        Podcast p = DbHelper.getInstance(this).getPodcast(podcastId);
+        p = DbHelper.getInstance(this).getPodcast(podcastId);
 
         //Set podcast data
         TextView title = (TextView)findViewById(R.id.pod_title_tv);
@@ -62,9 +65,15 @@ public class PodcastActivity extends AppCompatActivity {
         }
 
         Button b = (Button) findViewById(R.id.subscribe_button);
-        if (b != null)
+        if (b != null) {
             b.setText(getString(R.string.unsubscribe_button));
-            //TODO open alert and then delete podcast and close activity
+            b.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showAlertDialog();
+                }
+            });
+        }
 
         List<Episode> episodes = DbHelper.getInstance(this).getEpisodes(podcastId);
         RecyclerView epsRV = (RecyclerView)findViewById(R.id.episodes_rv);
@@ -81,6 +90,22 @@ public class PodcastActivity extends AppCompatActivity {
         PodcastPlayerService service = PodcastPlayerService.getInstance();
         if (service.isStarted())
             (new PlayerSheetManager()).setSheetInterface(service.getEpisode(),this);
+    }
+
+    private void showAlertDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.unsubs_title_dialog));
+        builder.setMessage(getString(R.string.unsubs_message_dialog));
+        builder.setPositiveButton(R.string.unsubscribe_button, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                DbHelper.getInstance(PodcastActivity.this).deletePodcast(p.getPodcastId());
+                finish();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+            @Override public void onClick(DialogInterface dialog, int which) {} });
+        builder.create().show();
     }
 
     @Override

@@ -106,7 +106,6 @@ public class PodcastSearchActivity extends AppCompatActivity implements Download
                     DbHelper db = DbHelper.getInstance(v.getContext());
                     boolean isSubscribed = false;
                     if (((Button)v).getText().equals(getString(R.string.unsubscribe_button)))
-                        //TODO probar esto bien, me parece que no funciona bien. Lo probe y quedaron los episodios 2 veces. Habria que borrar los podcasts bajados tmb
                         db.deletePodcast(podcast.getPodcastId());
                     else {
                         db.insertPodcast(podcast);
