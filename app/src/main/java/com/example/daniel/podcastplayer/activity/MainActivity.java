@@ -1,7 +1,11 @@
 package com.example.daniel.podcastplayer.activity;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.IBinder;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,41 +26,42 @@ import com.example.daniel.podcastplayer.fragment.SubscriptionsFragment;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 
-public class MainActivity extends AppCompatActivity {
-
-    private ViewPager viewPager;
-    private FrameLayout fragmentContainer;
+public class MainActivity extends ServiceActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        viewPager = (ViewPager)findViewById(R.id.viewPager);
+        ViewPager viewPager = (ViewPager)findViewById(R.id.viewPager);
         viewPager.setAdapter(new TabPagerAdapter(getSupportFragmentManager()));
         viewPager.setCurrentItem(1);
         TabLayout tl = (TabLayout) findViewById(R.id.tabLayout);
         tl.setupWithViewPager(viewPager);
-
+        startService(new Intent(this,PodcastPlayerService.class));  //TODO it has to run continously, but when do we stop it?
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (bound)
+            setupPlayerUI();
+    }
 
-        PodcastPlayerService pps = PodcastPlayerService.getInstance();
-        if (pps.isStarted())
-            setPlayerSheet(pps);
-        else{
+    @Override
+    public void setupPlayerUI() {
+        if (service.isStarted())
+            setPlayerSheet(service);
+        else {
             SharedPreferences sp = getSharedPreferences(getString(R.string.file_setting),
                     Context.MODE_PRIVATE);
-            int duration = sp.getInt(getString(R.string.listened_setting),-1);
-            String epUrl = sp.getString(getString(R.string.episode_listen_setting),"");
-            if (!epUrl.isEmpty() && duration>0){
+            int duration = sp.getInt(getString(R.string.listened_setting), -1);
+            String epUrl = sp.getString(getString(R.string.episode_listen_setting), "");
+            if (!epUrl.isEmpty() && duration > 0) {
                 Episode e = DbHelper.getInstance(this).getEpisode(epUrl);
-                pps.startPlayback(e, this, false);
+                service.startPlayback(e, this, false);
             }
-            setPlayerSheet(pps);
+            setPlayerSheet(service);
         }
     }
 

@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.activity.PlayerActivity;
+import com.example.daniel.podcastplayer.activity.ServiceActivity;
 import com.example.daniel.podcastplayer.data.Episode;
 
 import java.io.File;
@@ -26,7 +27,7 @@ import java.io.File;
 public class PlayerSheetManager {
 
     //containter activity has the UI
-    public void setSheetInterface(Episode e, Activity container){
+    public void setSheetInterface(Episode e, ServiceActivity container){
         ViewGroup splayerLayout = (ViewGroup)container.findViewById(R.id.splayer_layout);
         if (splayerLayout != null){
             splayerLayout.setVisibility(View.VISIBLE);
@@ -52,29 +53,32 @@ public class PlayerSheetManager {
         }
     }
 
-    private void setPlayButton(Activity container){
+    private void setPlayButton(final ServiceActivity container){
         final ImageButton playButton = (ImageButton)container.findViewById(R.id.splayer_play_button);
         if (playButton != null){
             playButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    PodcastPlayerService player = PodcastPlayerService.getInstance();
-                    if (player.isPlaying()) {
-                        player.pausePlayback();
-                        playButton.setImageBitmap(BitmapFactory.decodeResource(v.getResources(),
-                                R.drawable.ic_play_arrow_black_24dp));
-                    }else {
-                        player.resumePlayback();
-                        playButton.setImageBitmap(BitmapFactory.decodeResource(v.getResources(),
-                                R.drawable.ic_pause_black_24dp));
-                    }
+                    PodcastPlayerService player = container.getService();
+                    if (player != null)
+                        if (player.isPlaying()) {
+                            player.pausePlayback();
+                            playButton.setImageBitmap(BitmapFactory.decodeResource(v.getResources(),
+                                    R.drawable.ic_play_arrow_black_24dp));
+                        }else {
+                            player.resumePlayback();
+                            playButton.setImageBitmap(BitmapFactory.decodeResource(v.getResources(),
+                                    R.drawable.ic_pause_black_24dp));
+                        }
+
                 }
             });
 
             //Setup the icon accordingly
-            if (PodcastPlayerService.getInstance().isPlaying()) {
+            PodcastPlayerService player = container.getService();
+            if (player != null && player.isPlaying()) {
                 playButton.setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
-                        R.drawable.ic_pause_black_24dp));
+                      R.drawable.ic_pause_black_24dp));
             }
             else {
                 playButton.setImageBitmap(BitmapFactory.decodeResource(container.getResources(),

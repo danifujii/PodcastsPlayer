@@ -1,10 +1,15 @@
 package com.example.daniel.podcastplayer.activity;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -22,17 +27,18 @@ import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
+import com.example.daniel.podcastplayer.player.PodcastPlayerService.PlayerBinder;
+
 
 import java.io.File;
 
-public class PlayerActivity extends AppCompatActivity {
+public class PlayerActivity extends ServiceActivity{
 
-    private PodcastPlayerService service;
     private SeekBar progressBar;
     private TextView progressTV;
 
     //Progress text
-    private final static String divider = "/";
+    private final static String divider = " / ";
     private String length;
 
     @Override
@@ -41,117 +47,118 @@ public class PlayerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_player);
     }
 
-    private void setupPlayerUI(){
+    public void setupPlayerUI(){
         progressTV = (TextView) findViewById(R.id.player_progress_tv);
         progressBar = (SeekBar)findViewById(R.id.player_progress_bar);
         final ImageButton play = (ImageButton)findViewById(R.id.player_play_button);
 
-        service = PodcastPlayerService.getInstance();
-        Episode e = service.getEpisode();
+        if (bound){
+            Episode e = service.getEpisode();
 
-        ImageView artwork = (ImageView)findViewById(R.id.player_artwork_iv);
-        File image = new File(getApplicationInfo().dataDir + "/Artwork", e.getPodcastId() + ".png");
-        Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
-        artwork.setImageBitmap(bitmap);
+            ImageView artwork = (ImageView)findViewById(R.id.player_artwork_iv);
+            File image = new File(getApplicationInfo().dataDir + "/Artwork", e.getPodcastId() + ".png");
+            Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
+            artwork.setImageBitmap(bitmap);
 
-        TextView epTV = (TextView) findViewById(R.id.player_ep_tv);
-        if (epTV != null)
-            epTV.setText(e.getEpTitle());
+            TextView epTV = (TextView) findViewById(R.id.player_ep_tv);
+            if (epTV != null)
+                epTV.setText(e.getEpTitle());
 
-        if (play != null){
-            if (service.isPlaying())
-                play.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.ic_pause_black_48dp));
-            else play.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.ic_play_arrow_black_48dp));
+            if (play != null) {
+                if (service.isPlaying())
+                    play.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_pause_black_48dp));
+                else
+                    play.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_play_arrow_black_48dp));
 
-            play.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    changeButtonIcon(play);
-                    if (service.isPlaying())
-                        service.pausePlayback();
-                    else
-                        service.resumePlayback();
-                }
-            });
-        }
-
-        //TODO Cuando termina la reproducción, no funciona muy bien el progress bar ni se cambia el boton.
-        progressBar.setMax(service.getEpisode().getLength());
-        progressBar.setProgress(service.getProgress());
-        progressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    service.setProgress(progress);
-                    progressTV.setText(getTime(service.getProgress()) + divider + length);
-                }
-            }
-
-            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-
-            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
-
-        new Thread(new Runnable() { //TODO preguntar si esta bien este approach
-            @Override
-            public void run() {
-                while (progressBar.getProgress() < progressBar.getMax()){
-                    if (service.isPlaying()) {
-                        progressBar.setProgress(progressBar.getProgress() + 1);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressTV.setText(getTime(service.getProgress()) + divider + length);
-                                if (service.getProgress() == service.getEpisode().getLength())
-                                    changeButtonIcon(play);
-                            }
-                        });
+                play.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        changeButtonIcon(play);
+                        if (service.isPlaying())
+                            service.pausePlayback();
+                        else
+                            service.resumePlayback();
                     }
-                    try { Thread.sleep(1000); }
-                    catch (InterruptedException e) { e.printStackTrace(); }
-                }
+                });
             }
-        }).start();
 
-        ImageButton rewindButton = (ImageButton) findViewById(R.id.player_rewind_button);
-        if (rewindButton !=  null)
-            rewindButton.setOnClickListener(new View.OnClickListener() {
+            //TODO Cuando termina la reproducción, no funciona muy bien el progress bar ni se cambia el boton.
+            progressBar.setMax(service.getEpisode().getLength());
+            progressBar.setProgress(service.getProgress());
+            progressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
-                public void onClick(View v) {
-                    service.rewindPlayback();
-                    progressBar.setProgress(service.getProgress());
-                    progressTV.setText(getTime(service.getProgress()) + divider + length);
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if (fromUser) {
+                        service.setProgress(progress);
+                        progressTV.setText(getTime(service.getProgress()) + divider + length);
+                    }
                 }
+
+                @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+
+                @Override public void onStopTrackingTouch(SeekBar seekBar) {}
             });
 
-        ImageButton forwardButton = (ImageButton) findViewById(R.id.player_forward_button);
-        if (forwardButton != null)
-            forwardButton.setOnClickListener(new View.OnClickListener() {
+            new Thread(new Runnable() { //TODO preguntar si esta bien este approach
                 @Override
-                public void onClick(View v) {
-                    service.forwardPlayback();
-                    progressBar.setProgress(service.getProgress());
-                    progressTV.setText(getTime(service.getProgress()) + divider + length);
+                public void run() {
+                    while (progressBar.getProgress() < progressBar.getMax()){
+                        if (service.isPlaying()) {
+                            progressBar.setProgress(progressBar.getProgress() + 1);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    progressTV.setText(getTime(service.getProgress()) + divider + length);
+                                    if (service.getProgress() == service.getEpisode().getLength())
+                                        changeButtonIcon(play);
+                                }
+                            });
+                        }
+                        try { Thread.sleep(1000); }
+                        catch (InterruptedException e) { e.printStackTrace(); }
+                    }
                 }
-            });
+            }).start();
 
-        length = getTime(service.getEpisode().getLength());
-        if (progressTV != null)
-            progressTV.setText(getTime(service.getProgress()) + divider + length);
+            ImageButton rewindButton = (ImageButton) findViewById(R.id.player_rewind_button);
+            if (rewindButton !=  null)
+                rewindButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        service.rewindPlayback();
+                        progressBar.setProgress(service.getProgress());
+                        progressTV.setText(getTime(service.getProgress()) + divider + length);
+                    }
+                });
 
-        int color = ColorPicker.getArtworkColor(bitmap);
-        //Toolbar toolbar = (Toolbar)findViewById(R.id.player_act_toolbar);
-        //toolbar.setTitle(DbHelper.getInstance(this).getPodcast(e.getPodcastId()).getPodcastName());
-        //toolbar.setBackgroundColor(color);
-        findViewById(R.id.ep_bg_view).setBackgroundColor(ColorPicker.getDarkerColor(color));
-        if (Build.VERSION.SDK_INT >= 21)
-            getWindow().setStatusBarColor(ColorPicker.getDarkerColor(color));
+            ImageButton forwardButton = (ImageButton) findViewById(R.id.player_forward_button);
+            if (forwardButton != null)
+                forwardButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        service.forwardPlayback();
+                        progressBar.setProgress(service.getProgress());
+                        progressTV.setText(getTime(service.getProgress()) + divider + length);
+                    }
+                });
+
+            length = getTime(service.getEpisode().getLength());
+            if (progressTV != null)
+                progressTV.setText(getTime(service.getProgress()) + divider + length);
+
+            int color = ColorPicker.getArtworkColor(bitmap);
+            //Toolbar toolbar = (Toolbar)findViewById(R.id.player_act_toolbar);
+            //toolbar.setTitle(DbHelper.getInstance(this).getPodcast(e.getPodcastId()).getPodcastName());
+            //toolbar.setBackgroundColor(color);
+            findViewById(R.id.ep_bg_view).setBackgroundColor(ColorPicker.getDarkerColor(color));
+            if (Build.VERSION.SDK_INT >= 21)
+                getWindow().setStatusBarColor(ColorPicker.getDarkerColor(color));
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
         setupPlayerUI();
     }
 
@@ -174,7 +181,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void changeButtonIcon(ImageButton playButton){
-        if (service.isPlaying())
+        if (bound && service.isPlaying())
             playButton.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.ic_play_arrow_black_48dp));
         else
             playButton.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.ic_pause_black_48dp));

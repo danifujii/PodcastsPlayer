@@ -15,6 +15,7 @@ import android.webkit.URLUtil;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.daniel.podcastplayer.activity.ServiceActivity;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 import com.example.daniel.podcastplayer.R;
@@ -30,7 +31,7 @@ import java.util.Locale;
 public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeViewHolder>{
 
     private List<Episode> data;
-    private Activity activity;  //save the activity that uses this to set the player layout as visible
+    private ServiceActivity activity;  //save the activity that uses this to set the player layout as visible
 
     public EpisodeAdapter(List<Episode> data){
         this.data = data;
@@ -41,7 +42,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         View itemView = LayoutInflater.
                 from(parent.getContext()).
                 inflate(R.layout.episode_layout, parent, false);
-        activity = (Activity)parent.getContext();
+        activity = (ServiceActivity)parent.getContext();
 
         return new EpisodeAdapter.EpisodeViewHolder(itemView);
     }
@@ -68,13 +69,15 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
                                     , URLUtil.guessFileName(ep.getEpURL(), null, null)));
                 }
                 else{
-                    PodcastPlayerService player = PodcastPlayerService.getInstance();
+                    PodcastPlayerService player = activity.getService();
                     //if (player.getEpisode() != ep || !player.isPlaying())    //avoid restarting an episode already playing
-                        player.startPlayback(ep,activity);
-                    //TODO Como el comienzo del player ahora es async, puede terminar luego de que se setea la interfaz
-                    //haciendo que el boton no aparezca como Pause y quede como Play
-                    PlayerSheetManager psm = new PlayerSheetManager();
-                    psm.setSheetInterface(ep, activity);
+                    if (player != null) {
+                        player.startPlayback(ep, activity);
+                        //TODO Como el comienzo del player ahora es async, puede terminar luego de que se setea la interfaz
+                        //haciendo que el boton no aparezca como Pause y quede como Play
+                        PlayerSheetManager psm = new PlayerSheetManager();
+                        psm.setSheetInterface(ep, activity);
+                    }
                 }
             }
         });

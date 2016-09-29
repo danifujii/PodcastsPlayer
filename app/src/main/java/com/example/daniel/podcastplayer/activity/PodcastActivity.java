@@ -41,10 +41,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PodcastActivity extends AppCompatActivity {
+public class PodcastActivity extends ServiceActivity {
 
     private BroadcastReceiver downloadReceiver;
-    private Downloader.DownloadReceiver dr;
     private Podcast p;
 
     @Override
@@ -92,8 +91,8 @@ public class PodcastActivity extends AppCompatActivity {
             playerArtwork.setImageBitmap(bitmap);
         }
 
-        PodcastPlayerService service = PodcastPlayerService.getInstance();
-        if (service.isStarted())
+
+        if (bound && service.isStarted())
             (new PlayerSheetManager()).setSheetInterface(service.getEpisode(),this);
 
         int artworkColor = ColorPicker.getArtworkColor(bitmap);
@@ -125,6 +124,9 @@ public class PodcastActivity extends AppCompatActivity {
     }
 
     @Override
+    public void setupPlayerUI() {}
+
+    @Override
     protected void onResume() {
         super.onResume();
         setDownloadReceiver();
@@ -137,6 +139,7 @@ public class PodcastActivity extends AppCompatActivity {
     }
 
     private void setDownloadReceiver(){
+        //TODO actualizar boton del EpisodeAdapter
         downloadReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {

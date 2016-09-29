@@ -26,6 +26,8 @@
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".activity.PlayerActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
+
+        <service android:name=".player.PodcastPlayerService"/>
     </application>
 
 </manifest>
