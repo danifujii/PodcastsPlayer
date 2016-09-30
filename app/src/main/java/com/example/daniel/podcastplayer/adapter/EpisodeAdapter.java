@@ -75,8 +75,9 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
                         player.startPlayback(ep, activity);
                         //TODO Como el comienzo del player ahora es async, puede terminar luego de que se setea la interfaz
                         //haciendo que el boton no aparezca como Pause y quede como Play
-                        PlayerSheetManager psm = new PlayerSheetManager();
-                        psm.setSheetInterface(ep, activity);
+                        //PlayerSheetManager psm = new PlayerSheetManager(this);
+                        //psm.setSheetInterface(ep, activity);
+                        activity.setupPlayerUI();
                     }
                 }
             }

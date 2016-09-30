@@ -1,6 +1,7 @@
 package com.example.daniel.podcastplayer.player;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -11,6 +12,9 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
+import android.media.session.MediaController;
+import android.media.session.MediaSession;
+import android.media.session.MediaSessionManager;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -19,6 +23,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.SyncStateContract;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.webkit.URLUtil;
@@ -32,10 +37,16 @@ import com.example.daniel.podcastplayer.data.Podcast;
 import java.io.File;
 import java.io.IOException;
 
+import static android.drm.DrmStore.Action.PLAY;
 import static android.provider.ContactsContract.Intents.Insert.ACTION;
 
 
 public class PodcastPlayerService extends Service {
+
+    public static final String ACTION_PLAY = "action_play";
+    public static final String ACTION_START = "action_start";
+    public static final String ACTION_PAUSE = "action_pause";
+    public static final String ACTION_FINISH = "action_finish";
 
     private final static int skipForward = 30000;   //30 seconds
     private final static int rewind = 10000;   //10 seconds
@@ -54,42 +65,70 @@ public class PodcastPlayerService extends Service {
         }
     };
 
-    private Notification buildNotif(){
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        switch (intent.getAction()){
+            case(ACTION_START):
+                //startForeground(notificationId, buildNotif(true));
+                break;
+            case(ACTION_PLAY):
+                resumePlayback();
+                break;
+            case(ACTION_PAUSE):
+                pausePlayback();
+                break;
+        }
+        return START_STICKY;
+    }
+
+    private Notification buildNotif(boolean paused){
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
                 new Intent(getApplicationContext(), PlayerActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
         //TODO ajustar bien esto, no se muestra muy bien
-        Notification notif = new NotificationCompat.Builder(this)
-                .setContentTitle("Playing")
-                .setTicker("Ticker")
-                .setContentText("Content")
-                .setContentIntent(pi).build();
-        return notif;
+        android.support.v4.app.NotificationCompat.Builder notif = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_play_circle_outline_black_24dp)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setContentTitle(episode.getEpTitle())
+                .setTicker(episode.getEpTitle())
+                .setContentText(DbHelper.getInstance(this).getPodcast(episode.getPodcastId()).getPodcastArtist())
+                .setContentIntent(pi)
+                .setOngoing(true);
+        if (paused)
+            notif.addAction(R.drawable.ic_play_arrow_black_24dp, getString(R.string.play), PendingIntent.getService(this,0,
+                    new Intent(this, PodcastPlayerService.class).setAction(ACTION_PLAY),0));
+        else
+            notif.addAction(R.drawable.ic_pause_black_24dp, getString(R.string.pause), PendingIntent.getService(this,0,
+                new Intent(this, PodcastPlayerService.class).setAction(ACTION_PAUSE),0));
+        return notif.build();
     }
 
-    //private Context context = null; //TODO esto cambiar dsp si el service cuenta como context
-    //private static PodcastPlayerService mInstance = new PodcastPlayerService();
     public PodcastPlayerService(){}
 
     @Override
     public void onCreate() {
         super.onCreate();
-        registerReceiver(audioChangeReceiver,new IntentFilter(AudioManager.ACTION_HEADSET_PLUG));
+        registerReceiver(audioChangeReceiver,
+                new IntentFilter(AudioManager.ACTION_HEADSET_PLUG));
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         stopForeground(true);
+        ((NotificationManager)getSystemService(NOTIFICATION_SERVICE))
+                .cancel(notificationId);
         if (mp!=null){
             saveProgress();
             mp.release();
+            mp = null;
         }
         unregisterReceiver(audioChangeReceiver);
     }
 
     public void startPlayback(Episode e, Context context){
         startPlayback(e,context,true);
+        startForeground(notificationId, buildNotif(false));
     }
 
     //start=false is just for prepare, and not start playback
@@ -98,6 +137,16 @@ public class PodcastPlayerService extends Service {
             mp = new MediaPlayer();
             mp.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
             mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    LocalBroadcastManager.getInstance(PodcastPlayerService.this)
+                            .sendBroadcast(new Intent(ACTION_FINISH));
+                    saveProgress();
+                    ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE))
+                            .cancel(notificationId);
+                }
+            });
         }
         if (episode==null || !episode.getEpURL().equals(e.getEpURL()))
             try {
@@ -122,25 +171,38 @@ public class PodcastPlayerService extends Service {
                 excep.printStackTrace();
             }
             //if same episode, already prepared so resume playback
-        else if (episode.getEpURL().equals(e.getEpURL()) && start) mp.start();
+        else if (episode.getEpURL().equals(e.getEpURL()) && start){
+            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PLAY));
+            mp.start();
+        }
         this.episode = e;
     }
 
     private void startPlayback(boolean start){
         if (episode != null) {
-            if (start)
+            if (start) {
                 mp.start();
+                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PLAY));
+            }
             int listened = DbHelper.getInstance(getApplicationContext()).getEpisodeListened(episode.getEpURL());
             if (listened > 0)
                 mp.seekTo(listened);
         }
     }
 
-    public void resumePlayback() { mp.start(); }
+    public void resumePlayback() {
+        mp.start();
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PLAY));
+        ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE))
+                .notify(notificationId, buildNotif(false));
+    }
 
     public void pausePlayback(){
         saveProgress();
         mp.pause();
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PAUSE));
+        ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE))
+                .notify(notificationId, buildNotif(true));
     }
 
     public void forwardPlayback() {
@@ -206,7 +268,6 @@ public class PodcastPlayerService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        startForeground(notificationId, buildNotif());
         return binder;
     }
 

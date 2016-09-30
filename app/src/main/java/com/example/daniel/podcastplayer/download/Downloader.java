@@ -1,8 +1,12 @@
 package com.example.daniel.podcastplayer.download;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+
+import com.example.daniel.podcastplayer.data.DbHelper;
+import com.example.daniel.podcastplayer.data.Podcast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,5 +54,21 @@ public class Downloader {
                 re.receiveImage(bitmap);
             }
         }.execute(url);
+    }
+
+    //Update podcasts episode, syncing and seeing if new episodes are available
+    public static void updatePodcasts(Context context){
+        for (Podcast p : DbHelper.getInstance(context).getPodcasts())
+            new AsyncTask<Void,Void,Void>(){
+                @Override
+                protected Void doInBackground(Void... params) {
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                }
+            }.execute();
     }
 }

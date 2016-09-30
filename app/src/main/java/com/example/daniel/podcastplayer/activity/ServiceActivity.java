@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 
 /**
@@ -18,12 +21,33 @@ import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 public abstract class ServiceActivity extends AppCompatActivity{
     protected PodcastPlayerService service;
     protected boolean bound = false;
+    protected PlayerSheetManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         bindService(new Intent(this,PodcastPlayerService.class),connection, Context.BIND_AUTO_CREATE);
+        manager = new PlayerSheetManager(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (manager != null) {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(PodcastPlayerService.ACTION_FINISH);
+            intentFilter.addAction(PodcastPlayerService.ACTION_PAUSE);
+            intentFilter.addAction(PodcastPlayerService.ACTION_PLAY);
+            LocalBroadcastManager.getInstance(this)
+                    .registerReceiver(manager.getHandler(), intentFilter);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (manager != null) LocalBroadcastManager.getInstance(this).unregisterReceiver(manager.getHandler());
     }
 
     @Override

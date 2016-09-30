@@ -1,6 +1,8 @@
 package com.example.daniel.podcastplayer.player;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,14 +22,16 @@ import com.example.daniel.podcastplayer.data.Episode;
 
 import java.io.File;
 
-/**
- * Created by Daniel on 25/9/2016.
- */
-
 public class PlayerSheetManager {
 
+    private ServiceActivity container;
+
+    public PlayerSheetManager(ServiceActivity act){
+        container = act;
+    }
+
     //containter activity has the UI
-    public void setSheetInterface(Episode e, ServiceActivity container){
+    public void setSheetInterface(Episode e){
         ViewGroup splayerLayout = (ViewGroup)container.findViewById(R.id.splayer_layout);
         if (splayerLayout != null){
             splayerLayout.setVisibility(View.VISIBLE);
@@ -42,7 +46,7 @@ public class PlayerSheetManager {
             if (episodeTV != null)
                 episodeTV.setText(e.getEpTitle());
 
-            setPlayButton(container);
+            setPlayButton();
 
             splayerLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -53,7 +57,7 @@ public class PlayerSheetManager {
         }
     }
 
-    private void setPlayButton(final ServiceActivity container){
+    private void setPlayButton(){
         final ImageButton playButton = (ImageButton)container.findViewById(R.id.splayer_play_button);
         if (playButton != null){
             playButton.setOnClickListener(new View.OnClickListener() {
@@ -86,4 +90,29 @@ public class PlayerSheetManager {
             }
         }
     }
+
+    public BroadcastReceiver getHandler() { return handler; }
+
+    private BroadcastReceiver handler = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch(intent.getAction()){
+                case(PodcastPlayerService.ACTION_FINISH):
+                    ((ImageButton)container.findViewById(R.id.splayer_play_button))
+                        .setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
+                                R.drawable.ic_play_arrow_black_24dp));
+                    break;
+                case(PodcastPlayerService.ACTION_PLAY):
+                    ((ImageButton)container.findViewById(R.id.splayer_play_button))
+                            .setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
+                                    R.drawable.ic_pause_black_24dp));
+                    break;
+                case(PodcastPlayerService.ACTION_PAUSE):
+                    ((ImageButton)container.findViewById(R.id.splayer_play_button))
+                            .setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
+                                    R.drawable.ic_play_arrow_black_24dp));
+                    break;
+            }
+        }
+    };
 }

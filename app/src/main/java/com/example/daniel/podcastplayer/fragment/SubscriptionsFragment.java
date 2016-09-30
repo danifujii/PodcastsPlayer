@@ -52,6 +52,7 @@ public class SubscriptionsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        gv.setAdapter(new ImageAdapter(getContext(), DbHelper.getInstance(getContext()).getPodcasts()));
+        //TODO Change adapter to List Adapter
+        gv.setAdapter(new ImageAdapter(getContext(), DbHelper.getInstance(getContext()).getPodcastsCursor()));
     }
 }

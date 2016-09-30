@@ -38,7 +38,14 @@ public class MainActivity extends ServiceActivity{
         viewPager.setCurrentItem(1);
         TabLayout tl = (TabLayout) findViewById(R.id.tabLayout);
         tl.setupWithViewPager(viewPager);
-        startService(new Intent(this,PodcastPlayerService.class));  //TODO it has to run continously, but when do we stop it?
+        startService(new Intent(this,PodcastPlayerService.class)
+                .setAction(PodcastPlayerService.ACTION_START));  //TODO JUST START WHEN PLAYING, OTHERWISE IT SHOWS THE NOTIFICATION TOO EARLY
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(this,PodcastPlayerService.class));
     }
 
     @Override
@@ -67,8 +74,7 @@ public class MainActivity extends ServiceActivity{
 
     private void setPlayerSheet(PodcastPlayerService pps){
         findViewById(R.id.splayer_layout).setVisibility(View.VISIBLE);
-        PlayerSheetManager psm = new PlayerSheetManager();
-        psm.setSheetInterface(pps.getEpisode(),this);
+        manager.setSheetInterface(pps.getEpisode());
     }
 
     private class TabPagerAdapter extends FragmentStatePagerAdapter {

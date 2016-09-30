@@ -88,18 +88,33 @@ public class DbHelper extends SQLiteOpenHelper{
                 + Tbls.NAME_PODCAST + " WHERE " + Tbls.COLUMN_ID + "='"
                 + String.valueOf(podcastId) + "'"
                 , null);
-        return buildPodcast(c);
+        if (c.moveToFirst()) {
+            Podcast p = buildPodcast(c);
+            c.close();
+            return p;
+        }
+        return null;
     }
 
-    public Cursor getPodcasts(){
+    public Cursor getPodcastsCursor(){
         return getWritableDatabase().rawQuery("SELECT * FROM "
             + Tbls.NAME_PODCAST + " ORDER BY " + Tbls.COLUMN_TITLE, null);
+    }
+
+    public List<Podcast> getPodcasts(){
+        List<Podcast> result = new ArrayList<>();
+
+        Cursor c = getPodcastsCursor();
+        while (c.moveToNext()){
+            result.add(buildPodcast(c));
+        }
+        c.close();
+        return result;
     }
 
     public Podcast buildPodcast(Cursor c){
         Podcast p = null;
         if (c.getCount() > 0){
-            c.moveToFirst();
             p = new Podcast();
             p.setPodcastId(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_ID)));
             p.setPodcastName(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_TITLE)));
@@ -107,7 +122,6 @@ public class DbHelper extends SQLiteOpenHelper{
             try { p.setFeedUrl(new URL(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_FEED)))); }
             catch (MalformedURLException me) { me.printStackTrace(); }
         }
-        c.close();
         return p;
     }
 
@@ -135,6 +149,10 @@ public class DbHelper extends SQLiteOpenHelper{
             return c.getInt(c.getColumnIndex(Tbls.COLUMN_LISTENED));
         }
         return -1;
+    }
+
+    public Episode getLastEpisode(int podcastId){
+        return getEpisodes(podcastId).get(0);
     }
 
     //Get latest, non listened episodes from each podcast

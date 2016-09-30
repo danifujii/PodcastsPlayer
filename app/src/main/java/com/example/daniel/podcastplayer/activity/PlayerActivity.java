@@ -1,8 +1,10 @@
 package com.example.daniel.podcastplayer.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,6 +12,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +28,7 @@ import android.widget.TextView;
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
+import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService.PlayerBinder;
@@ -45,6 +49,8 @@ public class PlayerActivity extends ServiceActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
+
+        manager = null; //No player sheet in here, so no sense to update such UI
     }
 
     public void setupPlayerUI(){
@@ -73,11 +79,11 @@ public class PlayerActivity extends ServiceActivity{
                 play.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        changeButtonIcon(play);
                         if (service.isPlaying())
                             service.pausePlayback();
                         else
                             service.resumePlayback();
+                        changeButtonIcon(play);
                     }
                 });
             }
@@ -157,6 +163,22 @@ public class PlayerActivity extends ServiceActivity{
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(PodcastPlayerService.ACTION_FINISH);
+        intentFilter.addAction(PodcastPlayerService.ACTION_PLAY);
+        intentFilter.addAction(PodcastPlayerService.ACTION_PAUSE);
+        LocalBroadcastManager.getInstance(this).registerReceiver(handler, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(handler);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         setupPlayerUI();
@@ -182,8 +204,33 @@ public class PlayerActivity extends ServiceActivity{
 
     private void changeButtonIcon(ImageButton playButton){
         if (bound && service.isPlaying())
-            playButton.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.ic_play_arrow_black_48dp));
-        else
             playButton.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.ic_pause_black_48dp));
+        else
+            playButton.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.ic_play_arrow_black_48dp));
     }
+
+    private BroadcastReceiver handler = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ImageButton playButton =((ImageButton) findViewById(R.id.player_play_button));
+            Log.d("PLAYERACT",intent.getAction());
+            switch (intent.getAction()){
+                case(PodcastPlayerService.ACTION_FINISH):{
+                    playButton.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_play_arrow_black_48dp));
+                    progressTV.setText(length + divider + length);
+                    break;
+                }
+                case(PodcastPlayerService.ACTION_PLAY):{
+                    Log.d("PLAYERACT","PLAY");
+                    changeButtonIcon(playButton);
+                    break;
+                }
+                case(PodcastPlayerService.ACTION_PAUSE):{
+                    changeButtonIcon(playButton);
+                    Log.d("PLAYERACT","PAUSE");
+                    break;
+                }
+            }
+        }
+    };
 }

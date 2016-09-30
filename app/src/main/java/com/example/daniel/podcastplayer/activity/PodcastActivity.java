@@ -32,7 +32,6 @@ import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.download.Downloader;
-import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 
 import java.io.File;
@@ -93,7 +92,7 @@ public class PodcastActivity extends ServiceActivity {
 
 
         if (bound && service.isStarted())
-            (new PlayerSheetManager()).setSheetInterface(service.getEpisode(),this);
+            manager.setSheetInterface(service.getEpisode());
 
         int artworkColor = ColorPicker.getArtworkColor(bitmap);
         if (artworkColor != 0x000000) {

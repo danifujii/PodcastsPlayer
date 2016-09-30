@@ -20,4 +20,7 @@
     <string name="listened_setting">listenedSetting</string>
     <string name="episode_listen_setting">episodeListeningSetting</string>
     <string name="file_setting">prefsFile</string>
+
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
 </resources>
