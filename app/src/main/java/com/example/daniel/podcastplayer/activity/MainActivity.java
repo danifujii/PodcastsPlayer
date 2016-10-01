@@ -1,5 +1,6 @@
 package com.example.daniel.podcastplayer.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +20,7 @@ import android.widget.FrameLayout;
 
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
+import com.example.daniel.podcastplayer.download.Downloader;
 import com.example.daniel.podcastplayer.fragment.NewPodcastsFragment;
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.fragment.SearchFragment;
@@ -33,13 +35,14 @@ public class MainActivity extends ServiceActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ViewPager viewPager = (ViewPager)findViewById(R.id.viewPager);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setAdapter(new TabPagerAdapter(getSupportFragmentManager()));
         viewPager.setCurrentItem(1);
         TabLayout tl = (TabLayout) findViewById(R.id.tabLayout);
         tl.setupWithViewPager(viewPager);
         startService(new Intent(this,PodcastPlayerService.class)
-                .setAction(PodcastPlayerService.ACTION_START));  //TODO JUST START WHEN PLAYING, OTHERWISE IT SHOWS THE NOTIFICATION TOO EARLY
+                .setAction(PodcastPlayerService.ACTION_START));
+        Downloader.updatePodcasts(this);
     }
 
     @Override
@@ -56,6 +59,12 @@ public class MainActivity extends ServiceActivity{
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
+
+    @Override
     public void setupPlayerUI() {
         if (service.isStarted())
             setPlayerSheet(service);
@@ -64,9 +73,7 @@ public class MainActivity extends ServiceActivity{
                     Context.MODE_PRIVATE);
             int duration = sp.getInt(getString(R.string.listened_setting), -1);
             String epUrl = sp.getString(getString(R.string.episode_listen_setting), "");
-            Log.d("MAINACT",epUrl);
             if (!epUrl.isEmpty() && duration > 0) {
-                Log.d("MAINACT","Enters IF");
                 Episode e = DbHelper.getInstance(this).getEpisode(epUrl);
                 service.startPlayback(e, this, false);
                 setPlayerSheet(service);

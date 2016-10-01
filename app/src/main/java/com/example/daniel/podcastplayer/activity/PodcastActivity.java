@@ -42,8 +42,8 @@ import java.util.List;
 
 public class PodcastActivity extends ServiceActivity {
 
-    private BroadcastReceiver downloadReceiver;
     private Podcast p;
+    private RecyclerView epsRV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +79,7 @@ public class PodcastActivity extends ServiceActivity {
         }
 
         List<Episode> episodes = DbHelper.getInstance(this).getEpisodes(podcastId);
-        RecyclerView epsRV = (RecyclerView)findViewById(R.id.episodes_rv);
+        epsRV = (RecyclerView)findViewById(R.id.episodes_rv);
         if (epsRV != null){
             epsRV.setLayoutManager(new LinearLayoutManager(this));
             epsRV.setAdapter(new EpisodeAdapter(episodes));
@@ -128,24 +128,31 @@ public class PodcastActivity extends ServiceActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setDownloadReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        filter.addAction(Downloader.ACTION_DOWNLOADED);
+        registerReceiver(receiver,filter);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(downloadReceiver);
+        unregisterReceiver(receiver);
     }
 
-    private void setDownloadReceiver(){
-        //TODO actualizar boton del EpisodeAdapter
-        downloadReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction()))
-                    Log.d("POD ACT","Download completed");
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch(intent.getAction()){
+                case (DownloadManager.ACTION_DOWNLOAD_COMPLETE): epsRV.getAdapter().notifyDataSetChanged();
+                    break;
+                case (Downloader.ACTION_DOWNLOADED): {
+                    List<Episode> episodes = DbHelper.getInstance(PodcastActivity.this)
+                            .getEpisodes(p.getPodcastId());
+                    epsRV.setAdapter(new EpisodeAdapter(episodes));
+                    break;
+                }
             }
-        };
-        registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-    }
+        }
+    };
 }

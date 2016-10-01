@@ -1,9 +1,14 @@
 package com.example.daniel.podcastplayer.fragment;
 
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,6 +20,7 @@ import com.example.daniel.podcastplayer.activity.PodcastActivity;
 import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
+import com.example.daniel.podcastplayer.download.Downloader;
 
 import java.util.List;
 
@@ -26,10 +32,7 @@ public class NewPodcastsFragment extends Fragment {
 
     private RecyclerView rv;
 
-    public NewPodcastsFragment() {
-        // Required empty public constructor
-    }
-
+    public NewPodcastsFragment() {} // Required empty public constructor
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,8 +47,26 @@ public class NewPodcastsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver,
+                new IntentFilter(Downloader.ACTION_DOWNLOADED));
+        setRecyclerViewInfo();
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+    }
+
+    public void setRecyclerViewInfo(){
         List<Episode> latest = DbHelper.getInstance(getContext()).getLatestEpisodes();
         rv.setAdapter(new EpisodeAdapter(latest));
     }
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            setRecyclerViewInfo();
+        }
+    };
 }

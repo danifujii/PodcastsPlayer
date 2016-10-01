@@ -1,13 +1,16 @@
 package com.example.daniel.podcastplayer.download;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
@@ -36,6 +39,7 @@ public class Downloader {
     public interface OnImageDownloadReceiver { void receiveImage(Bitmap bitmap); }
     public interface OnEpisodeParsedReceiver{ void receiveEpisodes(List<Episode> episodes); }
     public interface OnPodcastParsedReceiver{ void receivePodcasts(List<Podcast> podcast); }
+    public static final String ACTION_DOWNLOADED = "action_downloaded";
 
     public static void downloadImage(URL url, final OnImageDownloadReceiver re){
         new AsyncTask<URL,Void,Bitmap>(){
@@ -129,18 +133,36 @@ public class Downloader {
     }
 
     //Update podcasts episode, syncing and seeing if new episodes are available
-    public static void updatePodcasts(Context context){
-        for (Podcast p : DbHelper.getInstance(context).getPodcasts())
-            new AsyncTask<Void,Void,Void>(){
-                @Override
-                protected Void doInBackground(Void... params) {
-                    return null;
+    public static void updatePodcasts(final Context context){
+        new AsyncTask<Void,Void,Void>(){
+            @Override
+            protected Void doInBackground(Void... params) {
+                for (Podcast p : DbHelper.getInstance(context).getPodcasts()){
+                    OnEpisodeParsedReceiver receiver = new OnEpisodeParsedReceiver() {
+                        @Override
+                        public void receiveEpisodes(List<Episode> episodes) {
+                            DbHelper db = DbHelper.getInstance(context);
+                            if (episodes.size()>0) {
+                                int podcastId = episodes.get(0).getPodcastId();
+                                Episode last = db.getLastEpisode(podcastId);
+                                for (Episode e : episodes) {
+                                    if (!e.getEpURL().equals(last.getEpURL()))
+                                        db.insertEpisode(e, podcastId);
+                                    else break;
+                                }
+                            }
+                        }
+                    };
+                    parseEpisodes(p.getFeedUrl(), p.getPodcastId(), receiver);
                 }
+                return null;
+            }
 
-                @Override
-                protected void onPostExecute(Void aVoid) {
-                    super.onPostExecute(aVoid);
-                }
-            }.execute();
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(ACTION_DOWNLOADED));
+            }
+        }.execute();
     }
 }
