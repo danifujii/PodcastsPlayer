@@ -1,16 +1,20 @@
 package com.example.daniel.podcastplayer.download;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.webkit.URLUtil;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
@@ -26,7 +30,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static android.R.attr.bitmap;
 
@@ -83,9 +89,16 @@ public class Downloader {
                     conn.connect();
                     stream = conn.getInputStream();
                 } catch (IOException e){e.printStackTrace();}
-                List<Episode> result = ResultParser.getInstance().parseFeed(stream, podcastId);
-                try {stream.close();}
-                catch (IOException e) {e.printStackTrace();}
+                List<Episode> result = new ArrayList<Episode>();
+                if (stream != null) {                           //can be null if connection fails
+                    result = ResultParser.getInstance().parseFeed(stream, podcastId);
+                    try {
+                        stream.close();
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
                 if (conn != null) conn.disconnect();
                 return result;
             }
@@ -137,6 +150,8 @@ public class Downloader {
         new AsyncTask<Void,Void,Void>(){
             @Override
             protected Void doInBackground(Void... params) {
+                final Set<String> prefs = PreferenceManager.getDefaultSharedPreferences(context)
+                        .getStringSet(context.getString(R.string.automatic_download_pref),null);
                 for (Podcast p : DbHelper.getInstance(context).getPodcasts()){
                     OnEpisodeParsedReceiver receiver = new OnEpisodeParsedReceiver() {
                         @Override
@@ -146,8 +161,11 @@ public class Downloader {
                                 int podcastId = episodes.get(0).getPodcastId();
                                 Episode last = db.getLastEpisode(podcastId);
                                 for (Episode e : episodes) {
-                                    if (!e.getEpURL().equals(last.getEpURL()))
+                                    if (!e.getEpURL().equals(last.getEpURL())) {
                                         db.insertEpisode(e, podcastId);
+                                        if (prefs.contains(String.valueOf(e.getPodcastId())))    //if automatic donwload is active, download episode
+                                            downloadEpisode(context, e);
+                                    }
                                     else break;
                                 }
                             }
@@ -164,5 +182,17 @@ public class Downloader {
                 LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(ACTION_DOWNLOADED));
             }
         }.execute();
+    }
+
+    public static void downloadEpisode(Context context, Episode ep){
+        DownloadManager mgr = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri uri = Uri.parse(ep.getEpURL());
+        mgr.enqueue(new DownloadManager.Request(uri)
+                .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI)
+                .setTitle("Downloading episode")
+                .setDescription(ep.getEpTitle())
+                .setDestinationInExternalFilesDir(context
+                        , context.getFilesDir().getAbsolutePath()
+                        , URLUtil.guessFileName(ep.getEpURL(), null, null)));
     }
 }

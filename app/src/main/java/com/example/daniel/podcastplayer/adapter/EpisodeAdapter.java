@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.activity.ServiceActivity;
+import com.example.daniel.podcastplayer.download.Downloader;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 import com.example.daniel.podcastplayer.R;
@@ -57,17 +58,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
             @Override
             public void onClick(View v) {
                 Episode ep = data.get(holder.getAdapterPosition());
-                if (!ep.getDownloaded()){
-                    DownloadManager mgr = (DownloadManager) v.getContext().getSystemService(Context.DOWNLOAD_SERVICE);
-                    Uri uri = Uri.parse(ep.getEpURL());
-                    mgr.enqueue(new DownloadManager.Request(uri)
-                            .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI)
-                            .setTitle("Downloading episode")
-                            .setDescription(ep.getEpTitle())
-                            .setDestinationInExternalFilesDir(v.getContext()
-                                    , v.getContext().getFilesDir().getAbsolutePath()
-                                    , URLUtil.guessFileName(ep.getEpURL(), null, null)));
-                }
+                if (!ep.getDownloaded())
+                    Downloader.downloadEpisode(v.getContext(), ep);
                 else{
                     PodcastPlayerService player = activity.getService();
                     //if (player.getEpisode() != ep || !player.isPlaying())    //avoid restarting an episode already playing

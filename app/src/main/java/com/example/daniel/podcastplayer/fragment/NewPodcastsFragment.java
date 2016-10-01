@@ -1,6 +1,7 @@
 package com.example.daniel.podcastplayer.fragment;
 
 
+import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -47,15 +48,17 @@ public class NewPodcastsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver,
-                new IntentFilter(Downloader.ACTION_DOWNLOADED));
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        filter.addAction(Downloader.ACTION_DOWNLOADED);
+        getActivity().registerReceiver(receiver,filter);
         setRecyclerViewInfo();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+        getActivity().unregisterReceiver(receiver);
     }
 
     public void setRecyclerViewInfo(){
@@ -66,7 +69,15 @@ public class NewPodcastsFragment extends Fragment {
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            setRecyclerViewInfo();
+            switch(intent.getAction()){
+                case (DownloadManager.ACTION_DOWNLOAD_COMPLETE):
+                    rv.getAdapter().notifyDataSetChanged();
+                    break;
+                case (Downloader.ACTION_DOWNLOADED): {
+                    setRecyclerViewInfo();
+                    break;
+                }
+            }
         }
     };
 }

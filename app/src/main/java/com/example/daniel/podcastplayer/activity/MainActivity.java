@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
@@ -43,6 +44,14 @@ public class MainActivity extends ServiceActivity{
         startService(new Intent(this,PodcastPlayerService.class)
                 .setAction(PodcastPlayerService.ACTION_START));
         Downloader.updatePodcasts(this);
+
+        ImageButton settingsButton = (ImageButton) findViewById(R.id.settings_button);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this,SettingsActivity.class));
+            }
+        });
     }
 
     @Override

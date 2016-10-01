@@ -18,9 +18,12 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -32,12 +35,8 @@ import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.download.Downloader;
-import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PodcastActivity extends ServiceActivity {
@@ -50,7 +49,7 @@ public class PodcastActivity extends ServiceActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_podcast);
 
-        long podcastId = Long.valueOf(getIntent().getExtras().getString(DbHelper.Tbls.COLUMN_ID));
+        int podcastId = Integer.valueOf(getIntent().getExtras().getString(DbHelper.Tbls.COLUMN_ID));
         p = DbHelper.getInstance(this).getPodcast(podcastId);
 
         //Set podcast data
@@ -95,12 +94,11 @@ public class PodcastActivity extends ServiceActivity {
             manager.setSheetInterface(service.getEpisode());
 
         int artworkColor = ColorPicker.getArtworkColor(bitmap);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.podcast_act_toolbar);
+        toolbar.setTitle(p.getPodcastName());
         if (artworkColor != 0x000000) {
             //((ViewGroup)findViewById(R.id.header_layout)).setBackgroundColor(artworkColor);
-            Toolbar toolbar = (Toolbar)findViewById(R.id.podcast_act_toolbar);
-            toolbar.setTitle(p.getPodcastName());
             toolbar.setBackgroundColor(artworkColor);
-
             if (Build.VERSION.SDK_INT >= 21)
                 getWindow().setStatusBarColor(ColorPicker.getDarkerColor(artworkColor));
         }

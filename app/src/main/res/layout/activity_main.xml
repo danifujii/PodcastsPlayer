@@ -7,15 +7,26 @@
     android:layout_height="match_parent"
     tools:context="com.example.daniel.podcastplayer.activity.MainActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/main_tool_bar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:title="@string/app_name">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/main_tool_bar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:title="@string/app_name">
 
-    </android.support.v7.widget.Toolbar>
+            <ImageButton
+                android:id="@+id/settings_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_settings_white_24dp"
+                android:padding="@dimen/activity_medium_margin"
+                android:background="@null"
+                android:layout_gravity="right"
+                />
+
+        </android.support.v7.widget.Toolbar>
+
     
     <LinearLayout
         android:orientation="vertical"

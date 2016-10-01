@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Podcast Player</string>
+    <string name="app_name">Stereo</string>
     <string name="tab_search">Search</string>
     <string name="tab_discover">Discover</string>
     <string name="tab_new">New</string>
@@ -20,6 +20,9 @@
     <string name="listened_setting">listenedSetting</string>
     <string name="episode_listen_setting">episodeListeningSetting</string>
     <string name="file_setting">prefsFile</string>
+
+    <string name="title_act_pref">Settings</string>
+    <string name="automatic_download_pref">Automatic download</string>
 
     <string name="play">Play</string>
     <string name="pause">Pause</string>

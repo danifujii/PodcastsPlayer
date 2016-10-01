@@ -83,7 +83,7 @@ public class DbHelper extends SQLiteOpenHelper{
                 ,null).getCount())>0;
     }
 
-    public Podcast getPodcast(long podcastId){
+    public Podcast getPodcast(int podcastId){
         Cursor c =getWritableDatabase().rawQuery("SELECT * FROM "
                 + Tbls.NAME_PODCAST + " WHERE " + Tbls.COLUMN_ID + "='"
                 + String.valueOf(podcastId) + "'"

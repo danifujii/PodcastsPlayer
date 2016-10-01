@@ -54,32 +54,35 @@ public class ResultParser {
     private List<Episode> parseFeed(InputStream is, int limit, int podcastId){
         List<Episode> result = new ArrayList<>();
         try{
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document d = builder.parse(is);
+            if (is != null){
+                DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                Document d = builder.parse(is);
 
-            //Get podcast description from RSS
-            NodeList descList = d.getElementsByTagName("description");
-            if (descList.getLength() > 0)
-                desc = descList.item(0).getTextContent();
+                //Get podcast description from RSS
+                NodeList descList = d.getElementsByTagName("description");
+                if (descList.getLength() > 0)
+                    desc = descList.item(0).getTextContent();
 
-            //Parse episodes from RSS
-            NodeList episodes = d.getElementsByTagName("item");
-            for (int i = 0; i < episodes.getLength(); i++) {
-                Episode e = new Episode(podcastId);
-                Element n = (Element)episodes.item(i);
-                e.setEpTitle(n.getElementsByTagName("title").item(0).getTextContent());
-                e.setEpDate(getDate(n.getElementsByTagName("pubDate").item(0).getTextContent()));
-                e.setLength(getMiliseconds(n.getElementsByTagName("itunes:duration").item(0)
-                        .getTextContent()));
-                Element url = (Element)n.getElementsByTagName("enclosure").item(0);
-                //e.setLength(Integer.valueOf(url.getAttribute("length")));
-                e.setEpURL(url.getAttribute("url"));
-                if (url.getAttribute("type").matches("audio/(.*)"))
-                    result.add(e);
-                else Log.d("TAG","NO Matches"); //TODO mostrar error al usuario, indicando que el formato no es soportado
+                //Parse episodes from RSS
+                NodeList episodes = d.getElementsByTagName("item");
+                for (int i = 0; i < episodes.getLength(); i++) {
+                    Episode e = new Episode(podcastId);
+                    Element n = (Element) episodes.item(i);
+                    e.setEpTitle(n.getElementsByTagName("title").item(0).getTextContent());
+                    e.setEpDate(getDate(n.getElementsByTagName("pubDate").item(0).getTextContent()));
+                    e.setLength(getMiliseconds(n.getElementsByTagName("itunes:duration").item(0)
+                            .getTextContent()));
+                    Element url = (Element) n.getElementsByTagName("enclosure").item(0);
+                    //e.setLength(Integer.valueOf(url.getAttribute("length")));
+                    e.setEpURL(url.getAttribute("url"));
+                    if (url.getAttribute("type").matches("audio/(.*)"))
+                        result.add(e);
+                    else
+                        Log.d("TAG", "NO Matches"); //TODO mostrar error al usuario, indicando que el formato no es soportado
 
 
-                if (result.size() == limit) break;
+                    if (result.size() == limit) break;
+            }
             }
         } catch (Exception e) { e.printStackTrace(); }
 

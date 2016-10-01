@@ -14,12 +14,17 @@ public class ColorPicker {
     {
         Palette p = Palette.from(artwork).generate();
         int def = 0x000000;
-        int artColor = p.getDarkVibrantColor(def);
+        int artColor = p.getVibrantColor(def);
         if (def != artColor)
             return artColor;
         else{
-            artColor = p.getDarkMutedColor(def);
-            return (artColor != def) ? artColor : p.getMutedColor(def);
+            artColor = p.getDarkVibrantColor(def);
+            if (def != artColor)
+                return artColor;
+            else {
+                artColor = p.getDarkMutedColor(def);
+                return (artColor != def) ? artColor : p.getMutedColor(def);
+            }
         }
     }
 
