@@ -36,7 +36,8 @@ public class PlayerSheetManager {
         if (splayerLayout != null){
             splayerLayout.setVisibility(View.VISIBLE);
 
-            File image = new File(container.getApplicationInfo().dataDir + "/Artwork", e.getPodcastId() + ".png");
+            File image = new File(container.getApplicationInfo().dataDir + "/Artwork",
+                    String.valueOf(e.getPodcastId()) + ".png");
             Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
             ImageView artworkIV = (ImageView)container.findViewById(R.id.splayer_art_iv);
             if (artworkIV != null)

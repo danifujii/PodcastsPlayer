@@ -31,7 +31,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-public class PodcastSearchActivity extends AppCompatActivity implements Downloader.DownloadReceiver{
+public class PodcastSearchActivity extends AppCompatActivity
+        implements Downloader.OnImageDownloadReceiver, Downloader.OnEpisodeParsedReceiver{
 
     private RecyclerView rv;
     private Button subsButton;
@@ -56,49 +57,13 @@ public class PodcastSearchActivity extends AppCompatActivity implements Download
         artwork = (ImageView)findViewById(R.id.pod_artwork);
         if (artwork!=null) artwork.setImageBitmap(podcast.getArtwork());
 
-        //NetworkInfo networkInfo = ((ConnectivityManager)
-          //      getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-        //if (networkInfo != null && networkInfo.isConnected())
-            //Download the feed data
-            new AsyncTask<URL,Void,List<Episode>>(){
-                @Override
-                protected List<Episode> doInBackground(URL... params) {
-                    HttpURLConnection conn = null;
-                    InputStream stream = null;
-                    try{
-                        conn = (HttpURLConnection) (params[0]).openConnection();
-                        conn.connect();
-                        stream = conn.getInputStream();
-                    } catch (IOException e){e.printStackTrace();}
-                    List<Episode> result = ResultParser.getInstance().parseFeed(stream,
-                            podcast.getPodcastId());
-                    desc = ResultParser.getInstance().getDesc();
-                    try {stream.close();}
-                    catch (IOException e) {e.printStackTrace();}
-                    if (conn != null) conn.disconnect();
-                    return result;
-                }
-
-                @Override
-                protected void onPostExecute(List<Episode> episodes) {
-                    super.onPostExecute(episodes);
-                    if (episodes.size() > 0){
-                        ((TextView)findViewById(R.id.ep_title_tv)).setText(episodes.get(0).getEpTitle());
-                        ((TextView)findViewById(R.id.ep_date_tv)).
-                                setText(EpisodeAdapter.getDateFormat(episodes.get(0).getEpDate()));
-                    }
-                    TextView descTV = (TextView)findViewById(R.id.pod_desc_tv);
-                    descTV.setText(desc);
-                    parsedEpisodes = episodes;
-                    subsButton.setEnabled(true);
-                }
-            }.execute(podcast.getFeedUrl());
+        //Download the feed data
+        Downloader.parseEpisodes(podcast.getFeedUrl(), podcast.getPodcastId() ,this);
 
         //Setup the Subscribe button
         subsButton = (Button)findViewById(R.id.subscribe_button);
         if (subsButton != null) {
             changeSubButtonText(DbHelper.getInstance(this).existsPodcast(podcast.getPodcastId()));
-
             subsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -145,14 +110,15 @@ public class PodcastSearchActivity extends AppCompatActivity implements Download
                 dir.mkdirs();
             }
             File image = new File(dir, String.valueOf(podcast.getPodcastId()) + ".png");
-            FileOutputStream fOut = new FileOutputStream(image);
-
-            if (artwork != null) {
-                Bitmap art = ((BitmapDrawable) artwork.getDrawable()).getBitmap();
-                art.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+            if (!image.exists()) {      //don't save if it already exists
+                FileOutputStream fOut = new FileOutputStream(image);
+                if (artwork != null) {
+                    Bitmap art = ((BitmapDrawable) artwork.getDrawable()).getBitmap();
+                    art.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                }
+                fOut.flush();
+                fOut.close();
             }
-            fOut.flush();
-            fOut.close();
         } catch (IOException e) { e.printStackTrace(); }
     }
 
@@ -164,5 +130,20 @@ public class PodcastSearchActivity extends AppCompatActivity implements Download
             if (subsButton.getText().equals(getString(R.string.unsubscribe_button)))
                 saveArtwork();
         }
+    }
+
+    @Override
+    public void receiveEpisodes(List<Episode> episodes) {
+        if (episodes.size() > 0){
+            ((TextView)findViewById(R.id.ep_title_tv)).setText(episodes.get(0).getEpTitle());
+            ((TextView)findViewById(R.id.ep_date_tv)).
+                    setText(EpisodeAdapter.getDateFormat(episodes.get(0).getEpDate()));
+        }
+        TextView descTV = (TextView)findViewById(R.id.pod_desc_tv);
+        desc = ResultParser.getInstance().getDesc();    //Esto fue modificado durante el parsing que
+        // ocurre en AsyncTask
+        descTV.setText(desc);
+        parsedEpisodes = episodes;
+        subsButton.setEnabled(true);
     }
 }

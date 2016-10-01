@@ -47,11 +47,11 @@ public class ResultParser {
         return result;
     }
 
-    public List<Episode> parseFeed(InputStream is, long podcastId){
+    public List<Episode> parseFeed(InputStream is, int podcastId){
         return parseFeed(is, Integer.MAX_VALUE, podcastId);
     }
 
-    private List<Episode> parseFeed(InputStream is, int limit, long podcastId){
+    private List<Episode> parseFeed(InputStream is, int limit, int podcastId){
         List<Episode> result = new ArrayList<>();
         try{
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

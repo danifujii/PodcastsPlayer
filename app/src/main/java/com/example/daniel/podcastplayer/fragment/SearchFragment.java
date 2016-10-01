@@ -3,7 +3,6 @@ package com.example.daniel.podcastplayer.fragment;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -18,6 +17,8 @@ import android.widget.SearchView;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.adapter.PodResAdapter;
+import com.example.daniel.podcastplayer.data.Podcast;
+import com.example.daniel.podcastplayer.download.Downloader;
 import com.example.daniel.podcastplayer.download.ResultParser;
 
 import java.io.BufferedReader;
@@ -25,11 +26,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
-public class SearchFragment extends Fragment {
+public class SearchFragment extends Fragment implements Downloader.OnPodcastParsedReceiver{
 
-    private OnFragmentInteractionListener mListener;
     private RecyclerView rv;
 
     public SearchFragment() { /*Required empty*/ }
@@ -45,21 +47,13 @@ public class SearchFragment extends Fragment {
             sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    new AsyncTask<String,Void,String>(){
-                        @Override
-                        protected String doInBackground(String... params) {
-                            return getSearchResult(params[0]);
-                        }
-                        @Override
-                        protected void onPostExecute(String s) {
-                            super.onPostExecute(s);
-                            if (s != null)
-                                rv.setAdapter(new PodResAdapter(ResultParser.getInstance().parseSearch(s,rv)));
-                        }
-                    }.execute(query.replace(' ','+'));
+                    NetworkInfo networkInfo = ((ConnectivityManager)
+                            getActivity().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+                    if (networkInfo != null && networkInfo.isConnected()) {
+                        Downloader.parsePodcasts(query.replace(' ', '+'), rv, SearchFragment.this);
+                    } else Snackbar.make(getView(), getString(R.string.error_no_connection),Snackbar.LENGTH_SHORT).show();
                     return true;
                 }
-
                 @Override public boolean onQueryTextChange(String newText) { return false; }
             });
         }
@@ -70,35 +64,9 @@ public class SearchFragment extends Fragment {
         return v;
     }
 
-    public String getSearchResult(String term){
-        NetworkInfo networkInfo = ((ConnectivityManager)
-                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            BufferedReader reader = null;
-            HttpURLConnection huc = null;
-            try {
-                URL myurl = new URL("https://itunes.apple.com/search?term=" + term + "&media=podcast");
-                huc = (HttpURLConnection) myurl.openConnection();
-                huc.connect();
-                InputStream stream = huc.getInputStream();
-                reader = new BufferedReader(new InputStreamReader(stream));
-                StringBuilder buffer = new StringBuilder();
-                String line = "";
-                while ((line = reader.readLine())!=null)
-                    buffer.append(line);
-                return  buffer.toString();
-            } catch(IOException ioe) { ioe.printStackTrace(); }
-            finally {
-                if (huc != null) huc.disconnect();
-                try { if (reader != null) reader.close(); }
-                catch (IOException ie){ ie.printStackTrace(); }
-            }
-        } else
-            Snackbar.make(getView(), getString(R.string.error_no_connection),Snackbar.LENGTH_SHORT).show();
-        return null;
-    }
 
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
+    @Override
+    public void receivePodcasts(List<Podcast> podcast) {
+        rv.setAdapter(new PodResAdapter(podcast));
     }
 }

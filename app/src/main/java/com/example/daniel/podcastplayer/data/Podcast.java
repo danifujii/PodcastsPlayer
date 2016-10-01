@@ -8,6 +8,8 @@ import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.example.daniel.podcastplayer.download.Downloader;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,9 +19,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Podcast implements Parcelable{
+public class Podcast implements Parcelable, Downloader.OnImageDownloadReceiver{
 
-    private long podcastId;
+    private int podcastId;
     private String podcastName;
     private String podcastArtist;
     private Bitmap artwork;
@@ -34,44 +36,18 @@ public class Podcast implements Parcelable{
         try {
             podcastName = json.getString("trackName");
             podcastArtist = json.getString("artistName");
-            podcastId = json.getLong("collectionId");
+            podcastId = json.getInt("collectionId");
             feedUrl = new URL(json.getString("feedUrl"));
             //Download the artwork
-            downloadImage(json.getString("artworkUrl100"));
+            Downloader.downloadImage(new URL(json.getString("artworkUrl100")),this);
             artworkURL = json.getString("artworkUrl600");
         }catch (JSONException | MalformedURLException je) { je.printStackTrace(); }
     }
 
-    public void downloadImage(String url) throws JSONException{
-        new AsyncTask<String,Void,Bitmap>(){
-            @Override
-            protected Bitmap doInBackground(String... params) {
-                String url = params[0];
-                InputStream is = null;
-                HttpURLConnection conn = null;
-                Bitmap result = null;
-                try {
-                    conn = (HttpURLConnection) (new URL(url)).openConnection();
-                    conn.connect();
-                    is = conn.getInputStream();
-                    result = BitmapFactory.decodeStream(is);
-                }
-                catch (IOException e) { e.printStackTrace(); }
-                finally{
-                    if (is != null)
-                        try {is.close(); }
-                        catch(IOException e){ e.printStackTrace(); }
-                    if (conn != null) conn.disconnect();
-                }
-                return result;
-            }
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                super.onPostExecute(bitmap);
-                artwork = bitmap;
-                searchRecyclerView.getAdapter().notifyDataSetChanged();
-            }
-        }.execute(url);
+    @Override
+    public void receiveImage(Bitmap bitmap) {
+        artwork = bitmap;
+        searchRecyclerView.getAdapter().notifyDataSetChanged();
     }
 
     public String getPodcastName() {
@@ -88,7 +64,7 @@ public class Podcast implements Parcelable{
 
     public URL getFeedUrl(){ return feedUrl; }
 
-    public long getPodcastId() {
+    public int getPodcastId() {
         return podcastId;
     }
 
@@ -96,7 +72,7 @@ public class Podcast implements Parcelable{
         return artworkURL;
     }
 
-    public void setPodcastId(long podcastId) {
+    public void setPodcastId(int podcastId) {
         this.podcastId = podcastId;
     }
 
@@ -126,7 +102,7 @@ public class Podcast implements Parcelable{
     }
 
     private Podcast(Parcel in){
-        podcastId = in.readLong();
+        podcastId = in.readInt();
         podcastName = in.readString();
         podcastArtist = in.readString();
         try { feedUrl = new URL(in.readString()); }
@@ -139,7 +115,7 @@ public class Podcast implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(podcastId);
+        dest.writeInt(podcastId);
         dest.writeString(podcastName);
         dest.writeString(podcastArtist);
         dest.writeString(feedUrl.toString());

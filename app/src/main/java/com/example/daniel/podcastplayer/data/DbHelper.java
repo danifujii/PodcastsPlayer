@@ -116,7 +116,7 @@ public class DbHelper extends SQLiteOpenHelper{
         Podcast p = null;
         if (c.getCount() > 0){
             p = new Podcast();
-            p.setPodcastId(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_ID)));
+            p.setPodcastId(c.getInt(c.getColumnIndex(DbHelper.Tbls.COLUMN_ID)));
             p.setPodcastName(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_TITLE)));
             p.setPodcastArtist(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_ARTIST)));
             try { p.setFeedUrl(new URL(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_FEED)))); }
@@ -170,7 +170,7 @@ public class DbHelper extends SQLiteOpenHelper{
     {
         List<Episode> episodes = new ArrayList<>();
         while (c.moveToNext()){
-            Episode e = new Episode(c.getLong(c.getColumnIndex(DbHelper.Tbls.COLUMN_FK_POD)));
+            Episode e = new Episode(c.getInt(c.getColumnIndex(DbHelper.Tbls.COLUMN_FK_POD)));
             e.setEpTitle(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_TITLE)));
             e.setEpDate(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_DATE)));
             e.setLength(c.getInt(c.getColumnIndex(DbHelper.Tbls.COLUMN_LENGTH)));

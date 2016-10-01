@@ -64,11 +64,13 @@ public class MainActivity extends ServiceActivity{
                     Context.MODE_PRIVATE);
             int duration = sp.getInt(getString(R.string.listened_setting), -1);
             String epUrl = sp.getString(getString(R.string.episode_listen_setting), "");
+            Log.d("MAINACT",epUrl);
             if (!epUrl.isEmpty() && duration > 0) {
+                Log.d("MAINACT","Enters IF");
                 Episode e = DbHelper.getInstance(this).getEpisode(epUrl);
                 service.startPlayback(e, this, false);
+                setPlayerSheet(service);
             }
-            setPlayerSheet(service);
         }
     }
 
