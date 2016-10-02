@@ -3,14 +3,15 @@ package com.example.daniel.podcastplayer.download;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.BatteryManager;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -35,10 +36,6 @@ import java.util.List;
 import java.util.Set;
 
 import static android.R.attr.bitmap;
-
-/**
- * Created by Daniel on 23/9/2016.
- */
 
 public class Downloader {
 
@@ -75,7 +72,8 @@ public class Downloader {
                 super.onPostExecute(bitmap);
                 re.receiveImage(bitmap);
             }
-        }.execute(url);
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,url);
+        //.execute(url);
     }
 
     public static void parseEpisodes(URL url, final int podcastId, final OnEpisodeParsedReceiver er){
@@ -108,7 +106,8 @@ public class Downloader {
                 super.onPostExecute(episodes);
                 er.receiveEpisodes(episodes);
             }
-        }.execute(url);
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,url);
+        //.execute(url);
     }
 
     public static void parsePodcasts(String term, final RecyclerView rv, final OnPodcastParsedReceiver receiver){
@@ -118,7 +117,7 @@ public class Downloader {
                 BufferedReader reader = null;
                 HttpURLConnection huc = null;
                 try {
-                    URL myurl = new URL("https://itunes.apple.com/search?term=" + params[0] + "&media=podcast");
+                    URL myurl = new URL(getCorrectURL("https://itunes.apple.com/search?term=" + params[0] + "&media=podcast"));
                     huc = (HttpURLConnection) myurl.openConnection();
                     huc.connect();
                     InputStream stream = huc.getInputStream();
@@ -141,12 +140,44 @@ public class Downloader {
                 super.onPostExecute(podcasts);
                 receiver.receivePodcasts(podcasts);
             }
-        }.execute(term);
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,term.replace(' ','+'));
+        //.execute(term);
+    }
 
+    public static void parseCategory(int category, final RecyclerView rv, final OnPodcastParsedReceiver receiver){
+        new AsyncTask<String,Void,List<Podcast>>(){
+            @Override
+            protected List<Podcast> doInBackground(String... params) {
+                HttpURLConnection huc = null;
+                InputStream stream = null;
+                try {
+                    URL myurl = new URL(getCorrectURL("https://itunes.apple.com/us/rss/topaudiopodcasts/genre="
+                            + params[0] + "/limit=50/xml"));
+                    huc = (HttpURLConnection) myurl.openConnection();
+                    huc.connect();
+                    stream = huc.getInputStream();
+                    return  ResultParser.getInstance().parseTopCategory(stream,rv);
+                } catch(IOException ioe) { ioe.printStackTrace(); }
+                finally {
+                    if (huc != null) huc.disconnect();
+                    try { if (stream != null) stream.close(); }
+                    catch (IOException ie){ ie.printStackTrace(); }
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(List<Podcast> podcasts) {
+                super.onPostExecute(podcasts);
+                receiver.receivePodcasts(podcasts);
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, String.valueOf(category));
+        //.execute(String.valueOf(category));
     }
 
     //Update podcasts episode, syncing and seeing if new episodes are available
     public static void updatePodcasts(final Context context){
+        DownloadManager mgr = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         new AsyncTask<Void,Void,Void>(){
             @Override
             protected Void doInBackground(Void... params) {
@@ -163,7 +194,8 @@ public class Downloader {
                                 for (Episode e : episodes) {
                                     if (!e.getEpURL().equals(last.getEpURL())) {
                                         db.insertEpisode(e, podcastId);
-                                        if (prefs.contains(String.valueOf(e.getPodcastId())))    //if automatic donwload is active, download episode
+                                        if (prefs.contains(String.valueOf(e.getPodcastId()))        //if automatic donwload is active, download episode
+                                                && isCharging(context))
                                             downloadEpisode(context, e);
                                     }
                                     else break;
@@ -181,18 +213,33 @@ public class Downloader {
                 super.onPostExecute(aVoid);
                 LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(ACTION_DOWNLOADED));
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        //.execute();
     }
 
-    public static void downloadEpisode(Context context, Episode ep){
-        DownloadManager mgr = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        Uri uri = Uri.parse(ep.getEpURL());
-        mgr.enqueue(new DownloadManager.Request(uri)
-                .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI)
-                .setTitle("Downloading episode")
-                .setDescription(ep.getEpTitle())
-                .setDestinationInExternalFilesDir(context
-                        , context.getFilesDir().getAbsolutePath()
-                        , URLUtil.guessFileName(ep.getEpURL(), null, null)));
+    public static void downloadEpisode(Context context, Episode ep){  //if the user was explicit on downloading an episode
+            DownloadManager mgr = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        //TODO just in WIFI
+            Uri uri = Uri.parse(ep.getEpURL());
+            mgr.enqueue(new DownloadManager.Request(uri)
+                    .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI)
+                    .setTitle("Downloading episode")
+                    .setDescription(ep.getEpTitle())
+                    .setDestinationInExternalFilesDir(context
+                            , context.getFilesDir().getAbsolutePath()
+                            , URLUtil.guessFileName(ep.getEpURL(), null, null)));
+    }
+
+    public static boolean isCharging(Context context){
+        Intent batteryStatus = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                status == BatteryManager.BATTERY_STATUS_FULL;
+        return isCharging;
+    }
+
+    private static String getCorrectURL(String og){
+        //TODO complete with other special characters
+        return og.replace("%","%25");
     }
 }

@@ -26,4 +26,21 @@
 
     <string name="play">Play</string>
     <string name="pause">Pause</string>
+    
+    <string name="cat_arts">Arts</string>
+    <string name="cat_business">Business</string>
+    <string name="cat_comedy">Comedy</string>
+    <string name="cat_education">Education</string>
+    <string name="cat_games">Games</string>
+    <string name="cat_gov">Government and Organizations</string>
+    <string name="cat_health">Health</string>
+    <string name="cat_kids">Kids and Family</string>
+    <string name="cat_music">Music</string>
+    <string name="cat_news">News and Politics</string>
+    <string name="cat_religion">Religion</string>
+    <string name="cat_science">Science</string>
+    <string name="cat_society">Society and Culture</string>
+    <string name="cat_sports">Sports</string>
+    <string name="cat_technology">Technology</string>
+    <string name="cat_tv">TV and Film</string>
 </resources>

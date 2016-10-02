@@ -18,6 +18,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import org.w3c.dom.Element;
+
 
 public class Podcast implements Parcelable, Downloader.OnImageDownloadReceiver{
 
@@ -44,10 +46,26 @@ public class Podcast implements Parcelable, Downloader.OnImageDownloadReceiver{
         }catch (JSONException | MalformedURLException je) { je.printStackTrace(); }
     }
 
+    //Build through
+    public Podcast(Element element, RecyclerView recyclerView){
+        searchRecyclerView = recyclerView;
+        podcastId = Integer.valueOf(((Element)element.getElementsByTagName("id").item(0)).getAttribute("im:id"));
+        podcastName = element.getElementsByTagName("title").item(0).getTextContent();
+        podcastArtist = element.getElementsByTagName("im:artist").item(0).getTextContent();
+        artworkURL = element.getElementsByTagName("im:image").item(2).getTextContent();
+        try{
+            feedUrl = null;
+            Downloader.downloadImage(new URL(artworkURL),this);
+        }
+        catch (MalformedURLException e){e.printStackTrace();}
+
+    }
+
     @Override
     public void receiveImage(Bitmap bitmap) {
         artwork = bitmap;
-        searchRecyclerView.getAdapter().notifyDataSetChanged();
+        if (searchRecyclerView != null)
+            searchRecyclerView.getAdapter().notifyDataSetChanged();
     }
 
     public String getPodcastName() {
@@ -106,7 +124,9 @@ public class Podcast implements Parcelable, Downloader.OnImageDownloadReceiver{
         podcastName = in.readString();
         podcastArtist = in.readString();
         try { feedUrl = new URL(in.readString()); }
-        catch (MalformedURLException me) { me.printStackTrace(); }
+        catch (MalformedURLException me) {
+            feedUrl = null;
+            me.printStackTrace(); }
         artworkURL = in.readString();
         int value = in.readInt();
         if (value > 0)
@@ -118,7 +138,9 @@ public class Podcast implements Parcelable, Downloader.OnImageDownloadReceiver{
         dest.writeInt(podcastId);
         dest.writeString(podcastName);
         dest.writeString(podcastArtist);
-        dest.writeString(feedUrl.toString());
+        if (feedUrl != null)
+            dest.writeString(feedUrl.toString());
+        else dest.writeString("");
         dest.writeString(artworkURL);
         if (artwork != null) {
             dest.writeInt(1);

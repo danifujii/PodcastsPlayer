@@ -47,6 +47,30 @@ public class ResultParser {
         return result;
     }
 
+    public List<Podcast> parseTopCategory(InputStream is, RecyclerView rv){
+        final List<Podcast> result = new ArrayList<>();
+        try{
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document d = builder.parse(is);
+            NodeList items = d.getElementsByTagName("entry");
+            for (int i = 0 ; i < items.getLength(); i++){
+                Element p = (Element)items.item(i);
+                result.add(new Podcast(p, rv));
+                //Downloader.OnPodcastParsedReceiver receiver = new Downloader.OnPodcastParsedReceiver() {
+                    //@Override
+                    //public void receivePodcasts(List<Podcast> podcast) {
+                     //   //TODO verify the first podcast is the one with the ID of the XML
+                     //   if (podcast.size()>0)
+                     //       result.add(podcast.get(0));
+                    //}
+                //};
+                //Downloader.parsePodcasts(p.getElementsByTagName("title").item(0).getTextContent().replace(' ','+')
+                  //      ,rv,receiver);
+            }
+        } catch (Exception e){ e.printStackTrace(); }
+        return result;
+    }
+
     public List<Episode> parseFeed(InputStream is, int podcastId){
         return parseFeed(is, Integer.MAX_VALUE, podcastId);
     }
@@ -132,4 +156,6 @@ public class ResultParser {
         SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         return dbFormat.format(d);
     }
+
+
 }

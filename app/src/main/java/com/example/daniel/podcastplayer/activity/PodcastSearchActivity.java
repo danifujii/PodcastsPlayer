@@ -32,7 +32,8 @@ import java.net.URL;
 import java.util.List;
 
 public class PodcastSearchActivity extends AppCompatActivity
-        implements Downloader.OnImageDownloadReceiver, Downloader.OnEpisodeParsedReceiver{
+        implements Downloader.OnImageDownloadReceiver, Downloader.OnEpisodeParsedReceiver,
+        Downloader.OnPodcastParsedReceiver{
 
     private RecyclerView rv;
     private Button subsButton;
@@ -58,7 +59,9 @@ public class PodcastSearchActivity extends AppCompatActivity
         if (artwork!=null) artwork.setImageBitmap(podcast.getArtwork());
 
         //Download the feed data
-        Downloader.parseEpisodes(podcast.getFeedUrl(), podcast.getPodcastId() ,this);
+        if (podcast.getFeedUrl() != null)       //if opened from category, no feedURL is found
+            Downloader.parseEpisodes(podcast.getFeedUrl(), podcast.getPodcastId() ,this);
+        else Downloader.parsePodcasts(podcast.getPodcastName(), rv, this);
 
         //Setup the Subscribe button
         subsButton = (Button)findViewById(R.id.subscribe_button);
@@ -145,5 +148,17 @@ public class PodcastSearchActivity extends AppCompatActivity
         descTV.setText(desc);
         parsedEpisodes = episodes;
         subsButton.setEnabled(true);
+    }
+
+    @Override
+    public void receivePodcasts(List<Podcast> podcasts) {
+        if (podcasts.size() > 0) {
+            Downloader.parseEpisodes(podcasts.get(0).getFeedUrl(),
+                    podcasts.get(0).getPodcastId(), this);
+            podcast = podcasts.get(0);  //this is now the complete one
+            try{
+                Downloader.downloadImage(new URL(podcast.getArtworkURL()),this);
+            } catch (MalformedURLException e){ e.printStackTrace(); }
+        }
     }
 }
