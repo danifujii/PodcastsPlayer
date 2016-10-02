@@ -54,6 +54,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CatVie
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ((SearchFragment)activity).setDownloadingUI();
                 Downloader.parseCategory(catsId.get(cats.get(position)),
                         ((SearchFragment)activity).getRecyclerView(),activity);
             }

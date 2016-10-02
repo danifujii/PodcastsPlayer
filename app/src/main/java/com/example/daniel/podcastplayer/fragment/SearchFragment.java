@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 
 import com.example.daniel.podcastplayer.R;
@@ -40,6 +41,7 @@ import java.util.Map;
 public class SearchFragment extends Fragment implements Downloader.OnPodcastParsedReceiver{
 
     private RecyclerView rv;
+    private ProgressBar progressBar;
     private HashMap<String,Integer> categoriesId;
 
     public SearchFragment() { /*Required empty*/ }
@@ -58,6 +60,7 @@ public class SearchFragment extends Fragment implements Downloader.OnPodcastPars
                     NetworkInfo networkInfo = ((ConnectivityManager)
                             getActivity().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
                     if (networkInfo != null && networkInfo.isConnected()) {
+                        setDownloadingUI();
                         Downloader.parsePodcasts(query.replace(' ', '+'), rv, SearchFragment.this);
                     } else Snackbar.make(getView(), getString(R.string.error_no_connection),Snackbar.LENGTH_SHORT).show();
                     return true;
@@ -69,15 +72,22 @@ public class SearchFragment extends Fragment implements Downloader.OnPodcastPars
         rv = (RecyclerView)v.findViewById(R.id.search_recycler_view);
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));
         rv.setAdapter(new CategoryAdapter(categoriesId,this));
-
+        progressBar = (ProgressBar)v.findViewById(R.id.search_progress_bar);
         return v;
     }
 
     public RecyclerView getRecyclerView() { return rv; }
 
+    public void setDownloadingUI(){
+        rv.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
     @Override
     public void receivePodcasts(List<Podcast> podcast) {
         rv.setAdapter(new PodResAdapter(podcast));
+        progressBar.setVisibility(View.GONE);
+        rv.setVisibility(View.VISIBLE);
     }
 
     private void initCategoriesMap(){
