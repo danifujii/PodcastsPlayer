@@ -43,4 +43,7 @@
     <string name="cat_sports">Sports</string>
     <string name="cat_technology">Technology</string>
     <string name="cat_tv">TV and Film</string>
+
+    <string name="no_eps_message">Nothing new!</string>
+    <string name="no_podcasts_message">Find new podcasts in Discover</string>
 </resources>

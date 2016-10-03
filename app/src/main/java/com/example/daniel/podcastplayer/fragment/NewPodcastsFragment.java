@@ -63,7 +63,12 @@ public class NewPodcastsFragment extends Fragment {
 
     public void setRecyclerViewInfo(){
         List<Episode> latest = DbHelper.getInstance(getContext()).getLatestEpisodes();
-        rv.setAdapter(new EpisodeAdapter(latest));
+        if (latest.isEmpty()) {
+            getView().findViewById(R.id.np_message_tv).setVisibility(View.VISIBLE);
+            rv.setVisibility(View.GONE);
+        }
+        else
+            rv.setAdapter(new EpisodeAdapter(latest));
     }
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {

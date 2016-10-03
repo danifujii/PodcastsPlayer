@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
@@ -24,8 +26,10 @@ import android.os.PowerManager;
 import android.provider.SyncStateContract;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.webkit.URLUtil;
 
 import com.example.daniel.podcastplayer.R;
@@ -47,6 +51,8 @@ public class PodcastPlayerService extends Service {
     public static final String ACTION_START = "action_start";
     public static final String ACTION_PAUSE = "action_pause";
     public static final String ACTION_FINISH = "action_finish";
+    public static final String ACTION_REWIND = "action_rewind";
+    public static final String ACTION_FORWARD = "action_forward";
 
     private final static int skipForward = 30000;   //30 seconds
     private final static int rewind = 10000;   //10 seconds
@@ -55,15 +61,6 @@ public class PodcastPlayerService extends Service {
     private MediaPlayer mp = null;
     private final IBinder binder = new PlayerBinder();
     private Episode episode = null;
-
-    private BroadcastReceiver audioChangeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(AudioManager.ACTION_HEADSET_PLUG) && mp != null
-                    && intent.getIntExtra("state",4)==0)
-                mp.pause();
-        }
-    };
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -77,6 +74,12 @@ public class PodcastPlayerService extends Service {
             case(ACTION_PAUSE):
                 pausePlayback();
                 break;
+            case(ACTION_FORWARD):
+                forwardPlayback();
+                break;
+            case(ACTION_REWIND):
+                rewindPlayback();
+                break;
         }
         return START_STICKY;
     }
@@ -86,20 +89,27 @@ public class PodcastPlayerService extends Service {
                 new Intent(getApplicationContext(), PlayerActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
         //TODO ajustar bien esto, no se muestra muy bien
+        File image = new File(getApplicationInfo().dataDir + "/Artwork", episode.getPodcastId() + ".png");
+        Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
         android.support.v4.app.NotificationCompat.Builder notif = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_play_circle_outline_black_24dp)
+                .setSmallIcon(R.drawable.ic_notif)
+                .setLargeIcon(bitmap)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setContentTitle(episode.getEpTitle())
                 .setTicker(episode.getEpTitle())
                 .setContentText(DbHelper.getInstance(this).getPodcast(episode.getPodcastId()).getPodcastArtist())
                 .setContentIntent(pi)
                 .setOngoing(true);
+        notif.addAction(R.drawable.ic_fast_rewind_black_24dp, "", PendingIntent.getService(this,0,
+                new Intent(this, PodcastPlayerService.class).setAction(ACTION_REWIND),0));
         if (paused)
-            notif.addAction(R.drawable.ic_play_arrow_black_24dp, getString(R.string.play), PendingIntent.getService(this,0,
+            notif.addAction(R.drawable.ic_play_arrow_black_24dp, "", PendingIntent.getService(this,0,
                     new Intent(this, PodcastPlayerService.class).setAction(ACTION_PLAY),0));
         else
-            notif.addAction(R.drawable.ic_pause_black_24dp, getString(R.string.pause), PendingIntent.getService(this,0,
+            notif.addAction(R.drawable.ic_pause_black_24dp, "", PendingIntent.getService(this,0,
                 new Intent(this, PodcastPlayerService.class).setAction(ACTION_PAUSE),0));
+        notif.addAction(R.drawable.ic_fast_forward_black_24dp, "", PendingIntent.getService(this,0,
+                new Intent(this, PodcastPlayerService.class).setAction(ACTION_FORWARD),0));
         return notif.build();
     }
 
@@ -110,6 +120,12 @@ public class PodcastPlayerService extends Service {
         super.onCreate();
         registerReceiver(audioChangeReceiver,
                 new IntentFilter(AudioManager.ACTION_HEADSET_PLUG));
+
+        //IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
+        //mediaFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+        //registerReceiver(controlReceiver, mediaFilter);
+        //AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        //am.registerMediaButtonEventReceiver(RemoteControlReceiver);
     }
 
     @Override
@@ -124,6 +140,7 @@ public class PodcastPlayerService extends Service {
             mp = null;
         }
         unregisterReceiver(audioChangeReceiver);
+        //unregisterReceiver(controlReceiver);
     }
 
     public void startPlayback(Episode e, Context context){
@@ -158,7 +175,7 @@ public class PodcastPlayerService extends Service {
                         if (Build.VERSION.SDK_INT >= 23) {  //TODO now SeekBar and time should update faster (maybe?)
                             PlaybackParams params = new PlaybackParams();
                             params.setPitch(1.0f);
-                            params.setSpeed(2.0f);
+                            params.setSpeed(1.8f);
                             mp.setPlaybackParams(params);
                         }
                         startPlayback(start); }
@@ -279,4 +296,33 @@ public class PodcastPlayerService extends Service {
     }
 
     //TODO implement Audio Focus
+    //TODO include bluetooth controls
+    private BroadcastReceiver controlReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("RECEIVER_BROADCAST","MEDIA ACTION");
+            if (Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())){
+                KeyEvent event = (KeyEvent)intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+                if (event != null)
+                    switch (event.getAction()){
+                        case(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE):
+                            pausePlayback();
+                            break;
+                        case(KeyEvent.KEYCODE_MEDIA_FAST_FORWARD):
+                            forwardPlayback();
+                            break;
+                    }
+            }
+        }
+    };
+
+    private BroadcastReceiver audioChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(AudioManager.ACTION_HEADSET_PLUG) && mp != null
+                    && intent.getIntExtra("state",4)==0)
+                mp.pause();
+        }
+    };
+
 }

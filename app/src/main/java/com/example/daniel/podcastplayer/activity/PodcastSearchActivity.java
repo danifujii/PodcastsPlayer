@@ -66,6 +66,7 @@ public class PodcastSearchActivity extends AppCompatActivity
         //Setup the Subscribe button
         subsButton = (Button)findViewById(R.id.subscribe_button);
         if (subsButton != null) {
+            subsButton.setEnabled(false);
             changeSubButtonText(DbHelper.getInstance(this).existsPodcast(podcast.getPodcastId()));
             subsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -102,8 +103,6 @@ public class PodcastSearchActivity extends AppCompatActivity
         String text = (isSubscribed) ?
                 getString(R.string.unsubscribe_button) : getString(R.string.subscribe_button);
         subsButton.setText(text);
-        if (text.equals(getString(R.string.subscribe_button)))
-            subsButton.setEnabled(false);
     }
 
     public void saveArtwork(){
@@ -137,12 +136,14 @@ public class PodcastSearchActivity extends AppCompatActivity
 
     @Override
     public void receiveEpisodes(List<Episode> episodes) {
+        findViewById(R.id.latest_ep_tv).setVisibility(View.VISIBLE);
         if (episodes.size() > 0){
             ((TextView)findViewById(R.id.ep_title_tv)).setText(episodes.get(0).getEpTitle());
             ((TextView)findViewById(R.id.ep_date_tv)).
                     setText(EpisodeAdapter.getDateFormat(episodes.get(0).getEpDate()));
         }
         TextView descTV = (TextView)findViewById(R.id.pod_desc_tv);
+        findViewById(R.id.description_tv).setVisibility(View.VISIBLE);
         desc = ResultParser.getInstance().getDesc();    //Esto fue modificado durante el parsing que
         // ocurre en AsyncTask
         descTV.setText(desc);

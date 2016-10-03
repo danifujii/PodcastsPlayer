@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -121,7 +122,21 @@ public class PodcastActivity extends ServiceActivity {
     }
 
     @Override
-    public void setupPlayerUI() {}
+    public void setupPlayerUI() {
+        if (service.isStarted())
+            manager.setSheetInterface(service.getEpisode());
+        else {
+            SharedPreferences sp = getSharedPreferences(getString(R.string.file_setting),
+                    Context.MODE_PRIVATE);
+            int duration = sp.getInt(getString(R.string.listened_setting), -1);
+            String epUrl = sp.getString(getString(R.string.episode_listen_setting), "");
+            if (!epUrl.isEmpty() && duration > 0) {
+                Episode e = DbHelper.getInstance(this).getEpisode(epUrl);
+                service.startPlayback(e, this, false);
+                manager.setSheetInterface(service.getEpisode());
+            }
+        }
+    }
 
     @Override
     protected void onResume() {

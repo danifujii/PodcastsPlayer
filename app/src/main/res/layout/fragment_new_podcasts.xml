@@ -4,6 +4,18 @@
     android:layout_height="match_parent"
     tools:context="com.example.daniel.podcastplayer.fragment.NewPodcastsFragment">
 
+    <TextView
+        android:id="@+id/np_message_tv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="22sp"
+        android:text="@string/no_eps_message"
+        android:gravity="center"
+        android:textColor="@color/darkGray"
+        android:fontFamily="sans-serif-medium"
+        android:visibility="gone"
+        />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/new_episodes_rv"
         android:layout_width="match_parent"

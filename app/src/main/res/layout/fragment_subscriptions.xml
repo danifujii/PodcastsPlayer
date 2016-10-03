@@ -4,6 +4,18 @@
     android:layout_height="match_parent"
     tools:context="com.example.daniel.podcastplayer.fragment.SubscriptionsFragment">
 
+    <TextView
+        android:id="@+id/podcasts_message_tv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="22sp"
+        android:text="@string/no_podcasts_message"
+        android:gravity="center"
+        android:textColor="@color/darkGray"
+        android:fontFamily="sans-serif-medium"
+        android:visibility="gone"
+        />
+
     <GridView
         android:id="@+id/subs_gv"
         android:layout_width="match_parent"

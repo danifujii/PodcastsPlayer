@@ -76,7 +76,7 @@ public class MainActivity extends ServiceActivity{
     @Override
     public void setupPlayerUI() {
         if (service.isStarted())
-            setPlayerSheet(service);
+            manager.setSheetInterface(service.getEpisode());
         else {
             SharedPreferences sp = getSharedPreferences(getString(R.string.file_setting),
                     Context.MODE_PRIVATE);
@@ -85,14 +85,9 @@ public class MainActivity extends ServiceActivity{
             if (!epUrl.isEmpty() && duration > 0) {
                 Episode e = DbHelper.getInstance(this).getEpisode(epUrl);
                 service.startPlayback(e, this, false);
-                setPlayerSheet(service);
+                manager.setSheetInterface(service.getEpisode());
             }
         }
-    }
-
-    private void setPlayerSheet(PodcastPlayerService pps){
-        findViewById(R.id.splayer_layout).setVisibility(View.VISIBLE);
-        manager.setSheetInterface(pps.getEpisode());
     }
 
     private class TabPagerAdapter extends FragmentStatePagerAdapter {

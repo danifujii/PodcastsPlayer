@@ -15,6 +15,9 @@ import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.activity.PodcastActivity;
 import com.example.daniel.podcastplayer.adapter.ImageAdapter;
 import com.example.daniel.podcastplayer.data.DbHelper;
+import com.example.daniel.podcastplayer.data.Podcast;
+
+import java.util.List;
 
 
 /**
@@ -53,6 +56,14 @@ public class SubscriptionsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         //TODO Change adapter to List Adapter
-        gv.setAdapter(new ImageAdapter(getContext(), DbHelper.getInstance(getContext()).getPodcastsCursor()));
+        Cursor c = DbHelper.getInstance(getContext()).getPodcastsCursor();
+
+        if (c.getCount() > 0)
+            gv.setAdapter(new ImageAdapter(getContext(), c));
+        else{
+            c.close();
+            gv.setVisibility(View.GONE);
+            getView().findViewById(R.id.podcasts_message_tv).setVisibility(View.VISIBLE);
+        }
     }
 }

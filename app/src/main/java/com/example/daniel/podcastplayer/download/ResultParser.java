@@ -115,10 +115,12 @@ public class ResultParser {
 
     private int getMiliseconds(String duration){
         int result = 0;
-        for (int i = 2 ; i >= 0 ; i--){
-            result = result + getTimeComponent(duration) * (int)Math.pow(60,i);
-            duration = duration.substring(duration.indexOf(':')+1);
-        }
+        if (duration.indexOf(':') > 0) {
+            for (int i = 2; i >= 0; i--) {
+                result = result + getTimeComponent(duration) * (int) Math.pow(60, i);
+                duration = duration.substring(duration.indexOf(':') + 1);
+            }
+        } else result = Integer.valueOf(duration);  //ya viene en segundos la duracion
         return result * 1000;
     }
 
