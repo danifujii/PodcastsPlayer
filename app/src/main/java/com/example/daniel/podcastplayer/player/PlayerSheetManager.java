@@ -16,8 +16,10 @@ import android.widget.TextClock;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
+import com.example.daniel.podcastplayer.activity.ColorPicker;
 import com.example.daniel.podcastplayer.activity.PlayerActivity;
 import com.example.daniel.podcastplayer.activity.ServiceActivity;
+import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 
 import java.io.File;
@@ -40,8 +42,11 @@ public class PlayerSheetManager {
                     String.valueOf(e.getPodcastId()) + ".png");
             Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
             ImageView artworkIV = (ImageView)container.findViewById(R.id.splayer_art_iv);
-            if (artworkIV != null)
+            if (artworkIV != null) {
                 artworkIV.setImageBitmap(bitmap);
+                container.findViewById(R.id.player_sheet_layout)
+                        .setBackgroundColor(ColorPicker.getDarkerColor(ColorPicker.getArtworkColor(bitmap)));
+            }
 
             TextView episodeTV = (TextView)container.findViewById(R.id.splayer_ep_tv);
             if (episodeTV != null)
@@ -55,6 +60,10 @@ public class PlayerSheetManager {
                     v.getContext().startActivity(new Intent(v.getContext(),PlayerActivity.class));
                 }
             });
+
+            TextView podTV = (TextView)container.findViewById(R.id.splayer_pod_tv);
+            podTV.setText(DbHelper.getInstance(container)
+                    .getPodcast(e.getPodcastId()).getPodcastName());
         }
     }
 
@@ -69,11 +78,11 @@ public class PlayerSheetManager {
                         if (player.isPlaying()) {
                             player.pausePlayback();
                             playButton.setImageBitmap(BitmapFactory.decodeResource(v.getResources(),
-                                    R.drawable.ic_play_arrow_black_24dp));
+                                    R.drawable.ic_play_circle_outline_white_36dp));
                         }else {
                             player.resumePlayback();
                             playButton.setImageBitmap(BitmapFactory.decodeResource(v.getResources(),
-                                    R.drawable.ic_pause_black_24dp));
+                                    R.drawable.ic_pause_circle_outline_white_36dp));
                         }
 
                 }
@@ -83,11 +92,11 @@ public class PlayerSheetManager {
             PodcastPlayerService player = container.getService();
             if (player != null && player.isPlaying()) {
                 playButton.setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
-                      R.drawable.ic_pause_black_24dp));
+                      R.drawable.ic_pause_circle_outline_white_36dp));
             }
             else {
                 playButton.setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
-                        R.drawable.ic_play_arrow_black_24dp));
+                        R.drawable.ic_play_circle_outline_white_36dp));
             }
         }
     }
@@ -101,17 +110,17 @@ public class PlayerSheetManager {
                 case(PodcastPlayerService.ACTION_FINISH):
                     ((ImageButton)container.findViewById(R.id.splayer_play_button))
                         .setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
-                                R.drawable.ic_play_arrow_black_24dp));
+                                R.drawable.ic_play_circle_outline_white_36dp));
                     break;
                 case(PodcastPlayerService.ACTION_PLAY):
                     ((ImageButton)container.findViewById(R.id.splayer_play_button))
                             .setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
-                                    R.drawable.ic_pause_black_24dp));
+                                    R.drawable.ic_pause_circle_outline_white_36dp));
                     break;
                 case(PodcastPlayerService.ACTION_PAUSE):
                     ((ImageButton)container.findViewById(R.id.splayer_play_button))
                             .setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
-                                    R.drawable.ic_play_arrow_black_24dp));
+                                    R.drawable.ic_play_circle_outline_white_36dp));
                     break;
             }
         }
