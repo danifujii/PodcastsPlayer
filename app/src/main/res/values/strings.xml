@@ -9,6 +9,7 @@
     <string name="hello_blank_fragment">Search fragment</string>
     <string name="subscribe_button">Subscribe</string>
     <string name="unsubscribe_button">Unsubscribe</string>
+    <string name="ok_button">Ok</string>
     <string name="cancel_button">Cancel</string>
     <string name="latest_ep">Latest episode</string>
     <string name="show_desc">Show description</string>
@@ -20,6 +21,8 @@
     <string name="listened_setting">listenedSetting</string>
     <string name="episode_listen_setting">episodeListeningSetting</string>
     <string name="file_setting">prefsFile</string>
+    <string name="speed_setting">speedSetting</string>
+    <string name="default_speed_setting">Playback speed</string>
 
     <string name="title_act_pref">Settings</string>
     <string name="automatic_download_pref">Automatic download</string>
@@ -46,4 +49,6 @@
 
     <string name="no_eps_message">Nothing new!</string>
     <string name="no_podcasts_message">Find new podcasts in Discover</string>
+
+    <string name="default_speed">1.0x</string>
 </resources>

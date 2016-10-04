@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.provider.SyncStateContract;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -172,12 +173,7 @@ public class PodcastPlayerService extends Service {
                 mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
-                        if (Build.VERSION.SDK_INT >= 23) {  //TODO now SeekBar and time should update faster (maybe?)
-                            PlaybackParams params = new PlaybackParams();
-                            params.setPitch(1.0f);
-                            params.setSpeed(1.8f);
-                            mp.setPlaybackParams(params);
-                        }
+                        setPlaybackParams();
                         startPlayback(start); }
                 });
                 mp.setDataSource(context,
@@ -193,6 +189,24 @@ public class PodcastPlayerService extends Service {
             mp.start();
         }
         this.episode = e;
+    }
+
+    public void setPlaybackParams(){
+        if (Build.VERSION.SDK_INT >= 23) {  //TODO now SeekBar and time should update faster (maybe?)
+            PlaybackParams params = new PlaybackParams();
+            if (episode!=null) {
+                float speed = PreferenceManager.getDefaultSharedPreferences(PodcastPlayerService.this)
+                        .getFloat(String.valueOf(episode.getPodcastId()) + getString(R.string.speed_setting)
+                                , -1);
+                if (speed == -1)
+                    speed = PreferenceManager.getDefaultSharedPreferences(PodcastPlayerService.this)
+                            .getFloat(getString(R.string.default_speed_setting),-1);
+                if (speed > 0)
+                    params.setSpeed(speed);
+            } else params.setSpeed(1.0f);
+            params.setPitch(1.0f);
+            mp.setPlaybackParams(params);
+        }
     }
 
     private void startPlayback(boolean start){
@@ -257,7 +271,8 @@ public class PodcastPlayerService extends Service {
 
     public void setProgress(int progress){
         mp.seekTo(progress);
-        mp.start();
+        if (mp.isPlaying())
+            mp.start();
     }
 
     private File getEpisodeFile(String filename, Context context){

@@ -3,16 +3,20 @@ package com.example.daniel.podcastplayer.activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -32,6 +36,7 @@ import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService.PlayerBinder;
+import com.example.daniel.podcastplayer.player.SpeedDialogManager;
 
 
 import java.io.File;
@@ -59,7 +64,7 @@ public class PlayerActivity extends ServiceActivity{
         final ImageButton play = (ImageButton)findViewById(R.id.player_play_button);
 
         if (bound){
-            Episode e = service.getEpisode();
+            final Episode e = service.getEpisode();
 
             ImageView artwork = (ImageView)findViewById(R.id.player_artwork_iv);
             File image = new File(getApplicationInfo().dataDir + "/Artwork", e.getPodcastId() + ".png");
@@ -159,6 +164,36 @@ public class PlayerActivity extends ServiceActivity{
             findViewById(R.id.ep_bg_view).setBackgroundColor(ColorPicker.getDarkerColor(color));
             if (Build.VERSION.SDK_INT >= 21)
                 getWindow().setStatusBarColor(ColorPicker.getDarkerColor(color));
+
+            ImageButton speedButton = (ImageButton) findViewById(R.id.speed_button);
+            if (Build.VERSION.SDK_INT>=23)
+                speedButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(PlayerActivity.this);
+                        View dialogView = getLayoutInflater().inflate(R.layout.speed_dialog_layout, null);
+                        builder.setView(dialogView);
+                        SpeedDialogManager.setSpeedDialog(dialogView, e.getPodcastId());
+                        builder.setTitle("Playback Speed");
+                        builder.setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                SharedPreferences.Editor editor =
+                                        PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).edit();
+                                String speed = ((TextView)((AlertDialog)dialog).findViewById(R.id.speed_tv)).getText().toString();
+                                speed = speed.substring(0,speed.length()-1);    //remove the x at the end
+                                editor.putFloat(String.valueOf(e.getPodcastId())+getString(R.string.speed_setting),
+                                        Float.valueOf(speed));
+                                editor.apply();
+                                service.setPlaybackParams();
+                            }
+                        });
+                        builder.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                            @Override public void onClick(DialogInterface dialog, int which) {} });
+                        builder.create().show();
+                    }
+                });
+            else speedButton.setVisibility(View.GONE);
         }
     }
 

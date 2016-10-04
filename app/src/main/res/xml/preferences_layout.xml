@@ -4,4 +4,10 @@
         android:title="@string/automatic_download_pref"
         android:key="@string/automatic_download_pref"
         />
+
+    <com.example.daniel.podcastplayer.SpeedPreference
+        android:title="@string/default_speed_setting"
+        android:key="@string/default_speed_setting"
+        />
+
 </PreferenceScreen>
