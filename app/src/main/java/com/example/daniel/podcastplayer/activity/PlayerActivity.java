@@ -93,7 +93,6 @@ public class PlayerActivity extends ServiceActivity{
                 });
             }
 
-            //TODO Cuando termina la reproducción, no funciona muy bien el progress bar ni se cambia el boton.
             progressBar.setMax(service.getEpisode().getLength());
             progressBar.setProgress(service.getProgress());
             progressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -110,7 +109,7 @@ public class PlayerActivity extends ServiceActivity{
                 @Override public void onStopTrackingTouch(SeekBar seekBar) {}
             });
 
-            new Thread(new Runnable() { //TODO preguntar si esta bien este approach
+            new Thread(new Runnable() {
                 @Override
                 public void run() {
                     while (progressBar.getProgress() < progressBar.getMax()){
@@ -223,7 +222,7 @@ public class PlayerActivity extends ServiceActivity{
         int minutes = (miliSeconds / 1000) / 60;
         int seconds = (miliSeconds / 1000) % 60;
         StringBuilder builder = new StringBuilder();
-        if (minutes > 60){
+        if (minutes >= 60){
             int hours = minutes / 60;
             minutes = minutes % 60;
             builder.append(hours);

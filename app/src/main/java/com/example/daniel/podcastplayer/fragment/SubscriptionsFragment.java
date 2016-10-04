@@ -55,7 +55,6 @@ public class SubscriptionsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        //TODO Change adapter to List Adapter
         Cursor c = DbHelper.getInstance(getContext()).getPodcastsCursor();
 
         if (c.getCount() > 0)

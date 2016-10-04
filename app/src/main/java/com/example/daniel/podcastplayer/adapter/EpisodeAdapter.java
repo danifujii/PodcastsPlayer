@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.activity.ServiceActivity;
+import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.download.Downloader;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
@@ -65,7 +66,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
                     //if (player.getEpisode() != ep || !player.isPlaying())    //avoid restarting an episode already playing
                     if (player != null) {
                         player.startPlayback(ep, activity);
-                        //TODO Como el comienzo del player ahora es async, puede terminar luego de que se setea la interfaz
                         //haciendo que el boton no aparezca como Pause y quede como Play
                         //PlayerSheetManager psm = new PlayerSheetManager(this);
                         //psm.setSheetInterface(ep, activity);
@@ -76,22 +76,13 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         });
 
         Context c = holder.dateTV.getContext();
-        if (existsFile(URLUtil.guessFileName(item.getEpURL(),null,null), c)) {
+        if (FileManager.getEpisodeFile(c, item).exists()) {
             holder.downloadButton.setImageBitmap(BitmapFactory.decodeResource(c.getResources(),
                     R.drawable.ic_play_circle_outline_black_24dp));
             item.setDownloaded(true);
         }
         else holder.downloadButton.setImageBitmap(BitmapFactory.decodeResource(c.getResources(),
                 R.drawable.ic_file_download_black_24dp));
-    }
-
-    private boolean existsFile(String fileName, Context context){
-        //TODO see if you can change this hardcoded route
-        File f = new File(
-                Environment.getExternalStorageDirectory().getAbsolutePath()
-                    + "/Android/data/com.example.daniel.podcastplayer/files/"
-                    + context.getFilesDir().getAbsolutePath() + "/" + fileName);
-        return f.isFile();
     }
 
     @Override

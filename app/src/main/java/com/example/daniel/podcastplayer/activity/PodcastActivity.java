@@ -34,6 +34,7 @@ import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
+import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.download.Downloader;
 
@@ -113,6 +114,7 @@ public class PodcastActivity extends ServiceActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 DbHelper.getInstance(PodcastActivity.this).deletePodcast(p.getPodcastId());
+                FileManager.deletePodcast(PodcastActivity.this, p);
                 finish();
             }
         });

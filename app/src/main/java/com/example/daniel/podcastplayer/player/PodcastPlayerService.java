@@ -37,10 +37,12 @@ import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.activity.PlayerActivity;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
+import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.data.Podcast;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import static android.drm.DrmStore.Action.PLAY;
 import static android.provider.ContactsContract.Intents.Insert.ACTION;
@@ -66,9 +68,6 @@ public class PodcastPlayerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         switch (intent.getAction()){
-            case(ACTION_START):
-                //startForeground(notificationId, buildNotif(true));
-                break;
             case(ACTION_PLAY):
                 resumePlayback();
                 break;
@@ -89,7 +88,6 @@ public class PodcastPlayerService extends Service {
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
                 new Intent(getApplicationContext(), PlayerActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        //TODO ajustar bien esto, no se muestra muy bien
         File image = new File(getApplicationInfo().dataDir + "/Artwork", episode.getPodcastId() + ".png");
         Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
         android.support.v4.app.NotificationCompat.Builder notif = new NotificationCompat.Builder(this)
@@ -121,7 +119,8 @@ public class PodcastPlayerService extends Service {
         super.onCreate();
         registerReceiver(audioChangeReceiver,
                 new IntentFilter(AudioManager.ACTION_HEADSET_PLUG));
-
+        LocalBroadcastManager.getInstance(this).registerReceiver(fileChangeReceiver,
+                new IntentFilter(FileManager.ACTION_DELETE));
         //IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
         //mediaFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
         //registerReceiver(controlReceiver, mediaFilter);
@@ -132,16 +131,24 @@ public class PodcastPlayerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        finishPlayback(false);
+        unregisterReceiver(audioChangeReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(fileChangeReceiver);
+        //unregisterReceiver(controlReceiver);
+    }
+
+    public void finishPlayback(boolean finished){
+        Log.d("PPS_SERVICE", "Finish playback");
         stopForeground(true);
         ((NotificationManager)getSystemService(NOTIFICATION_SERVICE))
                 .cancel(notificationId);
         if (mp!=null){
-            saveProgress();
+            saveProgress(finished);
+            mp.stop();
             mp.release();
             mp = null;
+            episode = null;
         }
-        unregisterReceiver(audioChangeReceiver);
-        //unregisterReceiver(controlReceiver);
     }
 
     public void startPlayback(Episode e, Context context){
@@ -160,15 +167,7 @@ public class PodcastPlayerService extends Service {
                 public void onCompletion(MediaPlayer mpParam) {
                     LocalBroadcastManager.getInstance(PodcastPlayerService.this)
                             .sendBroadcast(new Intent(ACTION_FINISH));
-                    saveProgress(true);
-                    File ep = getEpisodeFile(URLUtil.guessFileName(episode.getEpURL(),null,null), context);
-                    if (ep.exists()) ep.delete();
-                    stopForeground(true);
-                    ((NotificationManager)getSystemService(NOTIFICATION_SERVICE))
-                            .cancel(notificationId);
-                    mp.release();
-                    mp = null;
-                    episode = null;
+                    FileManager.deleteFile(context,episode);
                 }
             });
         }
@@ -183,8 +182,7 @@ public class PodcastPlayerService extends Service {
                         startPlayback(start); }
                 });
                 mp.setDataSource(context,
-                        Uri.parse(getEpisodeFile(URLUtil.guessFileName(e.getEpURL(),null,null)
-                                , context).getAbsolutePath()));
+                        Uri.parse(FileManager.getEpisodeFile(context, e).getAbsolutePath()));
                 mp.prepareAsync();
             } catch (IOException excep) {
                 excep.printStackTrace();
@@ -198,7 +196,7 @@ public class PodcastPlayerService extends Service {
     }
 
     public void setPlaybackParams(){
-        if (Build.VERSION.SDK_INT >= 23) {  //TODO now SeekBar and time should update faster (maybe?)
+        if (Build.VERSION.SDK_INT >= 23) {
             PlaybackParams params = new PlaybackParams();
             if (episode!=null) {
                 float speed = PreferenceManager.getDefaultSharedPreferences(PodcastPlayerService.this)
@@ -222,6 +220,7 @@ public class PodcastPlayerService extends Service {
                 LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PLAY));
             }
             int listened = DbHelper.getInstance(getApplicationContext()).getEpisodeListened(episode.getEpURL());
+            Log.d("PPS_SERVICE", String.valueOf(listened));
             if (listened > 0)
                 mp.seekTo(listened);
         }
@@ -281,27 +280,21 @@ public class PodcastPlayerService extends Service {
             mp.start();
     }
 
-    private File getEpisodeFile(String filename, Context context){
-        File f = new File(
-                Environment.getExternalStorageDirectory().getAbsolutePath()
-                        + "/Android/data/com.example.daniel.podcastplayer/files/"
-                        + context.getFilesDir().getAbsolutePath() + "/" + filename);
-        return f;
-    }
-
     private void saveProgress(){ saveProgress(false);}
 
     private void saveProgress(boolean finished){
         if (episode != null) {
-            DbHelper.getInstance(getApplicationContext()).updateEpisode(episode.getEpURL(), getProgress());
             SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getApplicationContext().getString(R.string.file_setting),
                     Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
-            if (finished)
+            if (finished) {
                 editor.putInt(getApplicationContext().getString(R.string.listened_setting), -1);
-            else
-                editor.putInt(getApplicationContext().getString(R.string.listened_setting)
-                        , getProgress());
+                DbHelper.getInstance(getApplicationContext()).updateEpisode(episode.getEpURL(), 0);
+            }
+            else {
+                editor.putInt(getApplicationContext().getString(R.string.listened_setting) , getProgress());
+                DbHelper.getInstance(getApplicationContext()).updateEpisode(episode.getEpURL(), getProgress());
+            }
             editor.putString(getApplicationContext().getString(R.string.episode_listen_setting)
                     ,episode.getEpURL());
             editor.apply();
@@ -351,4 +344,15 @@ public class PodcastPlayerService extends Service {
         }
     };
 
+    private BroadcastReceiver fileChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(FileManager.ACTION_DELETE)){
+                String name = intent.getStringExtra(FileManager.EP_KEY_EXTRA);
+                Log.d("PPS_SERVICE","Delete episode " + name );
+                if (name.equals(URLUtil.guessFileName(episode.getEpURL(), null,null)))
+                    finishPlayback(true);
+            }
+        }
+    };
 }

@@ -23,6 +23,7 @@ import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
 import com.example.daniel.podcastplayer.adapter.PodResAdapter;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
+import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.data.Podcast;
 
 import java.io.BufferedReader;
@@ -226,7 +227,7 @@ public class Downloader {
                     .setTitle("Downloading episode")
                     .setDescription(ep.getEpTitle())
                     .setDestinationInExternalFilesDir(context
-                            , context.getFilesDir().getAbsolutePath()
+                            , FileManager.episodePath(context, ep)
                             , URLUtil.guessFileName(ep.getEpURL(), null, null)));
     }
 

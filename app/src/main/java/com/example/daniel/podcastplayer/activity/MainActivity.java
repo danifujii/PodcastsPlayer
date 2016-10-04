@@ -63,7 +63,6 @@ public class MainActivity extends ServiceActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("MAIN_ACT","On resume");
         if (bound)
             setupPlayerUI();
     }
