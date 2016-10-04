@@ -98,7 +98,7 @@ public class PodcastPlayerService extends Service {
                 .setTicker(episode.getEpTitle())
                 .setContentText(DbHelper.getInstance(this).getPodcast(episode.getPodcastId()).getPodcastArtist())
                 .setContentIntent(pi)
-                .setOngoing(true);
+                .setOngoing(!paused);   //poder swipearla cuando esta pausado
         notif.addAction(R.drawable.ic_fast_rewind_black_24dp, "", PendingIntent.getService(this,0,
                 new Intent(this, PodcastPlayerService.class).setAction(ACTION_REWIND),0));
         if (paused)
@@ -219,13 +219,13 @@ public class PodcastPlayerService extends Service {
                 LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PLAY));
             }
             int listened = DbHelper.getInstance(getApplicationContext()).getEpisodeListened(episode.getEpURL());
-            Log.d("PPS_SERVICE", String.valueOf(listened));
             if (listened > 0)
                 mp.seekTo(listened);
         }
     }
 
     public void resumePlayback() {
+        startForeground(notificationId, buildNotif(false));
         mp.start();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PLAY));
         ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE))
@@ -238,6 +238,7 @@ public class PodcastPlayerService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PAUSE));
         ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE))
                 .notify(notificationId, buildNotif(true));
+        stopForeground(false);
     }
 
     public void forwardPlayback() {
