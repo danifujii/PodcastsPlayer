@@ -19,7 +19,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="com.example.daniel.podcastplayer.activity.PodcastActivity"
-        android:layout_below="@id/podcast_act_toolbar">
+        android:layout_below="@id/podcast_act_toolbar"
+        android:layout_above="@+id/splayer_layout">
 
         <include layout="@layout/podcast_header"/>
 

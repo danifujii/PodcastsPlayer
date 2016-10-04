@@ -2,6 +2,8 @@ package com.example.daniel.podcastplayer.data;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.webkit.URLUtil;
@@ -52,5 +54,10 @@ public class FileManager {
                 }
             }
         }
+    }
+
+    public static Bitmap getBitmap(Context c, int podcastId){
+        File image = new File(c.getApplicationInfo().dataDir + "/Artwork", String.valueOf(podcastId) + ".png");
+        return BitmapFactory.decodeFile(image.getAbsolutePath());
     }
 }

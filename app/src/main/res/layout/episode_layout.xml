@@ -1,46 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:layout_height="wrap_content"
+<RelativeLayout android:layout_height="60dp"
     android:layout_width="match_parent"
-    android:paddingTop="@dimen/activity_medium_margin"
-    android:paddingBottom="@dimen/activity_medium_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_small_margin"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical" android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="70dp"
+        android:orientation="horizontal"
+        android:layout_centerVertical="true"
+        android:paddingLeft="@dimen/activity_horizontal_margin">
 
-        <TextView
-            android:id="@+id/ep_title_tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="56dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textSize="16sp"
-            android:textColor="@color/darkGray"
-            />
+        <ImageView
+            android:id="@+id/pod_artwork_iv"
+            android:layout_width="@dimen/small_image_size"
+            android:layout_height="@dimen/small_image_size"
+            android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/ep_date_tv"
-            android:layout_width="match_parent"
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical" android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="56dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            />
+            android:paddingLeft="@dimen/activity_medium_margin">
+
+            <TextView
+                android:id="@+id/ep_title_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="16sp"
+                android:textColor="@color/darkGray"
+                />
+
+            <TextView
+                android:id="@+id/ep_date_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                />
+
+        </LinearLayout>
 
     </LinearLayout>
-    
-    <ImageButton
-        android:id="@+id/ep_download_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@null"
-        android:src="@drawable/ic_file_download_black_24dp"
+
+    <RelativeLayout
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="true"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/ep_download_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@null"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_file_download_black_24dp" />
+
+        <TextView
+            android:id="@+id/remaining_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:gravity="center_horizontal"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            android:paddingBottom="@dimen/activity_small_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"/>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/lightGray"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

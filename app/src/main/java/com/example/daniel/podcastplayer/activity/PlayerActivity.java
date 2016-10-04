@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
+import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
@@ -67,13 +68,16 @@ public class PlayerActivity extends ServiceActivity{
             final Episode e = service.getEpisode();
 
             ImageView artwork = (ImageView)findViewById(R.id.player_artwork_iv);
-            File image = new File(getApplicationInfo().dataDir + "/Artwork", e.getPodcastId() + ".png");
-            Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
+            //File image = new File(getApplicationInfo().dataDir + "/Artwork", e.getPodcastId() + ".png");
+            //Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
+            Bitmap bitmap = FileManager.getBitmap(this, e.getPodcastId());
             artwork.setImageBitmap(bitmap);
 
             TextView epTV = (TextView) findViewById(R.id.player_ep_tv);
             if (epTV != null)
                 epTV.setText(e.getEpTitle());
+            ((TextView)findViewById(R.id.player_pod_tv))
+                    .setText(DbHelper.getInstance(this).getPodcast(e.getPodcastId()).getPodcastName());
 
             if (play != null) {
                 if (service.isPlaying())
@@ -160,7 +164,8 @@ public class PlayerActivity extends ServiceActivity{
             //Toolbar toolbar = (Toolbar)findViewById(R.id.player_act_toolbar);
             //toolbar.setTitle(DbHelper.getInstance(this).getPodcast(e.getPodcastId()).getPodcastName());
             //toolbar.setBackgroundColor(color);
-            findViewById(R.id.ep_bg_view).setBackgroundColor(ColorPicker.getDarkerColor(color));
+            findViewById(R.id.player_ep_tv).setBackgroundColor(ColorPicker.getDarkerColor(color));
+            findViewById(R.id.player_pod_tv).setBackgroundColor(ColorPicker.getDarkerColor(color));
             if (Build.VERSION.SDK_INT >= 21)
                 getWindow().setStatusBarColor(ColorPicker.getDarkerColor(color));
 
@@ -247,7 +252,6 @@ public class PlayerActivity extends ServiceActivity{
         @Override
         public void onReceive(Context context, Intent intent) {
             ImageButton playButton =((ImageButton) findViewById(R.id.player_play_button));
-            Log.d("PLAYERACT",intent.getAction());
             switch (intent.getAction()){
                 case(PodcastPlayerService.ACTION_FINISH):{
                     playButton.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_play_arrow_black_48dp));
@@ -256,13 +260,11 @@ public class PlayerActivity extends ServiceActivity{
                     break;
                 }
                 case(PodcastPlayerService.ACTION_PLAY):{
-                    Log.d("PLAYERACT","PLAY");
                     changeButtonIcon(playButton);
                     break;
                 }
                 case(PodcastPlayerService.ACTION_PAUSE):{
                     changeButtonIcon(playButton);
-                    Log.d("PLAYERACT","PAUSE");
                     break;
                 }
             }

@@ -51,4 +51,7 @@
     <string name="no_podcasts_message">Find new podcasts in Discover</string>
 
     <string name="default_speed">1.0x</string>
+
+    <string name="mins">mins</string>
+    <string name="hours">hours</string>
 </resources>

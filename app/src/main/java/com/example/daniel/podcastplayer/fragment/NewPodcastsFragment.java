@@ -68,7 +68,7 @@ public class NewPodcastsFragment extends Fragment {
             rv.setVisibility(View.GONE);
         }
         else
-            rv.setAdapter(new EpisodeAdapter(latest));
+            rv.setAdapter(new EpisodeAdapter(latest,true));
     }
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {

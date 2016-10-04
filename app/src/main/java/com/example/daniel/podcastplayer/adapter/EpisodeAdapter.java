@@ -13,8 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.daniel.podcastplayer.activity.PlayerActivity;
 import com.example.daniel.podcastplayer.activity.ServiceActivity;
 import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.download.Downloader;
@@ -35,6 +37,12 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
 
     private List<Episode> data;
     private ServiceActivity activity;  //save the activity that uses this to set the player layout as visible
+    private boolean difPodcasts;
+
+    public EpisodeAdapter(List<Episode> data, boolean differentPodcasts){
+        this.difPodcasts = differentPodcasts;
+        this.data = data;
+    }
 
     public EpisodeAdapter(List<Episode> data){
         this.data = data;
@@ -55,6 +63,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         Episode item = data.get(position);
         holder.nameTV.setText(item.getEpTitle());
         holder.dateTV.setText(getDateFormat(item.getEpDate()));
+        holder.remainingTV.setVisibility(View.GONE);
 
         holder.downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,12 +91,20 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         Context c = holder.dateTV.getContext();
 
         if (!Downloader.isDownloading(item.getEpURL())){
-            if (FileManager.getEpisodeFile(c,item).exists())
+            if (FileManager.getEpisodeFile(c,item).exists()) {
                 changeImageButton(holder.downloadButton, Icons.PLAY.ordinal());
+                holder.remainingTV.setVisibility(View.VISIBLE);
+                holder.remainingTV.setText(getRemaining(item.getLength()-item.getListened(),c));
+            }
             else changeImageButton(holder.downloadButton, Icons.DOWNLOAD.ordinal());
         }
         else
             changeImageButton(holder.downloadButton, Icons.CANCEL.ordinal());
+
+        if (difPodcasts) {
+            holder.artworkIV.setVisibility(View.VISIBLE);
+            holder.artworkIV.setImageBitmap(FileManager.getBitmap(c, item.getPodcastId()));
+        }
     }
 
     private enum Icons {DOWNLOAD, CANCEL, PLAY}
@@ -120,13 +137,17 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
     public static class EpisodeViewHolder extends RecyclerView.ViewHolder{
         protected TextView nameTV;
         protected TextView dateTV;
+        protected TextView remainingTV;
         protected ImageButton downloadButton;
+        protected ImageView artworkIV;
 
         public EpisodeViewHolder(View itemView) {
             super(itemView);
             dateTV = (TextView)itemView.findViewById(R.id.ep_date_tv);
             nameTV = (TextView)itemView.findViewById(R.id.ep_title_tv);
+            remainingTV = (TextView)itemView.findViewById(R.id.remaining_tv);
             downloadButton = (ImageButton)itemView.findViewById(R.id.ep_download_button);
+            artworkIV = (ImageView)itemView.findViewById(R.id.pod_artwork_iv);
         }
     }
 
@@ -140,4 +161,18 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         return null;
     }
 
+    private String getRemaining(int remaining, Context context){
+        int seconds = remaining / 1000;
+        String minsText = context.getString(R.string.mins);
+        int mins = seconds /60;
+        if (seconds <= 60 || mins == 1) return "1 " + minsText.substring(0,minsText.length()-1);
+        if (mins < 60)
+            return String.valueOf(mins) + " " + minsText;
+        else{
+            String hoursText = context.getString(R.string.hours);
+            int hours = mins / 60;
+            if (hours == 1) return "1 " + hoursText.substring(0,hoursText.length()-1);
+            else return String.valueOf(mins/60) + " " + hours;
+        }
+    }
 }

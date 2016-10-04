@@ -1,54 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:id="@+id/activity_player"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.daniel.podcastplayer.activity.PlayerActivity">
 
-    <FrameLayout
-        android:id="@+id/player_episode_layout"
+    <ImageView
+        android:id="@+id/player_artwork_iv"
+        android:adjustViewBounds="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/player_act_toolbar">
+        />
 
-        <ImageView
-            android:id="@+id/player_artwork_iv"
-            android:adjustViewBounds="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
+    <TextView
+        android:id="@+id/player_ep_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingTop="@dimen/activity_medium_margin"
+        android:paddingBottom="@dimen/activity_small_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:gravity="center_horizontal"
+        android:layout_gravity="bottom"
+        android:background="@color/darkGray"
+        android:fontFamily="sans-serif-medium"/>
 
-        <View
-            android:id="@+id/ep_bg_view"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:background="@color/colorPrimaryDark"
-            android:layout_gravity="bottom"
-            android:alpha="0.75"/>
-        
-        <TextView
-            android:id="@+id/player_ep_tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:paddingTop="@dimen/activity_medium_margin"
-            android:paddingBottom="@dimen/activity_medium_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:gravity="center_horizontal"
-            android:layout_gravity="bottom"/>
-
-    </FrameLayout>
+    <TextView
+        android:id="@+id/player_pod_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingBottom="@dimen/activity_medium_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:textColor="@color/lightGray"
+        android:textSize="16sp"
+        android:gravity="center_horizontal"
+        android:layout_gravity="bottom"
+        android:background="@color/darkGray" />
 
     <LinearLayout
         android:id="@+id/player_controls_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingTop="@dimen/activity_horizontal_margin"
         android:paddingBottom="@dimen/activity_horizontal_margin"
@@ -89,7 +91,7 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center"
-            android:paddingTop="@dimen/activity_big_margin">
+            android:paddingTop="@dimen/activity_medium_margin">
             
             <ImageButton
                 android:id="@+id/player_rewind_button"
@@ -119,4 +121,4 @@
 
     </LinearLayout>
     
-</RelativeLayout>
+</LinearLayout>

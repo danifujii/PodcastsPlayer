@@ -169,6 +169,16 @@ public class PodcastPlayerService extends Service {
                     FileManager.deleteFile(context,episode);
                 }
             });
+            mp.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mediaPlayer, int what, int extra) {
+                    mp.reset();
+                    mp.release();
+                    mp = null;
+                    startPlayback(episode, context, false);
+                    return true;
+                }
+            });
         }
         if (episode==null || !episode.getEpURL().equals(e.getEpURL()))
             try {
