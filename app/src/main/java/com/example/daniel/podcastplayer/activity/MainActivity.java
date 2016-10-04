@@ -63,6 +63,7 @@ public class MainActivity extends ServiceActivity{
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d("MAIN_ACT","On resume");
         if (bound)
             setupPlayerUI();
     }
@@ -70,11 +71,11 @@ public class MainActivity extends ServiceActivity{
     @Override
     protected void onPause() {
         super.onPause();
-
     }
 
     @Override
     public void setupPlayerUI() {
+        findViewById(R.id.splayer_layout).setVisibility(View.GONE);
         if (service.isStarted())
             manager.setSheetInterface(service.getEpisode());
         else {

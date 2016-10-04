@@ -253,6 +253,7 @@ public class PlayerActivity extends ServiceActivity{
                 case(PodcastPlayerService.ACTION_FINISH):{
                     playButton.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_play_arrow_black_48dp));
                     progressTV.setText(length + divider + length);
+                    finish();
                     break;
                 }
                 case(PodcastPlayerService.ACTION_PLAY):{

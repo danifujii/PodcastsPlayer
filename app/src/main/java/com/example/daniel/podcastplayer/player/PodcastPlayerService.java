@@ -150,19 +150,25 @@ public class PodcastPlayerService extends Service {
     }
 
     //start=false is just for prepare, and not start playback
-    public void startPlayback(Episode e, Context context, final boolean start){
+    public void startPlayback(Episode e, final Context context, final boolean start){
         if (mp == null) {
             mp = new MediaPlayer();
             mp.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
             mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
-                public void onCompletion(MediaPlayer mp) {
+                public void onCompletion(MediaPlayer mpParam) {
                     LocalBroadcastManager.getInstance(PodcastPlayerService.this)
                             .sendBroadcast(new Intent(ACTION_FINISH));
-                    saveProgress();
-                    ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE))
+                    saveProgress(true);
+                    File ep = getEpisodeFile(URLUtil.guessFileName(episode.getEpURL(),null,null), context);
+                    if (ep.exists()) ep.delete();
+                    stopForeground(true);
+                    ((NotificationManager)getSystemService(NOTIFICATION_SERVICE))
                             .cancel(notificationId);
+                    mp.release();
+                    mp = null;
+                    episode = null;
                 }
             });
         }
@@ -283,16 +289,21 @@ public class PodcastPlayerService extends Service {
         return f;
     }
 
-    private void saveProgress(){
+    private void saveProgress(){ saveProgress(false);}
+
+    private void saveProgress(boolean finished){
         if (episode != null) {
             DbHelper.getInstance(getApplicationContext()).updateEpisode(episode.getEpURL(), getProgress());
             SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getApplicationContext().getString(R.string.file_setting),
                     Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
+            if (finished)
+                editor.putInt(getApplicationContext().getString(R.string.listened_setting), -1);
+            else
+                editor.putInt(getApplicationContext().getString(R.string.listened_setting)
+                        , getProgress());
             editor.putString(getApplicationContext().getString(R.string.episode_listen_setting)
                     ,episode.getEpURL());
-            editor.putInt(getApplicationContext().getString(R.string.listened_setting)
-                    , getProgress());
             editor.apply();
         }
     }

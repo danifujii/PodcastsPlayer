@@ -111,6 +111,7 @@ public class PlayerSheetManager {
                     ((ImageButton)container.findViewById(R.id.splayer_play_button))
                         .setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
                                 R.drawable.ic_play_circle_outline_white_36dp));
+                    container.findViewById(R.id.splayer_layout).setVisibility(View.GONE);
                     break;
                 case(PodcastPlayerService.ACTION_PLAY):
                     ((ImageButton)container.findViewById(R.id.splayer_play_button))
