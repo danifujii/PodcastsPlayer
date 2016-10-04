@@ -50,6 +50,7 @@ public class PodcastSearchActivity extends AppCompatActivity
 
         podcast = (Podcast)getIntent().getParcelableExtra(Podcast.class.getName());
 
+        findViewById(R.id.episode_divider).setVisibility(View.INVISIBLE);
         TextView titleTV = (TextView)findViewById(R.id.pod_title_tv);
         if (titleTV != null) titleTV.setText(podcast.getPodcastName());
 

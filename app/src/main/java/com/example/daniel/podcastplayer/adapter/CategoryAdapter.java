@@ -1,5 +1,6 @@
 package com.example.daniel.podcastplayer.adapter;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,9 +9,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
+import com.example.daniel.podcastplayer.SearchActivity;
 import com.example.daniel.podcastplayer.activity.ServiceActivity;
 import com.example.daniel.podcastplayer.download.Downloader;
-import com.example.daniel.podcastplayer.fragment.SearchFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,9 +25,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CatVie
 
     private List<String> cats;
     private HashMap<String,Integer> catsId;
-    private Downloader.OnPodcastParsedReceiver activity;
+    private SearchActivity activity;
 
-    public CategoryAdapter(HashMap<String,Integer> categories, Downloader.OnPodcastParsedReceiver receiver){
+    public CategoryAdapter(HashMap<String,Integer> categories, SearchActivity receiver){
         cats = new ArrayList<>();
         for(String s : categories.keySet())
             cats.add(s);
@@ -54,9 +55,14 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CatVie
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((SearchFragment)activity).setDownloadingUI();
-                Downloader.parseCategory(catsId.get(cats.get(position)),
-                        ((SearchFragment)activity).getRecyclerView(),activity);
+                //((SearchActivity)activity).setDownloadingUI();
+                Intent i = new Intent(activity, SearchActivity.class);
+                i.putExtra(SearchActivity.EXTRA_RESULT_ACT, true);
+                i.putExtra(SearchActivity.EXTRA_CAT, catsId.get(cats.get(position)));
+                i.putExtra(SearchActivity.EXTRA_CAT_NAME, cats.get(position));
+                activity.startActivity(i);
+                //Downloader.parseCategory(catsId.get(cats.get(position)),
+                //        ((SearchActivity)activity).getRecyclerView(),activity);
             }
         });
     }

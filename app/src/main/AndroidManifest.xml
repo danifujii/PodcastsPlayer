@@ -30,16 +30,17 @@
         <activity
             android:name=".activity.PlayerActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activity.SettingsActivity"/>
+        <activity android:name=".activity.SettingsActivity" />
 
         <service android:name=".player.PodcastPlayerService" />
 
         <receiver android:name=".receiver.BatteryReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
             </intent-filter>
         </receiver>
 
+        <activity android:name=".SearchActivity"></activity>
     </application>
 
 </manifest>

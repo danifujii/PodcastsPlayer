@@ -19,12 +19,12 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
+import com.example.daniel.podcastplayer.SearchActivity;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.download.Downloader;
 import com.example.daniel.podcastplayer.fragment.NewPodcastsFragment;
 import com.example.daniel.podcastplayer.R;
-import com.example.daniel.podcastplayer.fragment.SearchFragment;
 import com.example.daniel.podcastplayer.fragment.SubscriptionsFragment;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
@@ -38,7 +38,7 @@ public class MainActivity extends ServiceActivity{
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setAdapter(new TabPagerAdapter(getSupportFragmentManager()));
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(0);
         TabLayout tl = (TabLayout) findViewById(R.id.tabLayout);
         tl.setupWithViewPager(viewPager);
         startService(new Intent(this,PodcastPlayerService.class)
@@ -50,6 +50,13 @@ public class MainActivity extends ServiceActivity{
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this,SettingsActivity.class));
+            }
+        });
+        ImageButton searchButton = (ImageButton) findViewById(R.id.search_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, SearchActivity.class));
             }
         });
     }
@@ -91,7 +98,7 @@ public class MainActivity extends ServiceActivity{
     }
 
     private class TabPagerAdapter extends FragmentStatePagerAdapter {
-        private static final int numPages = 3;
+        private static final int numPages = 2;
 
         public TabPagerAdapter(FragmentManager fm){
             super(fm);
@@ -105,9 +112,8 @@ public class MainActivity extends ServiceActivity{
         @Override
         public Fragment getItem(int position) {
             switch(position) {
-                case 0: return new SearchFragment();
-                case 1: return new NewPodcastsFragment();
-                case 2: return new SubscriptionsFragment();
+                case 0: return new NewPodcastsFragment();
+                case 1: return new SubscriptionsFragment();
             }
             return null;
         }
@@ -115,9 +121,8 @@ public class MainActivity extends ServiceActivity{
         @Override
         public CharSequence getPageTitle(int position) {
             switch(position){
-                case 0: return getString(R.string.tab_discover);
-                case 1: return getString(R.string.tab_new);
-                case 2: return getString(R.string.tab_podcasts);
+                case 0: return getString(R.string.tab_new);
+                case 1: return getString(R.string.tab_podcasts);
             }
             return null;
         }

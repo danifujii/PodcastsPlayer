@@ -243,12 +243,14 @@ public class PodcastPlayerService extends Service {
     }
 
     public void pausePlayback(){
-        saveProgress();
-        mp.pause();
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PAUSE));
-        ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE))
-                .notify(notificationId, buildNotif(true));
-        stopForeground(false);
+        if (mp != null && mp.isPlaying()) {
+            saveProgress();
+            mp.pause();
+            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PAUSE));
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
+                    .notify(notificationId, buildNotif(true));
+            stopForeground(false);
+        }
     }
 
     public void forwardPlayback() {
