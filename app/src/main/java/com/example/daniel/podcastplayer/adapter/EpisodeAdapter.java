@@ -27,6 +27,7 @@ import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -59,30 +60,56 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
             @Override
             public void onClick(View v) {
                 Episode ep = data.get(holder.getAdapterPosition());
-                if (!ep.getDownloaded())
-                    Downloader.downloadEpisode(v.getContext(), ep);
-                else{
-                    PodcastPlayerService player = activity.getService();
-                    //if (player.getEpisode() != ep || !player.isPlaying())    //avoid restarting an episode already playing
-                    if (player != null) {
-                        player.startPlayback(ep, activity);
-                        //haciendo que el boton no aparezca como Pause y quede como Play
-                        //PlayerSheetManager psm = new PlayerSheetManager(this);
-                        //psm.setSheetInterface(ep, activity);
-                        activity.setupPlayerUI();
+                if (!Downloader.isDownloading(ep.getEpURL())) {         //no esta descargando actualmente
+                    if (FileManager.getEpisodeFile(holder.downloadButton.getContext(),
+                            ep).exists()){                              //si encuentra el archivo, puede reproducir
+                        PodcastPlayerService player = activity.getService();
+                        if (player != null) {
+                            player.startPlayback(ep, activity);
+                            activity.setupPlayerUI();
+                        }
+                    }else {                                             //si no esta, comenzar descarga
+                        Downloader.downloadEpisode(v.getContext(), ep);
+                        changeImageButton(holder.downloadButton, Icons.CANCEL.ordinal());
                     }
+                } else{
+                    Downloader.cancelDownload(holder.downloadButton.getContext(), ep.getEpURL());
+                    changeImageButton(holder.downloadButton, Icons.DOWNLOAD.ordinal());
                 }
             }
         });
 
         Context c = holder.dateTV.getContext();
-        if (FileManager.getEpisodeFile(c, item).exists()) {
-            holder.downloadButton.setImageBitmap(BitmapFactory.decodeResource(c.getResources(),
-                    R.drawable.ic_play_circle_outline_black_24dp));
-            item.setDownloaded(true);
+
+        if (!Downloader.isDownloading(item.getEpURL())){
+            if (FileManager.getEpisodeFile(c,item).exists())
+                changeImageButton(holder.downloadButton, Icons.PLAY.ordinal());
+            else changeImageButton(holder.downloadButton, Icons.DOWNLOAD.ordinal());
         }
-        else holder.downloadButton.setImageBitmap(BitmapFactory.decodeResource(c.getResources(),
-                R.drawable.ic_file_download_black_24dp));
+        else
+            changeImageButton(holder.downloadButton, Icons.CANCEL.ordinal());
+    }
+
+    private enum Icons {DOWNLOAD, CANCEL, PLAY}
+    private void changeImageButton(ImageButton im, int type){
+        Icons icon = Icons.values()[type];
+        switch (icon){
+            case DOWNLOAD:{
+                im.setImageBitmap(BitmapFactory.decodeResource(
+                        im.getResources(), R.drawable.ic_file_download_black_24dp));
+                break;
+            }
+            case CANCEL:{
+                im.setImageBitmap(BitmapFactory.decodeResource(
+                        im.getResources(), R.drawable.ic_close_black_24dp));
+                break;
+            }
+            case PLAY:{
+                im.setImageBitmap(BitmapFactory.decodeResource(
+                        im.getResources(), R.drawable.ic_play_circle_outline_black_24dp));
+                break;
+            }
+        }
     }
 
     @Override

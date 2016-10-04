@@ -77,6 +77,7 @@ public class NewPodcastsFragment extends Fragment {
             switch(intent.getAction()){
                 case (DownloadManager.ACTION_DOWNLOAD_COMPLETE):
                     rv.getAdapter().notifyDataSetChanged();
+                    Downloader.removeDownload(intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,-1));
                     break;
                 case (Downloader.ACTION_DOWNLOADED): {
                     setRecyclerViewInfo();

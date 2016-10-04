@@ -33,6 +33,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -44,6 +46,7 @@ public class Downloader {
     public interface OnEpisodeParsedReceiver{ void receiveEpisodes(List<Episode> episodes); }
     public interface OnPodcastParsedReceiver{ void receivePodcasts(List<Podcast> podcast); }
     public static final String ACTION_DOWNLOADED = "action_downloaded";
+    private static HashMap<String, Long> downloadIDs = new HashMap<>();
 
     public static void downloadImage(URL url, final OnImageDownloadReceiver re){
         new AsyncTask<URL,Void,Bitmap>(){
@@ -218,17 +221,34 @@ public class Downloader {
         //.execute();
     }
 
-    public static void downloadEpisode(Context context, Episode ep){  //if the user was explicit on downloading an episode
-            DownloadManager mgr = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+    public static long downloadEpisode(Context context, Episode ep){  //if the user was explicit on downloading an episode
+        DownloadManager mgr = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         //TODO just in WIFI
-            Uri uri = Uri.parse(ep.getEpURL());
-            mgr.enqueue(new DownloadManager.Request(uri)
+        Uri uri = Uri.parse(ep.getEpURL());
+        long id = mgr.enqueue(new DownloadManager.Request(uri)
                     .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI)
                     .setTitle("Downloading episode")
                     .setDescription(ep.getEpTitle())
                     .setDestinationInExternalFilesDir(context
                             , FileManager.episodePath(context, ep)
                             , URLUtil.guessFileName(ep.getEpURL(), null, null)));
+        downloadIDs.put(ep.getEpURL(),id);
+        return id;
+    }
+
+    public static boolean isDownloading(String epURL){
+        return (downloadIDs.get(epURL)!=null);
+    }
+
+    public static void removeDownload(long id){
+        //remove from list, either because if finished or it was canceled
+        downloadIDs.values().removeAll(Collections.singleton(id));
+    }
+
+    public static void cancelDownload(Context context, String epURL){
+        ((DownloadManager)context.getSystemService(Context.DOWNLOAD_SERVICE))
+                .remove(downloadIDs.get(epURL));
+        removeDownload(downloadIDs.get(epURL));
     }
 
     public static boolean isCharging(Context context){

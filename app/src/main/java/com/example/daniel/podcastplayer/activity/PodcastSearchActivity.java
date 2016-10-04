@@ -16,6 +16,7 @@ import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
+import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.download.ResultParser;
 import com.example.daniel.podcastplayer.download.Downloader;
@@ -73,8 +74,10 @@ public class PodcastSearchActivity extends AppCompatActivity
                 public void onClick(View v) {
                     DbHelper db = DbHelper.getInstance(v.getContext());
                     boolean isSubscribed = false;
-                    if (((Button)v).getText().equals(getString(R.string.unsubscribe_button)))
+                    if (((Button)v).getText().equals(getString(R.string.unsubscribe_button))) {
                         db.deletePodcast(podcast.getPodcastId());
+                        FileManager.deletePodcast(PodcastSearchActivity.this, podcast);
+                    }
                     else {
                         db.insertPodcast(podcast);
                         isSubscribed = true;

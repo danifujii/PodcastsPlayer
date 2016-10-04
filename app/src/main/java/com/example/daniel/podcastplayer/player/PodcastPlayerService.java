@@ -138,7 +138,6 @@ public class PodcastPlayerService extends Service {
     }
 
     public void finishPlayback(boolean finished){
-        Log.d("PPS_SERVICE", "Finish playback");
         stopForeground(true);
         ((NotificationManager)getSystemService(NOTIFICATION_SERVICE))
                 .cancel(notificationId);
@@ -350,7 +349,7 @@ public class PodcastPlayerService extends Service {
             if (intent.getAction().equals(FileManager.ACTION_DELETE)){
                 String name = intent.getStringExtra(FileManager.EP_KEY_EXTRA);
                 Log.d("PPS_SERVICE","Delete episode " + name );
-                if (name.equals(URLUtil.guessFileName(episode.getEpURL(), null,null)))
+                if (episode != null && name.equals(URLUtil.guessFileName(episode.getEpURL(), null,null)))
                     finishPlayback(true);
             }
         }

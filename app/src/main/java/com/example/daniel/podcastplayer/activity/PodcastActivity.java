@@ -160,7 +160,9 @@ public class PodcastActivity extends ServiceActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch(intent.getAction()){
-                case (DownloadManager.ACTION_DOWNLOAD_COMPLETE): epsRV.getAdapter().notifyDataSetChanged();
+                case (DownloadManager.ACTION_DOWNLOAD_COMPLETE):
+                    epsRV.getAdapter().notifyDataSetChanged();
+                    Downloader.removeDownload(intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,-1));
                     break;
                 case (Downloader.ACTION_DOWNLOADED): {
                     List<Episode> episodes = DbHelper.getInstance(PodcastActivity.this)
