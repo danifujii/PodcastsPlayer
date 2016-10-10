@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.download.Downloader;
+import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 
 import java.io.File;
 import java.util.List;
@@ -148,6 +150,8 @@ public class PodcastActivity extends ServiceActivity {
         filter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
         filter.addAction(Downloader.ACTION_DOWNLOADED);
         registerReceiver(receiver,filter);
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(finishReceiver, new IntentFilter(PodcastPlayerService.ACTION_FINISH));
         if (bound)
             setupPlayerUI();
     }
@@ -156,6 +160,7 @@ public class PodcastActivity extends ServiceActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(finishReceiver);
     }
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -173,6 +178,14 @@ public class PodcastActivity extends ServiceActivity {
                     break;
                 }
             }
+        }
+    };
+
+    private BroadcastReceiver finishReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(PodcastPlayerService.ACTION_FINISH))
+                epsRV.getAdapter().notifyDataSetChanged();
         }
     };
 }

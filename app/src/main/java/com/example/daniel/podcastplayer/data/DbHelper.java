@@ -14,7 +14,7 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper{
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "PodcastPlayerMov.db";
     private static DbHelper mInstance;
 
@@ -33,6 +33,7 @@ public class DbHelper extends SQLiteOpenHelper{
             + Tbls.COLUMN_DOWNLOADED+ " boolean NOT NULL, "
             + Tbls.COLUMN_LISTENED  + " integer NOT NULL, "
             + Tbls.COLUMN_FK_POD    + " integer NOT NULL, "
+            + Tbls.COLUMN_NEW_EP    + " boolean NOT NULL, "
             + " CONSTRAINT FK_Podcast FOREIGN KEY (" + Tbls.COLUMN_FK_POD + ") REFERENCES "
             + Tbls.NAME_PODCAST + "(" + Tbls.COLUMN_ID + ") ON DELETE CASCADE)";
 
@@ -60,10 +61,10 @@ public class DbHelper extends SQLiteOpenHelper{
         values.put(Tbls.COLUMN_ARTIST, p.getPodcastArtist());
         values.put(Tbls.COLUMN_FEED, p.getFeedUrl().toString());
         db.insert(Tbls.NAME_PODCAST, null, values);
-        db.close();
+        //db.close();
     }
 
-    public void insertEpisode(Episode e, long podcastId){
+    public void insertEpisode(Episode e, long podcastId, boolean newEp){
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(Tbls.COLUMN_TITLE,e.getEpTitle());
@@ -72,9 +73,10 @@ public class DbHelper extends SQLiteOpenHelper{
         values.put(Tbls.COLUMN_LENGTH,e.getLength());
         values.put(Tbls.COLUMN_DOWNLOADED,false);
         values.put(Tbls.COLUMN_LISTENED,"0");
+        values.put(Tbls.COLUMN_NEW_EP,newEp);
         values.put(Tbls.COLUMN_FK_POD,podcastId);
         db.insert(Tbls.NAME_EPISODE, null, values);
-        db.close();
+        //db.close();
     }
 
     public boolean existsPodcast(long podcastId){
@@ -159,7 +161,7 @@ public class DbHelper extends SQLiteOpenHelper{
     public List<Episode> getLatestEpisodes(){
         Cursor c = getReadableDatabase().rawQuery("SELECT e1.* FROM " + Tbls.NAME_EPISODE + " e1"
                 + " JOIN (SELECT " + Tbls.COLUMN_ID + ", MAX( " + Tbls.COLUMN_DATE + ") date "
-                + " FROM " +Tbls.NAME_EPISODE + " WHERE " + Tbls.COLUMN_LISTENED + "<" + Tbls.COLUMN_LENGTH
+                + " FROM " +Tbls.NAME_EPISODE + " WHERE " + Tbls.COLUMN_NEW_EP + "=1 "
                 + " GROUP BY " + Tbls.COLUMN_FK_POD +" ) e2"
                 + " ON e1." + Tbls.COLUMN_ID+"=e2."+Tbls.COLUMN_ID
                 + " AND e1."+ Tbls.COLUMN_DATE+"=e2.date", null);
@@ -193,12 +195,19 @@ public class DbHelper extends SQLiteOpenHelper{
         db.delete(tableName,
                 columnName + "=?",
                 selectionArgs);
-        db.close();
+        //db.close();
     }
 
     public void updateEpisode(String epURL, int listened){
         ContentValues cv = new ContentValues();
         cv.put(Tbls.COLUMN_LISTENED,String.valueOf(listened));
+        getWritableDatabase().update(Tbls.NAME_EPISODE, cv,
+                Tbls.COLUMN_EP_URL + "='" + epURL + "'", null);
+    }
+
+    public void updateEpisodeNew(String epURL, boolean newEp){
+        ContentValues cv = new ContentValues();
+        cv.put(Tbls.COLUMN_NEW_EP,newEp);
         getWritableDatabase().update(Tbls.NAME_EPISODE, cv,
                 Tbls.COLUMN_EP_URL + "='" + epURL + "'", null);
     }
@@ -225,6 +234,7 @@ public class DbHelper extends SQLiteOpenHelper{
         public static String COLUMN_LENGTH = "length";
         public static String COLUMN_DOWNLOADED = "downloaded";
         public static String COLUMN_LISTENED = "listened";
+        public static String COLUMN_NEW_EP = "new_ep";
         public static String COLUMN_FK_POD = "podcastId";
     }
 }

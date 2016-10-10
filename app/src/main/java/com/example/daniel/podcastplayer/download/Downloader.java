@@ -197,7 +197,7 @@ public class Downloader {
                                 Episode last = db.getLastEpisode(podcastId);
                                 for (Episode e : episodes) {
                                     if (!e.getEpURL().equals(last.getEpURL())) {
-                                        db.insertEpisode(e, podcastId);
+                                        db.insertEpisode(e, podcastId, true);
                                         if (prefs.contains(String.valueOf(e.getPodcastId()))        //if automatic donwload is active, download episode
                                                 && isCharging(context))
                                             downloadEpisode(context, e);
@@ -233,6 +233,7 @@ public class Downloader {
                             , FileManager.episodePath(context, ep)
                             , URLUtil.guessFileName(ep.getEpURL(), null, null)));
         downloadIDs.put(ep.getEpURL(),id);
+        DbHelper.getInstance(context).updateEpisodeNew(ep.getEpURL(), true);
         return id;
     }
 

@@ -107,6 +107,21 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         }
     }
 
+    public void removeItem(int position){
+        data.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, data.size());
+    }
+
+    public void addItem(Episode e, int pos){
+        data.add(pos, e);
+        notifyItemInserted(pos);
+    }
+
+    public Episode getItem(int position){
+        return data.get(position);
+    }
+
     private enum Icons {DOWNLOAD, CANCEL, PLAY}
     private void changeImageButton(ImageButton im, int type){
         Icons icon = Icons.values()[type];

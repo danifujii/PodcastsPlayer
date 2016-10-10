@@ -88,8 +88,11 @@ public class PodcastSearchActivity extends AppCompatActivity
                             protected Void doInBackground(Void... params) {
                                 DbHelper db = DbHelper.getInstance(getApplicationContext());
                                 if (parsedEpisodes != null)
-                                    for (Episode e : parsedEpisodes)
-                                        db.insertEpisode(e, podcast.getPodcastId());
+                                    for (Episode e : parsedEpisodes) {
+                                        if (parsedEpisodes.indexOf(e) == 0)
+                                            db.insertEpisode(e, podcast.getPodcastId(), true);
+                                        else db.insertEpisode(e, podcast.getPodcastId(), false);
+                                    }
                                 return null;
                             }
                         }.execute();

@@ -50,6 +50,8 @@ public class PlayerActivity extends ServiceActivity{
     //Progress text
     private final static String divider = " / ";
     private String length;
+    private static boolean active = false;  //active is used to avoid checking the player playing
+                                            // if the activity is not active
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,11 +115,12 @@ public class PlayerActivity extends ServiceActivity{
                 @Override public void onStopTrackingTouch(SeekBar seekBar) {}
             });
 
+            active = true;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     while (progressBar.getProgress() < progressBar.getMax()){
-                        if (service.isPlaying()) {
+                        if (active && service.isPlaying()) {
                             progressBar.setProgress(progressBar.getProgress() + 1);
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -204,6 +207,8 @@ public class PlayerActivity extends ServiceActivity{
     @Override
     protected void onResume() {
         super.onResume();
+
+        active = true;
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(PodcastPlayerService.ACTION_FINISH);
         intentFilter.addAction(PodcastPlayerService.ACTION_PLAY);
@@ -214,6 +219,7 @@ public class PlayerActivity extends ServiceActivity{
     @Override
     protected void onPause() {
         super.onPause();
+        active = false;
         LocalBroadcastManager.getInstance(this).unregisterReceiver(handler);
     }
 

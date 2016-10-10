@@ -8,4 +8,5 @@
     <color name="lightGray">#e1e1e1</color>
     <color name="mediumGray">#6f6f6f</color>
     <color name="white">#ffffff</color>
+    <color name="green_done">#00C853</color>
 </resources>

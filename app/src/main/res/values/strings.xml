@@ -54,4 +54,7 @@
 
     <string name="mins">mins</string>
     <string name="hours">hours</string>
+
+    <string name="undo">UNDO</string>
+    <string name="deleted">Episode deleted</string>
 </resources>
