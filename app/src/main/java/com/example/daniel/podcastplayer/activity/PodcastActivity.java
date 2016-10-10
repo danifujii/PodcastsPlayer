@@ -148,6 +148,8 @@ public class PodcastActivity extends ServiceActivity {
         filter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
         filter.addAction(Downloader.ACTION_DOWNLOADED);
         registerReceiver(receiver,filter);
+        if (bound)
+            setupPlayerUI();
     }
 
     @Override

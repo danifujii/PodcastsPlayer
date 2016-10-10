@@ -9,16 +9,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
-import com.example.daniel.podcastplayer.SearchActivity;
-import com.example.daniel.podcastplayer.activity.ServiceActivity;
-import com.example.daniel.podcastplayer.download.Downloader;
+import com.example.daniel.podcastplayer.activity.SearchActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CatViewHolder>{

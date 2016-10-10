@@ -1,4 +1,4 @@
-package com.example.daniel.podcastplayer;
+package com.example.daniel.podcastplayer.activity;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 
+import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.adapter.CategoryAdapter;
 import com.example.daniel.podcastplayer.adapter.PodResAdapter;
 import com.example.daniel.podcastplayer.data.Podcast;

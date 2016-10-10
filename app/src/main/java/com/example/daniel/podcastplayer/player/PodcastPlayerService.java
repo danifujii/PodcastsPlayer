@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -17,17 +18,21 @@ import android.media.PlaybackParams;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
+import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.SyncStateContract;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.session.MediaButtonReceiver;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -60,6 +65,9 @@ public class PodcastPlayerService extends Service {
     private final static int skipForward = 30000;   //30 seconds
     private final static int rewind = 10000;   //10 seconds
     private final static int notificationId = 212221;
+
+    private MediaSessionCompat session;
+    private float speed = 1.0f;
 
     private MediaPlayer mp = null;
     private final IBinder binder = new PlayerBinder();
@@ -143,6 +151,7 @@ public class PodcastPlayerService extends Service {
                 .cancel(notificationId);
         if (mp!=null){
             saveProgress(finished);
+            abandonAudioFocus();
             mp.stop();
             mp.release();
             mp = null;
@@ -199,7 +208,8 @@ public class PodcastPlayerService extends Service {
             //if same episode, already prepared so resume playback
         else if (episode.getEpURL().equals(e.getEpURL()) && start){
             LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PLAY));
-            mp.start();
+            if (requestAudioFocus())
+                mp.start();
         }
         this.episode = e;
     }
@@ -208,7 +218,7 @@ public class PodcastPlayerService extends Service {
         if (Build.VERSION.SDK_INT >= 23) {
             PlaybackParams params = new PlaybackParams();
             if (episode!=null) {
-                float speed = PreferenceManager.getDefaultSharedPreferences(PodcastPlayerService.this)
+                speed = PreferenceManager.getDefaultSharedPreferences(PodcastPlayerService.this)
                         .getFloat(String.valueOf(episode.getPodcastId()) + getString(R.string.speed_setting)
                                 , -1);
                 if (speed == -1)
@@ -224,7 +234,7 @@ public class PodcastPlayerService extends Service {
 
     private void startPlayback(boolean start){
         if (episode != null) {
-            if (start) {
+            if (start && requestAudioFocus()) {
                 mp.start();
                 LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PLAY));
             }
@@ -236,7 +246,8 @@ public class PodcastPlayerService extends Service {
 
     public void resumePlayback() {
         startForeground(notificationId, buildNotif(false));
-        mp.start();
+        if (requestAudioFocus())
+            mp.start();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PLAY));
         ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE))
                 .notify(notificationId, buildNotif(false));
@@ -313,6 +324,53 @@ public class PodcastPlayerService extends Service {
         }
     }
 
+    private boolean requestAudioFocus(){
+        AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        int result = am.requestAudioFocus(afChangeListener,
+                AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            session = new MediaSessionCompat(this,"Stereo session");
+            session.setCallback(new MediaSessionCompat.Callback() {
+                @Override
+                public void onPause() {
+                    super.onPause();
+                    if (isPlaying())
+                        pausePlayback();
+                    else startPlayback(true);
+                }
+
+                @Override
+                public void onPlay() {
+                    super.onPlay();
+                    startPlayback(true);
+                }
+                //TODO double click to skip forward
+            });
+            session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
+                    | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+            session.setActive(true);
+
+            PlaybackStateCompat state = new PlaybackStateCompat.Builder()
+                    .setActions(
+                            PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PLAY_PAUSE |
+                                    PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID | PlaybackStateCompat.ACTION_PAUSE |
+                                    PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
+                    .setState(PlaybackStateCompat.STATE_PLAYING, 0, speed, SystemClock.elapsedRealtime())
+                    .build();
+            session.setPlaybackState(state);
+            //am.registerMediaButtonEventReceiver(new ComponentName(this, controlReceiver.getClass()));
+            return true;
+        }
+        return false;
+    }
+
+    private void abandonAudioFocus(){
+        AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        //am.unregisterMediaButtonEventReceiver(new ComponentName(this, controlReceiver.getClass()));
+        if (session != null) session.release();
+        am.abandonAudioFocus(afChangeListener);
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -364,6 +422,20 @@ public class PodcastPlayerService extends Service {
                 Log.d("PPS_SERVICE","Delete episode " + name );
                 if (episode != null && name.equals(URLUtil.guessFileName(episode.getEpURL(), null,null)))
                     finishPlayback(true);
+            }
+        }
+    };
+
+    AudioManager.OnAudioFocusChangeListener afChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)
+                pausePlayback();
+            else if (focusChange == AudioManager.AUDIOFOCUS_GAIN)
+                resumePlayback();
+            else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                abandonAudioFocus();
+                pausePlayback();
             }
         }
     };

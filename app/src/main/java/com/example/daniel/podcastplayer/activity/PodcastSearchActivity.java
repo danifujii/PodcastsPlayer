@@ -83,10 +83,16 @@ public class PodcastSearchActivity extends AppCompatActivity
                         db.insertPodcast(podcast);
                         isSubscribed = true;
                         saveArtwork();
-                        if (parsedEpisodes != null) {
-                            for (Episode e : parsedEpisodes)
-                                db.insertEpisode(e, podcast.getPodcastId());
-                        }
+                        new AsyncTask<Void, Void, Void>(){
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                DbHelper db = DbHelper.getInstance(getApplicationContext());
+                                if (parsedEpisodes != null)
+                                    for (Episode e : parsedEpisodes)
+                                        db.insertEpisode(e, podcast.getPodcastId());
+                                return null;
+                            }
+                        }.execute();
                     }
                     changeSubButtonText(isSubscribed);
                 }
