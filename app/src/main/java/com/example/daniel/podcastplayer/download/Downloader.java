@@ -250,6 +250,7 @@ public class Downloader {
         ((DownloadManager)context.getSystemService(Context.DOWNLOAD_SERVICE))
                 .remove(downloadIDs.get(epURL));
         removeDownload(downloadIDs.get(epURL));
+        DbHelper.getInstance(context).updateEpisodeNew(epURL, false);
     }
 
     public static boolean isCharging(Context context){

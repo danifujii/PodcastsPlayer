@@ -29,6 +29,7 @@ public class FileManager {
 
     public static boolean deleteFile(Context c, Episode e){
         File ep = FileManager.getEpisodeFile(c,e);
+        DbHelper.getInstance(c).updateEpisodeNew(e.getEpURL(), false);
         Intent i = new Intent(ACTION_DELETE);
         i.putExtra(EP_KEY_EXTRA, URLUtil.guessFileName(e.getEpURL(), null, null));
         LocalBroadcastManager.getInstance(c).sendBroadcast(i);

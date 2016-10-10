@@ -7,8 +7,14 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -36,20 +42,44 @@ public class MainActivity extends ServiceActivity{
                 .setAction(PodcastPlayerService.ACTION_START));
         Downloader.updatePodcasts(this);
 
-        ImageButton settingsButton = (ImageButton) findViewById(R.id.settings_button);
-        settingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        getSupportActionBar().setElevation(0);
+
+        //ImageButton settingsButton = (ImageButton) findViewById(R.id.settings_button);
+        //settingsButton.setOnClickListener(new View.OnClickListener() {
+          //  @Override
+          //  public void onClick(View v) {
+          //      startActivity(new Intent(MainActivity.this,SettingsActivity.class));
+        //    }
+        //});
+        //ImageButton searchButton = (ImageButton) findViewById(R.id.search_button);
+        //searchButton.setOnClickListener(new View.OnClickListener() {
+         //   @Override
+         //   public void onClick(View v) {
+          //      startActivity(new Intent(MainActivity.this, SearchActivity.class));
+         //   }
+        //});
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case (R.id.search_menu):{
+                startActivity(new Intent(MainActivity.this,SearchActivity.class));
+                break;
+            }
+            case(R.id.settings_menu):{
                 startActivity(new Intent(MainActivity.this,SettingsActivity.class));
+                break;
             }
-        });
-        ImageButton searchButton = (ImageButton) findViewById(R.id.search_button);
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, SearchActivity.class));
-            }
-        });
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

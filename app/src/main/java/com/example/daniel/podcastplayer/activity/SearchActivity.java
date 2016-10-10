@@ -3,11 +3,18 @@ package com.example.daniel.podcastplayer.activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Slide;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
@@ -35,7 +42,7 @@ public class SearchActivity extends AppCompatActivity implements Downloader.OnPo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        SearchView sv = (SearchView)findViewById(R.id.search_view);
+        //SearchView sv = (SearchView)findViewById(R.id.search_view);
         initCategoriesMap();
         rv = (RecyclerView)findViewById(R.id.search_recycler_view);
         rv.setLayoutManager(new LinearLayoutManager(this));
@@ -50,8 +57,22 @@ public class SearchActivity extends AppCompatActivity implements Downloader.OnPo
             }
         }else {
             setTitle(getString(R.string.tab_search));
-            if (sv != null) {
-                sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            rv.setAdapter(new CategoryAdapter(categoriesId, this));
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.search_menu, menu);
+
+        if (getIntent().getBooleanExtra(EXTRA_RESULT_ACT,false))
+            menu.findItem(R.id.search_menu).setVisible(false);
+        else {
+            android.support.v7.widget.SearchView mSearchView =
+                    (android.support.v7.widget.SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search_menu));
+            if (mSearchView != null)
+                mSearchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String query) {
                         NetworkInfo networkInfo = ((ConnectivityManager)
@@ -69,9 +90,8 @@ public class SearchActivity extends AppCompatActivity implements Downloader.OnPo
                         return false;
                     }
                 });
-            }
-            rv.setAdapter(new CategoryAdapter(categoriesId, this));
         }
+        return true;
     }
 
     public RecyclerView getRecyclerView() { return rv; }

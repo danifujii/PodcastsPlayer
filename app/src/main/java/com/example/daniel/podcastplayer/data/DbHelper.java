@@ -159,12 +159,14 @@ public class DbHelper extends SQLiteOpenHelper{
 
     //Get latest, non listened episodes from each podcast
     public List<Episode> getLatestEpisodes(){
-        Cursor c = getReadableDatabase().rawQuery("SELECT e1.* FROM " + Tbls.NAME_EPISODE + " e1"
-                + " JOIN (SELECT " + Tbls.COLUMN_ID + ", MAX( " + Tbls.COLUMN_DATE + ") date "
-                + " FROM " +Tbls.NAME_EPISODE + " WHERE " + Tbls.COLUMN_NEW_EP + "=1 "
-                + " GROUP BY " + Tbls.COLUMN_FK_POD +" ) e2"
-                + " ON e1." + Tbls.COLUMN_ID+"=e2."+Tbls.COLUMN_ID
-                + " AND e1."+ Tbls.COLUMN_DATE+"=e2.date", null);
+        //Cursor c = getReadableDatabase().rawQuery("SELECT e1.* FROM " + Tbls.NAME_EPISODE + " e1"
+          //      + " JOIN (SELECT " + Tbls.COLUMN_ID + ", MAX( " + Tbls.COLUMN_DATE + ") date "
+          //      + " FROM " +Tbls.NAME_EPISODE + " WHERE " + Tbls.COLUMN_NEW_EP + "=1 "
+          //      + " GROUP BY " + Tbls.COLUMN_FK_POD +" ) e2"
+          //      + " ON e1." + Tbls.COLUMN_ID+"=e2."+Tbls.COLUMN_ID
+          //      + " AND e1."+ Tbls.COLUMN_DATE+"=e2.date", null);
+        Cursor c = getReadableDatabase().rawQuery("SELECT * FROM " + Tbls.NAME_EPISODE
+            + " WHERE " + Tbls.COLUMN_NEW_EP + "=1" + " ORDER BY " + Tbls.COLUMN_DATE + " DESC", null);
         return buildEpisodes(c);
     }
 

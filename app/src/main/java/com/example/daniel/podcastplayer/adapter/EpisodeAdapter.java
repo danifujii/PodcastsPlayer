@@ -187,7 +187,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
             String hoursText = context.getString(R.string.hours);
             int hours = mins / 60;
             if (hours == 1) return "1 " + hoursText.substring(0,hoursText.length()-1);
-            else return String.valueOf(mins/60) + " " + hours;
+            else return String.valueOf(mins/60) + " " + hoursText;
         }
     }
 }

@@ -149,6 +149,9 @@ public class PodcastPlayerService extends Service {
         stopForeground(true);
         ((NotificationManager)getSystemService(NOTIFICATION_SERVICE))
                 .cancel(notificationId);
+        if (finished)
+            LocalBroadcastManager.getInstance(PodcastPlayerService.this)
+                    .sendBroadcast(new Intent(ACTION_FINISH));
         if (mp!=null){
             saveProgress(finished);
             abandonAudioFocus();
@@ -173,8 +176,8 @@ public class PodcastPlayerService extends Service {
             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mpParam) {
-                    LocalBroadcastManager.getInstance(PodcastPlayerService.this)
-                            .sendBroadcast(new Intent(ACTION_FINISH));
+                    //LocalBroadcastManager.getInstance(PodcastPlayerService.this)
+                    //        .sendBroadcast(new Intent(ACTION_FINISH));
                     FileManager.deleteFile(context,episode);
                 }
             });
@@ -420,8 +423,10 @@ public class PodcastPlayerService extends Service {
             if (intent.getAction().equals(FileManager.ACTION_DELETE)){
                 String name = intent.getStringExtra(FileManager.EP_KEY_EXTRA);
                 Log.d("PPS_SERVICE","Delete episode " + name );
-                if (episode != null && name.equals(URLUtil.guessFileName(episode.getEpURL(), null,null)))
+                if (episode != null && name.equals(URLUtil.guessFileName(episode.getEpURL(), null,null))) {
                     finishPlayback(true);
+                    Log.d("PPS_SERVICE","Delete episode MATCH!");
+                }
             }
         }
     };

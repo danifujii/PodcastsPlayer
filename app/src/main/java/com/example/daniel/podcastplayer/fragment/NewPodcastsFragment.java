@@ -140,7 +140,7 @@ public class NewPodcastsFragment extends Fragment {
 
     private void showSnackbar(){
         Snackbar snackbar = Snackbar.make(
-                getView().findViewById(R.id.new_podcasts_layout), getString(R.string.deleted), Snackbar.LENGTH_LONG)
+                getView().findViewById(R.id.new_podcasts_layout), getString(R.string.deleted), Snackbar.LENGTH_SHORT)
                 .setAction(getString(R.string.undo), new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -152,7 +152,7 @@ public class NewPodcastsFragment extends Fragment {
                         //The rest are removed
                         for (Episode ep: deletedEpisodes){
                             FileManager.deleteFile(getContext(), ep);
-                            DbHelper.getInstance(getContext()).updateEpisodeNew(ep.getEpURL(), false);
+                            //DbHelper.getInstance(getContext()).updateEpisodeNew(ep.getEpURL(), false);
                         }
                     }
                 });
@@ -163,7 +163,7 @@ public class NewPodcastsFragment extends Fragment {
                 if (event == DISMISS_EVENT_TIMEOUT || event == DISMISS_EVENT_SWIPE){
                     for (Episode ep : deletedEpisodes){
                         FileManager.deleteFile(getContext(), ep);
-                        DbHelper.getInstance(getContext()).updateEpisodeNew(ep.getEpURL(), false);
+                        //DbHelper.getInstance(getContext()).updateEpisodeNew(ep.getEpURL(), false);
                     }
                 }
                 super.onDismissed(snackbar, event);
