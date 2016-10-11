@@ -387,7 +387,6 @@ public class PodcastPlayerService extends Service {
         }
     }
 
-    //TODO implement Audio Focus
     //TODO include bluetooth controls
     private BroadcastReceiver controlReceiver = new BroadcastReceiver() {
         @Override

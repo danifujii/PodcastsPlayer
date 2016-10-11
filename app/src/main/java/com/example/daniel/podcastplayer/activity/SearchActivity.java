@@ -1,10 +1,12 @@
 package com.example.daniel.podcastplayer.activity;
 
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
@@ -37,6 +40,8 @@ public class SearchActivity extends AppCompatActivity implements Downloader.OnPo
     private ProgressBar progressBar;
     private HashMap<String,Integer> categoriesId;
 
+
+    //TODO mejorar esto. Se usa solo para mostrar resultados de Categoria!
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +62,7 @@ public class SearchActivity extends AppCompatActivity implements Downloader.OnPo
             }
         }else {
             setTitle(getString(R.string.tab_search));
-            rv.setAdapter(new CategoryAdapter(categoriesId, this));
+            //rv.setAdapter(new CategoryAdapter(categoriesId, this));
         }
     }
 
@@ -65,6 +70,27 @@ public class SearchActivity extends AppCompatActivity implements Downloader.OnPo
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.search_menu, menu);
+
+
+        MenuItemCompat.setOnActionExpandListener(menu.findItem(R.id.search_menu), new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                if (getSupportActionBar() != null){
+                    getSupportActionBar().setBackgroundDrawable(
+                            new ColorDrawable(ContextCompat.getColor(SearchActivity.this, R.color.lightGray)));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                if (getSupportActionBar() != null){
+                    getSupportActionBar().setBackgroundDrawable(
+                            new ColorDrawable(ContextCompat.getColor(SearchActivity.this, R.color.colorPrimary)));
+                }
+                return true;
+            }
+        });
 
         if (getIntent().getBooleanExtra(EXTRA_RESULT_ACT,false))
             menu.findItem(R.id.search_menu).setVisible(false);

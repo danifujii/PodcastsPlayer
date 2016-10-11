@@ -3,10 +3,16 @@ package com.example.daniel.podcastplayer.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
@@ -16,8 +22,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 
+import com.example.daniel.podcastplayer.HomeFragment;
+import com.example.daniel.podcastplayer.SearchFragment;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.download.Downloader;
@@ -28,42 +37,80 @@ import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 
 public class MainActivity extends ServiceActivity{
 
+    private SearchFragment search;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
-        viewPager.setAdapter(new TabPagerAdapter(getSupportFragmentManager()));
-        viewPager.setCurrentItem(0);
-        TabLayout tl = (TabLayout) findViewById(R.id.tabLayout);
-        tl.setupWithViewPager(viewPager);
         startService(new Intent(this,PodcastPlayerService.class)
                 .setAction(PodcastPlayerService.ACTION_START));
         Downloader.updatePodcasts(this);
 
-        getSupportActionBar().setElevation(0);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setElevation(0);
 
-        //ImageButton settingsButton = (ImageButton) findViewById(R.id.settings_button);
-        //settingsButton.setOnClickListener(new View.OnClickListener() {
-          //  @Override
-          //  public void onClick(View v) {
-          //      startActivity(new Intent(MainActivity.this,SettingsActivity.class));
-        //    }
-        //});
-        //ImageButton searchButton = (ImageButton) findViewById(R.id.search_button);
-        //searchButton.setOnClickListener(new View.OnClickListener() {
-         //   @Override
-         //   public void onClick(View v) {
-          //      startActivity(new Intent(MainActivity.this, SearchActivity.class));
-         //   }
-        //});
+        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+        trans.add(R.id.fragment_layout, new HomeFragment());
+        trans.commit();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
+
+        final android.support.v7.widget.SearchView mSearchView =
+                (android.support.v7.widget.SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search_menu));
+        if (mSearchView != null)
+            mSearchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    NetworkInfo networkInfo = ((ConnectivityManager)
+                            getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+                    if (networkInfo != null && networkInfo.isConnected()) {
+                        if (search != null) {
+                            search.setDownloadingUI();
+                            Downloader.parsePodcasts(query.replace(' ', '+'), search.getRecyclerView()
+                                    , search);
+                        }
+                    } else Snackbar.make(findViewById(R.id.search_layout),
+                            getString(R.string.error_no_connection), Snackbar.LENGTH_SHORT).show();
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    return false;
+                }
+            });
+
+        MenuItemCompat.setOnActionExpandListener(menu.findItem(R.id.search_menu), new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                findViewById(R.id.splayer_layout).setVisibility(View.GONE);
+                if (getSupportActionBar() != null){
+                    getSupportActionBar().setBackgroundDrawable(
+                            new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.colorPrimaryDark)));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                if (getSupportActionBar() != null){
+                    getSupportActionBar().setBackgroundDrawable(
+                            new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.colorPrimary)));
+                }
+                onBackPressed();
+                setupPlayerUI();
+                return true;
+            }
+        });
+
         return true;
     }
 
@@ -71,7 +118,10 @@ public class MainActivity extends ServiceActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case (R.id.search_menu):{
-                startActivity(new Intent(MainActivity.this,SearchActivity.class));
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_layout, search = new SearchFragment())
+                        .addToBackStack(null)
+                        .commit();
                 break;
             }
             case(R.id.settings_menu):{
@@ -115,37 +165,6 @@ public class MainActivity extends ServiceActivity{
                 service.startPlayback(e, this, false);
                 manager.setSheetInterface(service.getEpisode());
             }
-        }
-    }
-
-    private class TabPagerAdapter extends FragmentStatePagerAdapter {
-        private static final int numPages = 2;
-
-        public TabPagerAdapter(FragmentManager fm){
-            super(fm);
-        }
-
-        @Override
-        public int getCount() {
-            return numPages;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            switch(position) {
-                case 0: return new NewPodcastsFragment();
-                case 1: return new SubscriptionsFragment();
-            }
-            return null;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch(position){
-                case 0: return getString(R.string.tab_new);
-                case 1: return getString(R.string.tab_podcasts);
-            }
-            return null;
         }
     }
 }

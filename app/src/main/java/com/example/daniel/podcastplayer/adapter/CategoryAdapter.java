@@ -21,14 +21,14 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CatVie
 
     private List<String> cats;
     private HashMap<String,Integer> catsId;
-    private SearchActivity activity;
+    //private SearchActivity activity;
 
-    public CategoryAdapter(HashMap<String,Integer> categories, SearchActivity receiver){
+    public CategoryAdapter(HashMap<String,Integer> categories/*, SearchActivity receiver*/){
         cats = new ArrayList<>();
         for(String s : categories.keySet())
             cats.add(s);
         Collections.sort(cats);
-        activity = receiver;
+        //activity = receiver;
         catsId = categories;
     }
 
@@ -52,11 +52,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CatVie
             @Override
             public void onClick(View v) {
                 //((SearchActivity)activity).setDownloadingUI();
-                Intent i = new Intent(activity, SearchActivity.class);
+                Intent i = new Intent(v.getContext(), SearchActivity.class);
                 i.putExtra(SearchActivity.EXTRA_RESULT_ACT, true);
                 i.putExtra(SearchActivity.EXTRA_CAT, catsId.get(cats.get(position)));
                 i.putExtra(SearchActivity.EXTRA_CAT_NAME, cats.get(position));
-                activity.startActivity(i);
+                //activity.startActivity(i);
+                v.getContext().startActivity(i);
                 //Downloader.parseCategory(catsId.get(cats.get(position)),
                 //        ((SearchActivity)activity).getRecyclerView(),activity);
             }

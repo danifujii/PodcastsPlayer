@@ -54,7 +54,6 @@ public class SpeedDialogManager {
     }
 
     private static String getChanged(String ogSpeed, Double inputDelta){
-        //TODO mirar si no hay una forma mas sencilla de hacerlo
         if (ogSpeed.equals(limit) && inputDelta > 0) return ogSpeed;
         if (ogSpeed.equals(bottom) && inputDelta < 0) return ogSpeed;
         else{
