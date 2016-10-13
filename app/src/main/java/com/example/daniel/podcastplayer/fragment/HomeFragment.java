@@ -1,4 +1,4 @@
-package com.example.daniel.podcastplayer;
+package com.example.daniel.podcastplayer.fragment;
 
 
 import android.os.Bundle;
@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.fragment.NewPodcastsFragment;
 import com.example.daniel.podcastplayer.fragment.SubscriptionsFragment;
 

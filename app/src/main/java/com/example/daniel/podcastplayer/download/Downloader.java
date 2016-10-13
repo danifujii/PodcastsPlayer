@@ -27,6 +27,7 @@ import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.data.Podcast;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,6 +46,7 @@ public class Downloader {
     public interface OnImageDownloadReceiver { void receiveImage(Bitmap bitmap); }
     public interface OnEpisodeParsedReceiver{ void receiveEpisodes(List<Episode> episodes); }
     public interface OnPodcastParsedReceiver{ void receivePodcasts(List<Podcast> podcast); }
+
     public static final String ACTION_DOWNLOADED = "action_downloaded";
     private static HashMap<String, Long> downloadIDs = new HashMap<>();
 
@@ -195,15 +197,17 @@ public class Downloader {
                             if (episodes.size()>0) {
                                 int podcastId = episodes.get(0).getPodcastId();
                                 Episode last = db.getLastEpisode(podcastId);
-                                for (Episode e : episodes) {
-                                    if (!e.getEpURL().equals(last.getEpURL())) {
+                                for (Episode e : episodes) {                                //insert new episodes
+                                    if (!e.getEpURL().equals(last.getEpURL()))
                                         db.insertEpisode(e, podcastId, true);
-                                        if (prefs.contains(String.valueOf(e.getPodcastId()))        //if automatic donwload is active, download episode
-                                                && isCharging(context))
-                                            downloadEpisode(context, e);
-                                    }
                                     else break;
                                 }
+                                if (prefs.contains(String.valueOf(last.getPodcastId()))     //if automatic donwload is active,
+                                        && isCharging(context))                             //download new episodes
+                                    for (Episode ep : db.getEpisodes(last.getPodcastId())){
+                                        if (ep.getNewEp())
+                                            downloadEpisode(context, ep);
+                                    }
                             }
                         }
                     };
@@ -224,17 +228,20 @@ public class Downloader {
     public static long downloadEpisode(Context context, Episode ep){  //if the user was explicit on downloading an episode
         DownloadManager mgr = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         //TODO just in WIFI
-        Uri uri = Uri.parse(ep.getEpURL());
-        long id = mgr.enqueue(new DownloadManager.Request(uri)
+        if (!FileManager.getEpisodeFile(context, ep).exists()) {
+            Uri uri = Uri.parse(ep.getEpURL());
+            long id = mgr.enqueue(new DownloadManager.Request(uri)
                     .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI)
-                    .setTitle("Downloading episode")
+                    .setTitle("Downloading " + ep.getEpTitle())
                     .setDescription(ep.getEpTitle())
                     .setDestinationInExternalFilesDir(context
                             , FileManager.episodePath(context, ep)
                             , URLUtil.guessFileName(ep.getEpURL(), null, null)));
-        downloadIDs.put(ep.getEpURL(),id);
-        DbHelper.getInstance(context).updateEpisodeNew(ep.getEpURL(), true);
-        return id;
+            downloadIDs.put(ep.getEpURL(), id);
+            DbHelper.getInstance(context).updateEpisodeNew(ep.getEpURL(), true);
+            return id;
+        }
+        return -1;
     }
 
     public static boolean isDownloading(String epURL){
@@ -250,10 +257,10 @@ public class Downloader {
         ((DownloadManager)context.getSystemService(Context.DOWNLOAD_SERVICE))
                 .remove(downloadIDs.get(epURL));
         removeDownload(downloadIDs.get(epURL));
-        DbHelper.getInstance(context).updateEpisodeNew(epURL, false);
+        //DbHelper.getInstance(context).updateEpisodeNew(epURL, false);
     }
 
-    public static boolean isCharging(Context context){
+    private static boolean isCharging(Context context){
         Intent batteryStatus = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
         boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
@@ -262,7 +269,6 @@ public class Downloader {
     }
 
     private static String getCorrectURL(String og){
-        //TODO complete with other special characters
         return og.replace("%","%25");
     }
 }

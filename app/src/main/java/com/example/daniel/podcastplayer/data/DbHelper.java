@@ -180,6 +180,7 @@ public class DbHelper extends SQLiteOpenHelper{
             e.setLength(c.getInt(c.getColumnIndex(DbHelper.Tbls.COLUMN_LENGTH)));
             e.setEpURL(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_EP_URL)));
             e.setListened(c.getInt(c.getColumnIndex(Tbls.COLUMN_LISTENED)));
+            e.setNewEp(c.getInt(c.getColumnIndex(Tbls.COLUMN_NEW_EP))==1);
             episodes.add(e);
         }
         c.close();

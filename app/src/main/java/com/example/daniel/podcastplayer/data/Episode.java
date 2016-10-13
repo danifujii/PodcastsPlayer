@@ -15,6 +15,7 @@ public class Episode {
     private int listened;
     private int podcastId;
     private boolean downloaded; //used for UI purposes mainly
+    private boolean newEp;      //not listened episode
 
     public Episode(int podcast){
         podcastId = podcast;
@@ -42,6 +43,8 @@ public class Episode {
 
     public int getListened() { return listened; }
 
+    public boolean getNewEp() { return newEp; }
+
     public void setListened(int listened){ this.listened = listened; }
 
     public void setLength(int length) {
@@ -61,4 +64,6 @@ public class Episode {
     public void setDownloaded(boolean downloaded) {
         this.downloaded = downloaded;
     }
+
+    public void setNewEp(boolean newEp) { this.newEp = newEp; }
 }

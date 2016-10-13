@@ -7,32 +7,22 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageButton;
 
-import com.example.daniel.podcastplayer.HomeFragment;
-import com.example.daniel.podcastplayer.SearchFragment;
+import com.example.daniel.podcastplayer.fragment.HomeFragment;
+import com.example.daniel.podcastplayer.fragment.SearchFragment;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.download.Downloader;
-import com.example.daniel.podcastplayer.fragment.NewPodcastsFragment;
 import com.example.daniel.podcastplayer.R;
-import com.example.daniel.podcastplayer.fragment.SubscriptionsFragment;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 
 public class MainActivity extends ServiceActivity{
@@ -106,6 +96,7 @@ public class MainActivity extends ServiceActivity{
                             new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.colorPrimary)));
                 }
                 onBackPressed();
+                search = null;
                 setupPlayerUI();
                 return true;
             }
@@ -141,7 +132,7 @@ public class MainActivity extends ServiceActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        if (bound)
+        if (bound && search == null)
             setupPlayerUI();
     }
 

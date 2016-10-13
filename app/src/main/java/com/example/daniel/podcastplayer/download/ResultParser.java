@@ -59,7 +59,6 @@ public class ResultParser {
                 //Downloader.OnPodcastParsedReceiver receiver = new Downloader.OnPodcastParsedReceiver() {
                     //@Override
                     //public void receivePodcasts(List<Podcast> podcast) {
-                     //   //TODO verify the first podcast is the one with the ID of the XML
                      //   if (podcast.size()>0)
                      //       result.add(podcast.get(0));
                     //}
@@ -103,7 +102,6 @@ public class ResultParser {
                         result.add(e);
                     else
                         Log.d("TAG", "NO Matches"); //TODO mostrar error al usuario, indicando que el formato no es soportado
-
 
                     if (result.size() == limit) break;
             }

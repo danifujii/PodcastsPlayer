@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.daniel.podcastplayer.HomeFragment">
+    tools:context="com.example.daniel.podcastplayer.fragment.HomeFragment">
 
     <LinearLayout
     android:id="@+id/view_pager_layout"

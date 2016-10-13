@@ -1,11 +1,14 @@
 package com.example.daniel.podcastplayer.player;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
+import android.os.Bundle;
 import android.text.Layout;
 import android.util.Log;
 import android.view.View;
@@ -57,7 +60,10 @@ public class PlayerSheetManager {
             splayerLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    v.getContext().startActivity(new Intent(v.getContext(),PlayerActivity.class));
+                    if (Build.VERSION.SDK_INT >= 21)
+                        v.getContext().startActivity(new Intent(v.getContext(), PlayerActivity.class),
+                                ActivityOptions.makeSceneTransitionAnimation(container).toBundle());
+                    else v.getContext().startActivity(new Intent(v.getContext(), PlayerActivity.class));
                 }
             });
 

@@ -1,4 +1,4 @@
-package com.example.daniel.podcastplayer;
+package com.example.daniel.podcastplayer.fragment;
 
 
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.adapter.CategoryAdapter;
 import com.example.daniel.podcastplayer.adapter.PodResAdapter;
 import com.example.daniel.podcastplayer.data.Podcast;
@@ -41,17 +42,6 @@ public class SearchFragment extends Fragment implements Downloader.OnPodcastPars
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         progressBar = (ProgressBar)v.findViewById(R.id.search_progress_bar);
 
-        //if (getActivity().getIntent().getBooleanExtra(EXTRA_RESULT_ACT,false)){
-        //    setDownloadingUI();
-        //    int cat = getIntent().getIntExtra(EXTRA_CAT, -1);
-        //    if (cat > 0) {
-        //        setTitle(getIntent().getStringExtra(EXTRA_CAT_NAME));
-        //        Downloader.parseCategory(cat, rv, this);
-        //    }
-        //}else {
-        //    setTitle(getString(R.string.tab_search));
-        //    rv.setAdapter(new CategoryAdapter(categoriesId, this));
-        //}
         rv.setAdapter(new CategoryAdapter(categoriesId));
         return v;
     }

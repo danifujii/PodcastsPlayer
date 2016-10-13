@@ -20,9 +20,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -55,9 +59,14 @@ public class PlayerActivity extends ServiceActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //if (Build.VERSION.SDK_INT >= 21) {
+        //    getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        //    getWindow().setEnterTransition(new Slide(Gravity.BOTTOM)
+        //            .setInterpolator(new LinearInterpolator()));
+        //}
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
-
         manager = null; //No player sheet in here, so no sense to update such UI
     }
 

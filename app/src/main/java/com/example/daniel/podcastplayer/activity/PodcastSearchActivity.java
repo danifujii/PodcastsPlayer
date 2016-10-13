@@ -2,7 +2,9 @@ package com.example.daniel.podcastplayer.activity;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -104,6 +106,16 @@ public class PodcastSearchActivity extends AppCompatActivity
 
         //Hide ImageButton from Episode layout
         findViewById(R.id.ep_download_button).setVisibility(View.INVISIBLE);
+
+        setTitle(podcast.getPodcastName());
+        int artworkColor = ColorPicker.getArtworkColor(podcast.getArtwork());
+        if (artworkColor != 0x000000) {
+            //((ViewGroup)findViewById(R.id.header_layout)).setBackgroundColor(artworkColor);
+            if (getSupportActionBar() != null)
+                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(artworkColor));
+            if (Build.VERSION.SDK_INT >= 21)
+                getWindow().setStatusBarColor(ColorPicker.getDarkerColor(artworkColor));
+        }
 
         //Dowload high res image
         try{
