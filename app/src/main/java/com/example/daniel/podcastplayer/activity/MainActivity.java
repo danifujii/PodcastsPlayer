@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -15,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 
 import com.example.daniel.podcastplayer.fragment.HomeFragment;
@@ -64,11 +66,12 @@ public class MainActivity extends ServiceActivity{
                             search.setDownloadingUI();
                             Downloader.parsePodcasts(query.replace(' ', '+'), search.getRecyclerView()
                                     , search);
+                            mSearchView.clearFocus();
                         }
                     } else Snackbar.make(findViewById(R.id.activity_main),
                             getString(R.string.error_no_connection), Snackbar.LENGTH_LONG).show();
-                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    //InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    //imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
                     return true;
                 }
 

@@ -19,7 +19,6 @@
     <string name="cat_technology">Tecnologia</string>
     <string name="cat_tv">TV y Cine</string>
     <string name="default_speed">1.0x</string>
-    <string name="default_speed_setting">Velocidad de reproducción</string>
     <string name="deleted">Episodio borrado</string>
     <string name="error_no_connection">Sin conexión a internet!</string>
     <string name="hello_blank_fragment">Search fragment</string>
@@ -45,4 +44,7 @@
     <string name="unsubs_title_dialog">Desuscribirse</string>
     <string name="unsubscribe_button">Desuscribirse</string>
     <string name="mobile_message">Se encuentra en una red móvil. ¿Desea descargar igual?</string>
+    <string name="automatic_download_pref_title">Descarga automática</string>
+    <string name="default_speed_setting_title">Velocidad de reproducción</string>
+    <string name="delete_message">¿Quiere borrar este episodio?</string>
 </resources>

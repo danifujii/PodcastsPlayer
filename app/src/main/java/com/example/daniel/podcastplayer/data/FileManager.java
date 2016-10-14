@@ -29,11 +29,14 @@ public class FileManager {
 
     public static boolean deleteFile(Context c, Episode e){
         File ep = FileManager.getEpisodeFile(c,e);
-        DbHelper.getInstance(c).updateEpisodeNew(e.getEpURL(), false);
-        Intent i = new Intent(ACTION_DELETE);
-        i.putExtra(EP_KEY_EXTRA, URLUtil.guessFileName(e.getEpURL(), null, null));
-        LocalBroadcastManager.getInstance(c).sendBroadcast(i);
-        return ep.delete();
+        if (ep.exists()) {
+            DbHelper.getInstance(c).updateEpisodeNew(e.getEpURL(), false);
+            Intent i = new Intent(ACTION_DELETE);
+            i.putExtra(EP_KEY_EXTRA, URLUtil.guessFileName(e.getEpURL(), null, null));
+            LocalBroadcastManager.getInstance(c).sendBroadcast(i);
+            return ep.delete();
+        }
+        return false;
     }
 
     public static void deletePodcast(Context c, Podcast p){

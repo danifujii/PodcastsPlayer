@@ -23,6 +23,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
@@ -72,6 +73,8 @@ public class PodcastPlayerService extends Service {
     private MediaPlayer mp = null;
     private final IBinder binder = new PlayerBinder();
     private Episode episode = null;
+
+    private int click = 0;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -337,8 +340,21 @@ public class PodcastPlayerService extends Service {
                 @Override
                 public void onPause() {
                     super.onPause();
-                    if (isPlaying())
-                        pausePlayback();
+                    if (isPlaying()) {
+                        click++;
+                        Handler handler = new Handler();
+                        Runnable r = new Runnable() {
+                            @Override
+                            public void run() {
+                                if (click == 1) pausePlayback();
+                                if (click == 2) forwardPlayback();
+                                click = 0;
+                            }
+                        };
+                        if (click == 1){
+                            handler.postDelayed(r, 500);
+                        }
+                    }
                     else startPlayback(true);
                 }
 
@@ -359,8 +375,6 @@ public class PodcastPlayerService extends Service {
                     super.onSkipToPrevious();
                     rewindPlayback();
                 }
-
-                //TODO double click to skip forward
             });
             session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
                     | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);

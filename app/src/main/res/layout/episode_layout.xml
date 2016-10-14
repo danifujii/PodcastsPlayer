@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:layout_height="60dp"
+<RelativeLayout android:id="@+id/episode_adap_layout"
+    android:layout_height="60dp"
     android:layout_width="match_parent"
     android:paddingTop="@dimen/activity_small_margin"
     xmlns:android="http://schemas.android.com/apk/res/android">

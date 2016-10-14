@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <MultiSelectListPreference
-        android:title="@string/automatic_download_pref"
+        android:title="@string/automatic_download_pref_title"
         android:key="@string/automatic_download_pref"
         />
 
     <com.example.daniel.podcastplayer.SpeedPreference
-        android:title="@string/default_speed_setting"
+        android:title="@string/default_speed_setting_title"
         android:key="@string/default_speed_setting"
         />
 

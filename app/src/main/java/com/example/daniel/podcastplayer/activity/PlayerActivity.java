@@ -59,11 +59,11 @@ public class PlayerActivity extends ServiceActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //if (Build.VERSION.SDK_INT >= 21) {
-        //    getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-        //    getWindow().setEnterTransition(new Slide(Gravity.BOTTOM)
-        //            .setInterpolator(new LinearInterpolator()));
-        //}
+        if (Build.VERSION.SDK_INT >= 21) {
+            getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+            getWindow().setEnterTransition(new Slide(Gravity.BOTTOM)
+                    .setDuration(500));
+        }
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);

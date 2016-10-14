@@ -3,10 +3,12 @@ package com.example.daniel.podcastplayer.adapter;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -61,7 +63,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
 
     @Override
     public void onBindViewHolder(final EpisodeAdapter.EpisodeViewHolder holder, int position) {
-        Episode item = data.get(position);
+        final Context c = holder.dateTV.getContext();
+        final Episode item = data.get(position);
         holder.nameTV.setText(item.getEpTitle());
         holder.dateTV.setText(getDateFormat(item.getEpDate()));
         holder.remainingTV.setVisibility(View.GONE);
@@ -93,7 +96,28 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
             }
         });
 
-        Context c = holder.dateTV.getContext();
+        if (FileManager.getEpisodeFile(c,item).exists()) {
+            holder.layout.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(c);
+                    builder.setMessage(c.getString(R.string.delete_message))
+                        .setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                FileManager.deleteFile(c, item);
+                                changeImageButton(holder.downloadButton, Icons.DOWNLOAD.ordinal());
+                                holder.remainingTV.setVisibility(View.INVISIBLE);
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                            @Override public void onClick(DialogInterface dialog, int which) {}
+                        })
+                            .create().show();
+                    return true;
+                }
+            });
+        }
 
         if (!Downloader.isDownloading(item.getEpURL())){
             if (FileManager.getEpisodeFile(c,item).exists()) {
@@ -162,6 +186,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         protected TextView remainingTV;
         protected ImageButton downloadButton;
         protected ImageView artworkIV;
+        protected ViewGroup layout;
 
         public EpisodeViewHolder(View itemView) {
             super(itemView);
@@ -170,6 +195,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
             remainingTV = (TextView)itemView.findViewById(R.id.remaining_tv);
             downloadButton = (ImageButton)itemView.findViewById(R.id.ep_download_button);
             artworkIV = (ImageView)itemView.findViewById(R.id.pod_artwork_iv);
+            layout = (ViewGroup)itemView.findViewById(R.id.episode_adap_layout);
         }
     }
 

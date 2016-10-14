@@ -56,9 +56,7 @@ public class SubscriptionsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        //TODO cuando esta vacio, el primer podcast suscripto no aparece en el OnResume
         Cursor c = DbHelper.getInstance(getContext()).getPodcastsCursor();
-
         if (c.getCount() > 0)
             gv.setAdapter(new ImageAdapter(getContext(), c));
         else{

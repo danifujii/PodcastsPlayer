@@ -16,21 +16,17 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
-import com.example.daniel.podcastplayer.adapter.PodResAdapter;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.data.Podcast;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -41,8 +37,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-
-import static android.R.attr.bitmap;
 
 public class Downloader {
 
@@ -192,7 +186,7 @@ public class Downloader {
             protected Void doInBackground(Void... params) {
                 final Set<String> prefs = PreferenceManager.getDefaultSharedPreferences(context)
                         .getStringSet(context.getString(R.string.automatic_download_pref),null);
-
+                if (prefs != null)
                 for (Podcast p : DbHelper.getInstance(context).getPodcasts()){
                     OnEpisodeParsedReceiver receiver = new OnEpisodeParsedReceiver() {
                         @Override
@@ -206,7 +200,7 @@ public class Downloader {
                                         db.insertEpisode(e, podcastId, true);
                                     else break;
                                 }
-                                if (String.valueOf(last.getPodcastId())!=null && prefs.contains(String.valueOf(last.getPodcastId()))     //if automatic donwload is active,
+                                if (prefs.contains(String.valueOf(last.getPodcastId()))     //if automatic donwload is active,
                                         && isCharging(context))                             //download new episodes
                                     for (Episode ep : db.getEpisodes(last.getPodcastId())){
                                         if (ep.getNewEp())
