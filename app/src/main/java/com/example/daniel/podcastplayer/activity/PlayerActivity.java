@@ -190,7 +190,7 @@ public class PlayerActivity extends ServiceActivity{
                         View dialogView = getLayoutInflater().inflate(R.layout.speed_dialog_layout, null);
                         builder.setView(dialogView);
                         SpeedDialogManager.setSpeedDialog(dialogView, e.getPodcastId());
-                        builder.setTitle("Playback Speed");
+                        builder.setTitle(getString(R.string.default_speed_setting));
                         builder.setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {

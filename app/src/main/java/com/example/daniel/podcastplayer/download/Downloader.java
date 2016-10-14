@@ -2,6 +2,7 @@ package com.example.daniel.podcastplayer.download;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -13,9 +14,11 @@ import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.webkit.URLUtil;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
@@ -189,6 +192,7 @@ public class Downloader {
             protected Void doInBackground(Void... params) {
                 final Set<String> prefs = PreferenceManager.getDefaultSharedPreferences(context)
                         .getStringSet(context.getString(R.string.automatic_download_pref),null);
+
                 for (Podcast p : DbHelper.getInstance(context).getPodcasts()){
                     OnEpisodeParsedReceiver receiver = new OnEpisodeParsedReceiver() {
                         @Override
@@ -202,11 +206,11 @@ public class Downloader {
                                         db.insertEpisode(e, podcastId, true);
                                     else break;
                                 }
-                                if (prefs.contains(String.valueOf(last.getPodcastId()))     //if automatic donwload is active,
+                                if (String.valueOf(last.getPodcastId())!=null && prefs.contains(String.valueOf(last.getPodcastId()))     //if automatic donwload is active,
                                         && isCharging(context))                             //download new episodes
                                     for (Episode ep : db.getEpisodes(last.getPodcastId())){
                                         if (ep.getNewEp())
-                                            downloadEpisode(context, ep);
+                                            downloadEpisode(context, ep, true);
                                     }
                             }
                         }
@@ -225,18 +229,51 @@ public class Downloader {
         //.execute();
     }
 
-    public static long downloadEpisode(Context context, Episode ep){  //if the user was explicit on downloading an episode
+    //Download is done by user, pressing download
+    public static void explicitDownloadEpisode(final Context c, final Episode e
+            , final EpisodeAdapter adapter, final ImageButton button){
+        if (isConnected(c, true))
+            downloadEpisode(c, e, true);
+        else{
+            NetworkInfo info = getNetworkInfo(c);
+            if (info != null && info.getTypeName().equals("MOBILE")) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(c);
+                builder.setMessage(c.getString(R.string.mobile_message))
+                        .setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                downloadEpisode(c, e, false);
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                adapter.changeImageButton(button, EpisodeAdapter.Icons.DOWNLOAD.ordinal());
+                            }
+                        })
+                        .create()
+                        .show();
+            }
+        }
+    }
+
+    public static long downloadEpisode(Context context, Episode ep, boolean onlyWifi){
         DownloadManager mgr = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         //TODO just in WIFI
         if (!FileManager.getEpisodeFile(context, ep).exists()) {
             Uri uri = Uri.parse(ep.getEpURL());
-            long id = mgr.enqueue(new DownloadManager.Request(uri)
-                    .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI)
+            DownloadManager.Request request = new DownloadManager.Request(uri)
                     .setTitle("Downloading " + ep.getEpTitle())
                     .setDescription(ep.getEpTitle())
                     .setDestinationInExternalFilesDir(context
                             , FileManager.episodePath(context, ep)
-                            , URLUtil.guessFileName(ep.getEpURL(), null, null)));
+                            , URLUtil.guessFileName(ep.getEpURL(), null, null));
+            if (onlyWifi)
+                request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
+            else request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI
+                    | DownloadManager.Request.NETWORK_MOBILE);
+            long id = mgr.enqueue(request);
+
             downloadIDs.put(ep.getEpURL(), id);
             DbHelper.getInstance(context).updateEpisodeNew(ep.getEpURL(), true);
             return id;
@@ -270,5 +307,15 @@ public class Downloader {
 
     private static String getCorrectURL(String og){
         return og.replace("%","%25");
+    }
+
+    public static boolean isConnected(Context context, boolean toWiFi){
+        NetworkInfo networkInfo = getNetworkInfo(context);
+        return (networkInfo!=null && (!toWiFi || networkInfo.getTypeName().equals("WIFI")));
+    }
+
+    public static NetworkInfo getNetworkInfo(Context context){
+        return ((ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
     }
 }

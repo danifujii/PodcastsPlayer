@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -78,8 +79,12 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
                             activity.setupPlayerUI();
                         }
                     }else {                                             //si no esta, comenzar descarga
-                        Downloader.downloadEpisode(v.getContext(), ep);
-                        changeImageButton(holder.downloadButton, Icons.CANCEL.ordinal());
+                        if (Downloader.isConnected(v.getContext(), false)) {
+                            Downloader.explicitDownloadEpisode(v.getContext(), ep
+                                    , EpisodeAdapter.this, holder.downloadButton);
+                            changeImageButton(holder.downloadButton, Icons.CANCEL.ordinal());
+                        } else Snackbar.make(v, activity.getString(R.string.error_no_connection),
+                                Snackbar.LENGTH_LONG).show();
                     }
                 } else{
                     Downloader.cancelDownload(holder.downloadButton.getContext(), ep.getEpURL());
@@ -122,8 +127,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         return data.get(position);
     }
 
-    private enum Icons {DOWNLOAD, CANCEL, PLAY}
-    private void changeImageButton(ImageButton im, int type){
+    public enum Icons {DOWNLOAD, CANCEL, PLAY}
+    public void changeImageButton(ImageButton im, int type){
         Icons icon = Icons.values()[type];
         switch (icon){
             case DOWNLOAD:{
@@ -143,6 +148,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
             }
         }
     }
+
+
 
     @Override
     public int getItemCount() {
