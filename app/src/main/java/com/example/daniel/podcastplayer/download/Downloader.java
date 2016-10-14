@@ -259,7 +259,6 @@ public class Downloader {
 
     public static long downloadEpisode(Context context, Episode ep, boolean onlyWifi){
         DownloadManager mgr = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        //TODO just in WIFI
         if (!FileManager.getEpisodeFile(context, ep).exists()) {
             Uri uri = Uri.parse(ep.getEpURL());
             DownloadManager.Request request = new DownloadManager.Request(uri)
@@ -311,7 +310,8 @@ public class Downloader {
 
     public static boolean isConnected(Context context, boolean toWiFi){
         NetworkInfo networkInfo = getNetworkInfo(context);
-        return (networkInfo!=null && (!toWiFi || networkInfo.getTypeName().equals("WIFI")));
+        return (networkInfo!=null
+                && ((!toWiFi && networkInfo.isConnected())|| networkInfo.getTypeName().equals("WIFI")));
     }
 
     public static NetworkInfo getNetworkInfo(Context context){

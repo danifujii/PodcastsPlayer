@@ -65,8 +65,8 @@ public class MainActivity extends ServiceActivity{
                             Downloader.parsePodcasts(query.replace(' ', '+'), search.getRecyclerView()
                                     , search);
                         }
-                    } else Snackbar.make(findViewById(R.id.search_layout),
-                            getString(R.string.error_no_connection), Snackbar.LENGTH_SHORT).show();
+                    } else Snackbar.make(findViewById(R.id.activity_main),
+                            getString(R.string.error_no_connection), Snackbar.LENGTH_LONG).show();
                     InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
                     return true;

@@ -1,6 +1,7 @@
 package com.example.daniel.podcastplayer.adapter;
 
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.activity.SearchActivity;
+import com.example.daniel.podcastplayer.download.Downloader;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,15 +53,20 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CatVie
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //((SearchActivity)activity).setDownloadingUI();
-                Intent i = new Intent(v.getContext(), SearchActivity.class);
-                i.putExtra(SearchActivity.EXTRA_RESULT_ACT, true);
-                i.putExtra(SearchActivity.EXTRA_CAT, catsId.get(cats.get(position)));
-                i.putExtra(SearchActivity.EXTRA_CAT_NAME, cats.get(position));
-                //activity.startActivity(i);
-                v.getContext().startActivity(i);
-                //Downloader.parseCategory(catsId.get(cats.get(position)),
-                //        ((SearchActivity)activity).getRecyclerView(),activity);
+                if (Downloader.isConnected(v.getContext(), false)) {
+                    //((SearchActivity)activity).setDownloadingUI();
+                    Intent i = new Intent(v.getContext(), SearchActivity.class);
+                    i.putExtra(SearchActivity.EXTRA_RESULT_ACT, true);
+                    i.putExtra(SearchActivity.EXTRA_CAT, catsId.get(cats.get(position)));
+                    i.putExtra(SearchActivity.EXTRA_CAT_NAME, cats.get(position));
+                    //activity.startActivity(i);
+                    v.getContext().startActivity(i);
+                    //Downloader.parseCategory(catsId.get(cats.get(position)),
+                    //        ((SearchActivity)activity).getRecyclerView(),activity);
+                }
+                else
+                    Snackbar.make(v, v.getContext().getString(R.string.error_no_connection),
+                            Snackbar.LENGTH_LONG).show();
             }
         });
     }

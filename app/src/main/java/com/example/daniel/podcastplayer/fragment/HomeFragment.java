@@ -21,6 +21,7 @@ import com.example.daniel.podcastplayer.fragment.SubscriptionsFragment;
  */
 public class HomeFragment extends Fragment {
 
+    private int currentFragment = -1;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -42,9 +43,17 @@ public class HomeFragment extends Fragment {
         View view = getView();
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.viewPager);
         viewPager.setAdapter(new TabPagerAdapter(getChildFragmentManager()));
-        viewPager.setCurrentItem(0);
         TabLayout tl = (TabLayout) view.findViewById(R.id.tabLayout);
+        if (currentFragment >= 0)
+            viewPager.setCurrentItem(currentFragment);
         tl.setupWithViewPager(viewPager);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        currentFragment = ((ViewPager) getView().findViewById(R.id.viewPager)).getCurrentItem();
     }
 
     private class TabPagerAdapter extends FragmentStatePagerAdapter {

@@ -347,6 +347,19 @@ public class PodcastPlayerService extends Service {
                     super.onPlay();
                     startPlayback(true);
                 }
+
+                @Override
+                public void onSkipToNext() {
+                    super.onSkipToNext();
+                    forwardPlayback();
+                }
+
+                @Override
+                public void onSkipToPrevious() {
+                    super.onSkipToPrevious();
+                    rewindPlayback();
+                }
+
                 //TODO double click to skip forward
             });
             session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
@@ -387,7 +400,6 @@ public class PodcastPlayerService extends Service {
         }
     }
 
-    //TODO include bluetooth controls
     private BroadcastReceiver controlReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

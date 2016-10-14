@@ -100,8 +100,6 @@ public class ResultParser {
                     e.setEpURL(url.getAttribute("url"));
                     if (url.getAttribute("type").matches("audio/(.*)"))
                         result.add(e);
-                    else
-                        Log.d("TAG", "NO Matches"); //TODO mostrar error al usuario, indicando que el formato no es soportado
 
                     if (result.size() == limit) break;
             }
