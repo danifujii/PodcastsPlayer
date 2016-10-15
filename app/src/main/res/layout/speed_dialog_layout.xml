@@ -22,7 +22,7 @@
         android:textSize="28sp"
         android:textColor="@color/darkGray"
         android:layout_gravity="center_vertical"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="sans-serif-light"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"/>
 

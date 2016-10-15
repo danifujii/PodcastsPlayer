@@ -251,7 +251,7 @@ public class Downloader {
         }
     }
 
-    public static long downloadEpisode(Context context, Episode ep, boolean onlyWifi){
+    private static long downloadEpisode(Context context, Episode ep, boolean onlyWifi){
         DownloadManager mgr = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         if (!FileManager.getEpisodeFile(context, ep).exists()) {
             Uri uri = Uri.parse(ep.getEpURL());
@@ -293,9 +293,8 @@ public class Downloader {
     private static boolean isCharging(Context context){
         Intent batteryStatus = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-        boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                status == BatteryManager.BATTERY_STATUS_FULL;
-        return isCharging;
+        return (status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                status == BatteryManager.BATTERY_STATUS_FULL);
     }
 
     private static String getCorrectURL(String og){
@@ -308,7 +307,7 @@ public class Downloader {
                 && ((!toWiFi && networkInfo.isConnected())|| networkInfo.getTypeName().equals("WIFI")));
     }
 
-    public static NetworkInfo getNetworkInfo(Context context){
+    private static NetworkInfo getNetworkInfo(Context context){
         return ((ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
     }

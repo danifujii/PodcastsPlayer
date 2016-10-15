@@ -6,11 +6,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.daniel.podcastplayer.activity.MainActivity">
-    
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:id="@+id/revealBackground"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:id="@+id/reveal"/>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/fragment_layout"
+        android:paddingTop="?attr/actionBarSize"
         android:layout_above="@+id/splayer_layout"/>
 
     <FrameLayout

@@ -163,6 +163,7 @@ public class PodcastActivity extends ServiceActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(finishReceiver);
     }
 
+
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

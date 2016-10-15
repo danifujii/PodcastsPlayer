@@ -60,10 +60,15 @@ public class PlayerSheetManager {
             splayerLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (Build.VERSION.SDK_INT >= 21)
-                        v.getContext().startActivity(new Intent(v.getContext(), PlayerActivity.class),
-                                ActivityOptions.makeSceneTransitionAnimation(container).toBundle());
-                    else v.getContext().startActivity(new Intent(v.getContext(), PlayerActivity.class));
+                    //if (Build.VERSION.SDK_INT >= 21) {
+                        //v.getContext().startActivity(new Intent(v.getContext(), PlayerActivity.class),
+                        //        ActivityOptions.makeSceneTransitionAnimation(container).toBundle());
+
+                    //}
+                    //else v.getContext().startActivity(new Intent(v.getContext(), PlayerActivity.class));
+                    v.getContext().startActivity(new Intent(v.getContext(), PlayerActivity.class));
+                    ((Activity)v.getContext()).overridePendingTransition(R.anim.slide_in_up,
+                            R.anim.stay);
                 }
             });
 

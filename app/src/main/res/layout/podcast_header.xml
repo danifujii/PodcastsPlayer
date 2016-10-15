@@ -14,6 +14,7 @@
         android:layout_height="@dimen/big_image_size"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:transitionName="@string/transition_artwork"
         />
 
     <LinearLayout

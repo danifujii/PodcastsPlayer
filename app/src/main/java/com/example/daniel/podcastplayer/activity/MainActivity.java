@@ -1,5 +1,8 @@
 package com.example.daniel.podcastplayer.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,12 +15,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.transition.TransitionManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
-import android.view.inputmethod.InputMethodManager;
 
 import com.example.daniel.podcastplayer.fragment.HomeFragment;
 import com.example.daniel.podcastplayer.fragment.SearchFragment;
@@ -30,6 +34,9 @@ import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 public class MainActivity extends ServiceActivity{
 
     private SearchFragment search;
+    private Toolbar toolbar;
+    private int searchButtonX;
+    private int searchButtonY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +47,8 @@ public class MainActivity extends ServiceActivity{
                 .setAction(PodcastPlayerService.ACTION_START));
         Downloader.updatePodcasts(this);
 
+        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setElevation(0);
 
@@ -81,12 +90,17 @@ public class MainActivity extends ServiceActivity{
                 }
             });
 
+
         MenuItemCompat.setOnActionExpandListener(menu.findItem(R.id.search_menu), new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 findViewById(R.id.splayer_layout).setVisibility(View.GONE);
                 if (getSupportActionBar() != null){
-                    getSupportActionBar().setBackgroundDrawable(
+                    //animateToolbar(R.color.colorPrimary, R.color.colorPrimaryDark);
+                    if (Build.VERSION.SDK_INT >= 21)
+                        animateToolbar(R.color.colorPrimary, R.color.colorPrimaryDark);
+                    else
+                        getSupportActionBar().setBackgroundDrawable(
                             new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.colorPrimaryDark)));
                 }
                 return true;
@@ -95,8 +109,12 @@ public class MainActivity extends ServiceActivity{
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 if (getSupportActionBar() != null){
-                    getSupportActionBar().setBackgroundDrawable(
+                    if (Build.VERSION.SDK_INT >= 21)
+                        animateToolbarShrink(R.color.colorPrimaryDark, R.color.colorPrimary);
+                    else
+                        getSupportActionBar().setBackgroundDrawable(
                             new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.colorPrimary)));
+
                 }
                 onBackPressed();
                 search = null;
@@ -112,6 +130,11 @@ public class MainActivity extends ServiceActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case (R.id.search_menu):{
+                int[] location = new int[2];
+                findViewById(R.id.search_menu).getLocationOnScreen(location);
+                searchButtonX = location[0] + 80;
+                searchButtonY = location[1];
+
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_layout, search = new SearchFragment())
                         .addToBackStack(null)
@@ -160,5 +183,59 @@ public class MainActivity extends ServiceActivity{
                 manager.setSheetInterface(service.getEpisode());
             }
         }
+    }
+
+    @TargetApi(21)
+    private void animateToolbar(final int fromColor, final int toColor){
+        final View mRevealView = findViewById(R.id.reveal);
+        View mRevealBackgroundView = findViewById(R.id.revealBackground);
+
+        Animator animator;
+            animator = ViewAnimationUtils.createCircularReveal(
+                mRevealView,
+                searchButtonX, searchButtonY,
+                0, toolbar.getWidth());
+
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                    mRevealView.setBackgroundColor(ContextCompat.getColor(MainActivity.this, toColor));
+            }
+        });
+
+            mRevealBackgroundView.setBackgroundColor(ContextCompat.getColor(MainActivity.this, fromColor));
+        //animator.setStartDelay(100);
+        animator.setDuration(300);
+        animator.start();
+        mRevealView.setVisibility(View.VISIBLE);
+    }
+
+    @TargetApi(21)
+    private void animateToolbarShrink(final int fromColor, int toColor){
+        final View mRevealView = findViewById(R.id.reveal);
+        View mRevealBackgroundView = findViewById(R.id.revealBackground);
+
+        Animator animator;
+        animator = ViewAnimationUtils.createCircularReveal(
+                mRevealView,
+                searchButtonX, searchButtonY,
+                toolbar.getWidth(), 0);
+
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                mRevealView.setBackgroundColor(ContextCompat.getColor(MainActivity.this, fromColor));
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mRevealView.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        mRevealBackgroundView.setBackgroundColor(ContextCompat.getColor(MainActivity.this, toColor));
+        //animator.setStartDelay(100);
+        animator.setDuration(300);
+        animator.start();
     }
 }

@@ -62,7 +62,7 @@ public class PlayerActivity extends ServiceActivity{
         if (Build.VERSION.SDK_INT >= 21) {
             getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
             getWindow().setEnterTransition(new Slide(Gravity.BOTTOM)
-                    .setDuration(500));
+                    .setDuration(200));
         }
 
         super.onCreate(savedInstanceState);
@@ -230,6 +230,8 @@ public class PlayerActivity extends ServiceActivity{
         super.onPause();
         active = false;
         LocalBroadcastManager.getInstance(this).unregisterReceiver(handler);
+
+        overridePendingTransition(R.anim.stay, R.anim.slide_down);
     }
 
     @Override

@@ -1,8 +1,10 @@
 package com.example.daniel.podcastplayer.fragment;
 
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -46,7 +48,13 @@ public class SubscriptionsFragment extends Fragment {
                 c.moveToPosition(position);
                 Intent i = new Intent(view.getContext(), PodcastActivity.class);
                 i.putExtra(DbHelper.Tbls.COLUMN_ID, c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_ID)));
-                startActivity(i);
+
+                //Shared element transition
+                if (Build.VERSION.SDK_INT >= 21) {
+                    ActivityOptions transitionOptions = ActivityOptions.makeSceneTransitionAnimation(getActivity(),
+                            view, getString(R.string.transition_artwork));
+                    startActivity(i, transitionOptions.toBundle());
+                } else startActivity(i);
             }
         });
 

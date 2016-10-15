@@ -9,7 +9,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.webkit.URLUtil;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class FileManager {
