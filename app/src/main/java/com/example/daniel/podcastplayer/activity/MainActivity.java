@@ -22,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.fragment.HomeFragment;
 import com.example.daniel.podcastplayer.fragment.SearchFragment;
@@ -30,8 +31,11 @@ import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.download.Downloader;
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
+import com.google.firebase.crash.FirebaseCrash;
 
 public class MainActivity extends ServiceActivity{
+
+    private final static String homeFragmentTag = "homeFragmentTag";
 
     private SearchFragment search;
     private Toolbar toolbar;
@@ -53,9 +57,19 @@ public class MainActivity extends ServiceActivity{
             getSupportActionBar().setElevation(0);
 
         FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
-        trans.add(R.id.fragment_layout, new HomeFragment());
-        trans.commit();
+        if (getSupportFragmentManager().findFragmentByTag(homeFragmentTag) == null) {
+            trans.add(R.id.fragment_layout, new HomeFragment(), homeFragmentTag);
+            trans.commit();
+        }
+
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler(){
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                FirebaseCrash.report(e);
+            }
+        });
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

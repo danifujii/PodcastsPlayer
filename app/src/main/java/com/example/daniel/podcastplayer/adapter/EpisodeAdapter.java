@@ -137,6 +137,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
     }
 
     public void removeItem(int position){
+        if (Downloader.isDownloading(data.get(position).getEpURL()))
+            Downloader.cancelDownload(activity,data.get(position).getEpURL());
         data.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, data.size());

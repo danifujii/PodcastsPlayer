@@ -11,7 +11,7 @@
         android:textSize="22sp"
         android:text="@string/no_podcasts_message"
         android:gravity="center"
-        android:textColor="@color/darkGray"
+        android:textColor="@color/mediumGray"
         android:fontFamily="sans-serif-medium"
         android:visibility="gone"
         />

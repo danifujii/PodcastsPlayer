@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -16,6 +17,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.ArraySet;
+import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.ImageButton;
 
@@ -35,7 +38,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Downloader {
@@ -288,6 +293,42 @@ public class Downloader {
                 .remove(downloadIDs.get(epURL));
         removeDownload(downloadIDs.get(epURL));
         //DbHelper.getInstance(context).updateEpisodeNew(epURL, false);
+    }
+
+    public static void updateDownloads(Context context){
+        DownloadManager manager = (DownloadManager)context.getSystemService(Context.DOWNLOAD_SERVICE);
+        Cursor c = manager.query(new DownloadManager.Query()
+                .setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL));
+
+        //Delete all finished ones
+        while (c.moveToNext()){
+            Long id = c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID));
+            if (downloadIDs.values().contains(id))
+                downloadIDs.remove(getKey(id));
+        }
+        c.close();
+
+//        Set<Long> pendingDownloads = new HashSet<>();
+        //Get all current downloads
+  //      while (c.moveToNext()){
+    //        Long id = c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID));
+      //      if (downloadIDs.values().contains(id))          //If this download is from Stereo, add it to pending
+      //          pendingDownloads.add(id);
+      //  }
+      //  HashMap<String,Long> newDownloadIds = new HashMap<>();
+      //  for (Long l : pendingDownloads)                    //Make the hashSet of download again
+      //      newDownloadIds.put(getKey(l), l);
+      //  downloadIDs = newDownloadIds;
+      //  c.close();
+    }
+
+    private static String getKey(Long value){
+        for (Map.Entry<String,Long> entry : downloadIDs.entrySet()){
+            if (value.equals(entry.getValue())){
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     private static boolean isCharging(Context context){

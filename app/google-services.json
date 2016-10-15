@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1078954252162",
+    "firebase_url": "https://stereo-9c555.firebaseio.com",
+    "project_id": "stereo-9c555",
+    "storage_bucket": "stereo-9c555.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1078954252162:android:58ae61ff7ea6d651",
+        "android_client_info": {
+          "package_name": "com.example.daniel.podcastplayer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1078954252162-ggf02mgmt3kglbunn9d9ebsqrea38vi0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkUKmyWZShv-Myp7TQHTTLAXLtzz7Juo4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

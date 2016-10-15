@@ -154,6 +154,11 @@ public class PodcastActivity extends ServiceActivity {
                 .registerReceiver(finishReceiver, new IntentFilter(PodcastPlayerService.ACTION_FINISH));
         if (bound)
             setupPlayerUI();
+
+        //Do this in case a download finishes while app is not active,
+        //avoiding the broadcast receivers to work
+        Downloader.updateDownloads(this);
+        epsRV.getAdapter().notifyDataSetChanged();
     }
 
     @Override

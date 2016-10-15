@@ -67,13 +67,17 @@ public class NewPodcastsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("SUBS_FRAG","ON RESUME2");
+        
         IntentFilter filter = new IntentFilter();
         filter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
         filter.addAction(Downloader.ACTION_DOWNLOADED);
         getActivity().registerReceiver(receiver,filter);
         LocalBroadcastManager.getInstance(getContext())
                 .registerReceiver(finishReceiver,new IntentFilter(PodcastPlayerService.ACTION_FINISH));
+
+        //Do this in case a download finishes while app is not active,
+        //avoiding the broadcast receivers to work
+        Downloader.updateDownloads(getActivity());
         setRecyclerViewInfo();
     }
 
