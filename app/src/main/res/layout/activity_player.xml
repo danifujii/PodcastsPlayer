@@ -48,6 +48,7 @@
         android:background="@color/darkGray" />
 
     <LinearLayout
+        android:background="@color/white"
         android:id="@+id/player_controls_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

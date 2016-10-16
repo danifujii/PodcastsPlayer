@@ -1,5 +1,7 @@
 package com.example.daniel.podcastplayer.activity;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,6 +13,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -21,17 +24,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
 import android.util.Log;
+import android.view.Display;
 import android.view.DragEvent;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.DbHelper;
@@ -46,7 +58,7 @@ import com.example.daniel.podcastplayer.player.SpeedDialogManager;
 
 import java.io.File;
 
-public class PlayerActivity extends ServiceActivity{
+public class PlayerActivity extends ServiceActivity implements View.OnTouchListener{
 
     private SeekBar progressBar;
     private TextView progressTV;
@@ -56,6 +68,16 @@ public class PlayerActivity extends ServiceActivity{
     private String length;
     private static boolean active = false;  //active is used to avoid checking the player playing
                                             // if the activity is not active
+
+    //Swipe Down
+    private ViewGroup layout;
+
+    private int previousFingerPosition = 0;
+    private int baseLayoutPosition = 0;
+    private int defaultViewHeight;
+    private boolean isClosing = false;
+    private boolean isScrollingUp = false;
+    private boolean isScrollingDown = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +90,9 @@ public class PlayerActivity extends ServiceActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
         manager = null; //No player sheet in here, so no sense to update such UI
+
+        layout = (ViewGroup) findViewById(R.id.activity_player);
+        layout.setOnTouchListener(this);
     }
 
     public void setupPlayerUI(){
@@ -237,12 +262,98 @@ public class PlayerActivity extends ServiceActivity{
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.stay, R.anim.slide_down);
+        //closeActivity((int)layout.getY());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         setupPlayerUI();
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        // Get finger position on screen
+        final int Y = (int) event.getRawY();
+
+        // Switch on motion event type
+        switch (event.getAction() & MotionEvent.ACTION_MASK) {
+
+            case MotionEvent.ACTION_DOWN:
+                // save default base layout height
+                defaultViewHeight = layout.getHeight();
+
+                // Init finger and view position
+                previousFingerPosition = Y;
+                baseLayoutPosition = (int) layout.getY();
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                if(!isClosing){
+                    int currentYPosition = (int) layout.getY();
+                    if (previousFingerPosition < Y){
+
+                        // First time android rise an event for "down" move
+                        if(!isScrollingDown){
+                            isScrollingDown = true;
+                        }
+
+                        // Has user scroll enough to "auto close" popup ?
+                        if (Math.abs(baseLayoutPosition - currentYPosition) > defaultViewHeight / 2)
+                        {
+                            //closeDownAndDismissDialog(currentYPosition);
+                            Toast.makeText(this,"Close down",Toast.LENGTH_LONG).show();
+                            return true;
+                        }
+
+                        // Change base layout size and position (must change position because view anchor is top left corner)
+                        layout.setY(layout.getY() + (Y - previousFingerPosition));
+                        layout.getLayoutParams().height = layout.getHeight() - (Y - previousFingerPosition);
+                        layout.requestLayout();
+                    }
+
+                    // Update position
+                    previousFingerPosition = Y;
+                }
+                break;
+            case MotionEvent.ACTION_UP: {
+
+                int currentYPosition = (int) layout.getY();
+
+                if (currentYPosition < defaultViewHeight / 5) {
+                    layout.setY(0);
+                    layout.getLayoutParams().height = defaultViewHeight;
+                    layout.requestLayout();
+                }
+                else{
+                    closeActivity(currentYPosition);
+                }
+                break;
+            }
+        }
+        return true;
+    }
+
+    private void closeActivity(int currentYPosition){
+        isClosing = true;
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int screenHeight = size.y;
+        ObjectAnimator positionAnimator = ObjectAnimator.ofFloat(layout, "y", currentYPosition
+                , screenHeight+layout.getHeight());
+        positionAnimator.setDuration(600);
+        positionAnimator.addListener(new Animator.AnimatorListener()
+        {
+            @Override public void onAnimationStart(Animator animation)  {}
+            @Override public void onAnimationRepeat(Animator animation) {}
+            @Override public void onAnimationCancel(Animator animation) {}
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                finish();
+            }
+        });
+        positionAnimator.start();
     }
 
     private String getTime(int miliSeconds){

@@ -88,39 +88,26 @@ public class ResultParser {
 
                 //Parse episodes from RSS
                 NodeList episodes = d.getElementsByTagName("item");
-                Log.d("PARSE_EP", String.valueOf(episodes.getLength()));
                 for (int i = 0; i < episodes.getLength(); i++) {
-                    Log.d("PARSE_EP","Enters");
                     Episode e = new Episode(podcastId);
                     Element n = (Element) episodes.item(i);
-                    Log.d("PARSE_EP","Enters 2");
                     e.setEpTitle(n.getElementsByTagName("title").item(0).getTextContent());
-                    Log.d("PARSE_EP","Enters 3");
 
                     e.setEpDate(getDate(n.getElementsByTagName("pubDate").item(0).getTextContent()));
-                    Log.d("PARSE_EP","Enters 4");
-
                     e.setLength(getMiliseconds(n.getElementsByTagName("itunes:duration").item(0)
                             .getTextContent()));
-                    Log.d("PARSE_EP","Enters 5");
 
                     Element url = (Element) n.getElementsByTagName("enclosure").item(0);
-                    Log.d("PARSE_EP","Enters 6");
-
                     //e.setLength(Integer.valueOf(url.getAttribute("length")));
                     e.setEpURL(url.getAttribute("url"));
-                    Log.d("PARSE_EP","Enters 7");
 
-                    if (url.getAttribute("type").matches("audio/(.*)")) {
+                    if (url.getAttribute("type").matches("audio/(.*)"))
                         result.add(e);
-                        Log.d("PARSE_EP", "MATCH");
-                    } else Log.d("PARSE_EP", "NO MATCH");
 
                     if (result.size() == limit) break;
             }
             }
-        } catch (Exception e) { e.printStackTrace();
-        Log.d("PARSE_EP","EXCEPTION");}
+        } catch (Exception e) { e.printStackTrace();}
 
         return result;
     }
