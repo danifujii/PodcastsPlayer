@@ -96,7 +96,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
             }
         });
 
-        if (FileManager.getEpisodeFile(c,item).exists()) {
+        if (FileManager.getEpisodeFile(c,item).exists() && !Downloader.isDownloading(item.getEpURL())) {
             holder.layout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {

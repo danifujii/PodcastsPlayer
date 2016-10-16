@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +52,8 @@ public class Downloader {
 
     public static final String ACTION_DOWNLOADED = "action_downloaded";
     private static HashMap<String, Long> downloadIDs = new HashMap<>();
+
+    private static final String feedburnerURL = "feeds.feedburner.com";
 
     public static void downloadImage(URL url, final OnImageDownloadReceiver re){
         new AsyncTask<URL,Void,Bitmap>(){
@@ -88,10 +91,18 @@ public class Downloader {
         new AsyncTask<URL,Void,List<Episode>>(){
             @Override
             protected List<Episode> doInBackground(URL... params) {
+                Log.d("PARSE_EP",params[0].getAuthority() + "-" + params[0].toString());
+                URL url = params[0];
+                if (params[0].getAuthority().equals(feedburnerURL))
+                    try {
+                        url = new URL(params[0].toString() + "?format=xml");
+                        Log.d("PARSE_EP",url.toString());
+                    } catch (MalformedURLException e) { e.printStackTrace(); }
+
                 HttpURLConnection conn = null;
                 InputStream stream = null;
                 try{
-                    conn = (HttpURLConnection) (params[0]).openConnection();
+                    conn = (HttpURLConnection) (url).openConnection();
                     conn.connect();
                     stream = conn.getInputStream();
                 } catch (IOException e){e.printStackTrace();}

@@ -231,6 +231,11 @@ public class PlayerActivity extends ServiceActivity{
         active = false;
         LocalBroadcastManager.getInstance(this).unregisterReceiver(handler);
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
         overridePendingTransition(R.anim.stay, R.anim.slide_down);
     }
 
