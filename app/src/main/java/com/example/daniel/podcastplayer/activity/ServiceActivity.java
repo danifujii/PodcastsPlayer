@@ -29,7 +29,6 @@ public abstract class ServiceActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         bindService(new Intent(this,PodcastPlayerService.class),connection, Context.BIND_AUTO_CREATE);
         manager = new PlayerSheetManager(this);
-
     }
 
     @Override

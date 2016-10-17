@@ -17,6 +17,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -46,16 +47,16 @@ public class MainActivity extends ServiceActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         startService(new Intent(this,PodcastPlayerService.class)
                 .setAction(PodcastPlayerService.ACTION_START));
         Downloader.updatePodcasts(this);
-
+        Log.d("MAIN_ACT","CREATE 1");
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Log.d("MAIN_ACT","CREATE 2");
         if (getSupportActionBar() != null)
             getSupportActionBar().setElevation(0);
-
+        Log.d("MAIN_ACT","CREATE 3");
         FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
         if (getSupportFragmentManager().findFragmentByTag(homeFragmentTag) == null) {
             trans.add(R.id.fragment_layout, new HomeFragment(), homeFragmentTag);
@@ -68,6 +69,7 @@ public class MainActivity extends ServiceActivity{
                 FirebaseCrash.report(e);
             }
         });
+        Log.d("MAIN_ACT","CREATE 4");
     }
 
 

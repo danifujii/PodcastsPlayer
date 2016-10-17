@@ -93,7 +93,6 @@ public class PodcastActivity extends ServiceActivity {
             playerArtwork.setImageBitmap(bitmap);
         }
 
-
         if (bound && service.isStarted())
             manager.setSheetInterface(service.getEpisode());
 
