@@ -51,6 +51,7 @@ public class SearchFragment extends Fragment implements Downloader.OnPodcastPars
     public void setDownloadingUI(){
         rv.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
+        getActivity().findViewById(R.id.empty_tv).setVisibility(View.GONE);
     }
 
     @Override
@@ -59,6 +60,7 @@ public class SearchFragment extends Fragment implements Downloader.OnPodcastPars
         if (podcast.size() > 0) {
             rv.setAdapter(new PodResAdapter(podcast));
             rv.setVisibility(View.VISIBLE);
+            getActivity().findViewById(R.id.empty_tv).setVisibility(View.GONE);
         } else getActivity().findViewById(R.id.empty_tv).setVisibility(View.VISIBLE);
     }
 

@@ -74,24 +74,29 @@ public class PodcastPlayerService extends Service {
     private final IBinder binder = new PlayerBinder();
     private Episode episode = null;
 
+    private boolean wasPlaying = false;
+
     private int click = 0;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        switch (intent.getAction()){
-            case(ACTION_PLAY):
-                resumePlayback();
-                break;
-            case(ACTION_PAUSE):
-                pausePlayback();
-                break;
-            case(ACTION_FORWARD):
-                forwardPlayback();
-                break;
-            case(ACTION_REWIND):
-                rewindPlayback();
-                break;
-        }
+        if (intent != null && intent.getAction() != null){
+            switch (intent.getAction()) {
+                case (ACTION_PLAY):
+                    resumePlayback();
+                    break;
+                case (ACTION_PAUSE):
+                    pausePlayback();
+                    break;
+                case (ACTION_FORWARD):
+                    forwardPlayback();
+                    break;
+                case (ACTION_REWIND):
+                    rewindPlayback();
+                    break;
+            }
+
+        } //else return START_REDELIVER_INTENT;
         return START_STICKY;
     }
 
@@ -171,7 +176,7 @@ public class PodcastPlayerService extends Service {
     }
 
     //start=false is just for prepare, and not start playback
-    public void startPlayback(Episode e, final Context context, final boolean start){
+    public void startPlayback(Episode e, Context context, final boolean start){
         if (mp == null) {
             mp = new MediaPlayer();
             mp.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
@@ -181,7 +186,8 @@ public class PodcastPlayerService extends Service {
                 public void onCompletion(MediaPlayer mpParam) {
                     //LocalBroadcastManager.getInstance(PodcastPlayerService.this)
                     //        .sendBroadcast(new Intent(ACTION_FINISH));
-                    FileManager.deleteFile(context,episode);
+                    FileManager.deleteFile(PodcastPlayerService.this,episode);
+                    Log.d("PPS","File deleted");
                 }
             });
             mp.setOnErrorListener(new MediaPlayer.OnErrorListener() {
@@ -190,7 +196,7 @@ public class PodcastPlayerService extends Service {
                     mp.reset();
                     mp.release();
                     mp = null;
-                    startPlayback(episode, context, false);
+                    startPlayback(episode, PodcastPlayerService.this, false);
                     return true;
                 }
             });
@@ -221,7 +227,7 @@ public class PodcastPlayerService extends Service {
     }
 
     public void setPlaybackParams(){
-        if (Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT >= 23 && mp != null) {
             PlaybackParams params = new PlaybackParams();
             if (episode!=null) {
                 speed = PreferenceManager.getDefaultSharedPreferences(PodcastPlayerService.this)
@@ -257,6 +263,8 @@ public class PodcastPlayerService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PLAY));
         ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE))
                 .notify(notificationId, buildNotif(false));
+
+        wasPlaying = false;
     }
 
     public void pausePlayback(){
@@ -450,7 +458,7 @@ public class PodcastPlayerService extends Service {
                 Log.d("PPS_SERVICE","Delete episode " + name );
                 if (episode != null && name.equals(URLUtil.guessFileName(episode.getEpURL(), null,null))) {
                     finishPlayback(true);
-                    Log.d("PPS_SERVICE","Delete episode MATCH!");
+                    Log.d("PPS","Delete episode MATCH!");
                 }
             }
         }
@@ -459,13 +467,23 @@ public class PodcastPlayerService extends Service {
     AudioManager.OnAudioFocusChangeListener afChangeListener = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
-            if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)
+            if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                if (mp != null && mp.isPlaying()) wasPlaying = true;
                 pausePlayback();
-            else if (focusChange == AudioManager.AUDIOFOCUS_GAIN)
+            }
+            else if (focusChange == AudioManager.AUDIOFOCUS_GAIN && wasPlaying)
                 resumePlayback();
-            else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                abandonAudioFocus();
-                pausePlayback();
+            else{
+                if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                    if (mp != null && mp.isPlaying()) wasPlaying = true;
+                    abandonAudioFocus();
+                    pausePlayback();
+                }
+                else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+                    if (mp != null && mp.isPlaying()) wasPlaying = true;
+                    pausePlayback();
+                }
+
             }
         }
     };

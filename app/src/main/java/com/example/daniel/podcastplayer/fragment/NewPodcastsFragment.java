@@ -166,8 +166,8 @@ public class NewPodcastsFragment extends Fragment {
             public void onDismissed(Snackbar snackbar, int event) {
                 if (event == DISMISS_EVENT_TIMEOUT || event == DISMISS_EVENT_SWIPE){
                     for (Episode ep : deletedEpisodes){
-                        FileManager.deleteFile(getContext(), ep);
-                        //DbHelper.getInstance(getContext()).updateEpisodeNew(ep.getEpURL(), false);
+                        if (!FileManager.deleteFile(getContext(), ep))
+                            DbHelper.getInstance(getContext()).updateEpisodeNew(ep.getEpURL(), false);
                     }
                 }
                 super.onDismissed(snackbar, event);

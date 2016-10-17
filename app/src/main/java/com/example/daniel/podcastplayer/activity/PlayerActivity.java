@@ -81,18 +81,16 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-            getWindow().setEnterTransition(new Slide(Gravity.BOTTOM)
-                    .setDuration(200));
-        }
-
+        Log.d("PPS","On create Player Act");
         super.onCreate(savedInstanceState);
+        Log.d("PPS","On create Player Act Finsihed");
         setContentView(R.layout.activity_player);
+        Log.d("PPS","Set content view");
         manager = null; //No player sheet in here, so no sense to update such UI
 
         layout = (ViewGroup) findViewById(R.id.activity_player);
         layout.setOnTouchListener(this);
+        Log.d("PPS","Set On touch");
     }
 
     public void setupPlayerUI(){
@@ -102,12 +100,16 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
 
         if (bound){
             final Episode e = service.getEpisode();
+            if (e == null){
+                finish();
+                return;
+            }
 
             ImageView artwork = (ImageView)findViewById(R.id.player_artwork_iv);
-            //File image = new File(getApplicationInfo().dataDir + "/Artwork", e.getPodcastId() + ".png");
-            //Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
             Bitmap bitmap = FileManager.getBitmap(this, e.getPodcastId());
             artwork.setImageBitmap(bitmap);
+
+            Log.d("PLAYER_PPS","1");
 
             TextView epTV = (TextView) findViewById(R.id.player_ep_tv);
             if (epTV != null)
@@ -181,6 +183,7 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
                         progressTV.setText(getTime(service.getProgress()) + divider + length);
                     }
                 });
+            Log.d("PLAYER_PPS","7");
 
             ImageButton forwardButton = (ImageButton) findViewById(R.id.player_forward_button);
             if (forwardButton != null)
@@ -198,9 +201,6 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
                 progressTV.setText(getTime(service.getProgress()) + divider + length);
 
             int color = ColorPicker.getArtworkColor(bitmap);
-            //Toolbar toolbar = (Toolbar)findViewById(R.id.player_act_toolbar);
-            //toolbar.setTitle(DbHelper.getInstance(this).getPodcast(e.getPodcastId()).getPodcastName());
-            //toolbar.setBackgroundColor(color);
             findViewById(R.id.player_ep_tv).setBackgroundColor(ColorPicker.getDarkerColor(color));
             findViewById(R.id.player_pod_tv).setBackgroundColor(ColorPicker.getDarkerColor(color));
             if (Build.VERSION.SDK_INT >= 21)
@@ -262,12 +262,12 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.stay, R.anim.slide_down);
-        //closeActivity((int)layout.getY());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
         setupPlayerUI();
     }
 
@@ -296,14 +296,6 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
                         // First time android rise an event for "down" move
                         if(!isScrollingDown){
                             isScrollingDown = true;
-                        }
-
-                        // Has user scroll enough to "auto close" popup ?
-                        if (Math.abs(baseLayoutPosition - currentYPosition) > defaultViewHeight / 2)
-                        {
-                            //closeDownAndDismissDialog(currentYPosition);
-                            Toast.makeText(this,"Close down",Toast.LENGTH_LONG).show();
-                            return true;
                         }
 
                         // Change base layout size and position (must change position because view anchor is top left corner)

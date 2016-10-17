@@ -27,7 +27,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.PlayerActivity"
-            android:theme="@style/AppTheme.Translucent" />
+            android:theme="@style/AppTheme.Translucent"
+            android:launchMode="singleTask"/>
         <activity android:name=".activity.SettingsActivity" />
 
         <service android:name=".player.PodcastPlayerService" />

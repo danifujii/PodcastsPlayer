@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
@@ -26,9 +27,9 @@ public abstract class ServiceActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         bindService(new Intent(this,PodcastPlayerService.class),connection, Context.BIND_AUTO_CREATE);
         manager = new PlayerSheetManager(this);
+
     }
 
     @Override
