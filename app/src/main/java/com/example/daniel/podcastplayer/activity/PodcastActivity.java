@@ -150,7 +150,7 @@ public class PodcastActivity extends ServiceActivity {
         filter.addAction(Downloader.ACTION_DOWNLOADED);
         registerReceiver(receiver,filter);
         LocalBroadcastManager.getInstance(this)
-                .registerReceiver(finishReceiver, new IntentFilter(PodcastPlayerService.ACTION_FINISH));
+                .registerReceiver(localReceiver, new IntentFilter(PodcastPlayerService.ACTION_FINISH));
         if (bound)
             setupPlayerUI();
 
@@ -164,33 +164,35 @@ public class PodcastActivity extends ServiceActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(receiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(finishReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(localReceiver);
     }
 
 
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
+    private BroadcastReceiver localReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch(intent.getAction()){
-                case (DownloadManager.ACTION_DOWNLOAD_COMPLETE):
-                    epsRV.getAdapter().notifyDataSetChanged();
-                    Downloader.removeDownload(intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,-1));
-                    break;
                 case (Downloader.ACTION_DOWNLOADED): {
                     List<Episode> episodes = DbHelper.getInstance(PodcastActivity.this)
                             .getEpisodes(p.getPodcastId());
                     epsRV.setAdapter(new EpisodeAdapter(episodes));
                     break;
                 }
+                case (PodcastPlayerService.ACTION_FINISH):{
+                    epsRV.getAdapter().notifyDataSetChanged();
+                    break;
+                }
             }
         }
     };
 
-    private BroadcastReceiver finishReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(PodcastPlayerService.ACTION_FINISH))
+            if (intent.getAction().equals(DownloadManager.ACTION_DOWNLOAD_COMPLETE)) {
                 epsRV.getAdapter().notifyDataSetChanged();
+                Downloader.removeDownload(intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,-1));
+            }
         }
     };
 }

@@ -176,7 +176,7 @@ public class PodcastPlayerService extends Service {
     }
 
     //start=false is just for prepare, and not start playback
-    public void startPlayback(Episode e, Context context, final boolean start){
+    public void startPlayback(Episode e, final Context context, final boolean start){
         if (mp == null) {
             mp = new MediaPlayer();
             mp.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
@@ -186,8 +186,7 @@ public class PodcastPlayerService extends Service {
                 public void onCompletion(MediaPlayer mpParam) {
                     //LocalBroadcastManager.getInstance(PodcastPlayerService.this)
                     //        .sendBroadcast(new Intent(ACTION_FINISH));
-                    FileManager.deleteFile(PodcastPlayerService.this,episode);
-                    Log.d("PPS","File deleted");
+                    FileManager.deleteFile(context,episode);
                 }
             });
             mp.setOnErrorListener(new MediaPlayer.OnErrorListener() {
@@ -196,7 +195,7 @@ public class PodcastPlayerService extends Service {
                     mp.reset();
                     mp.release();
                     mp = null;
-                    startPlayback(episode, PodcastPlayerService.this, false);
+                    startPlayback(episode, context, false);
                     return true;
                 }
             });

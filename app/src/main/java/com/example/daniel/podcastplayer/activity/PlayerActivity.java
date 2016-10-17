@@ -109,7 +109,6 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
             Bitmap bitmap = FileManager.getBitmap(this, e.getPodcastId());
             artwork.setImageBitmap(bitmap);
 
-            Log.d("PLAYER_PPS","1");
 
             TextView epTV = (TextView) findViewById(R.id.player_ep_tv);
             if (epTV != null)
@@ -183,7 +182,6 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
                         progressTV.setText(getTime(service.getProgress()) + divider + length);
                     }
                 });
-            Log.d("PLAYER_PPS","7");
 
             ImageButton forwardButton = (ImageButton) findViewById(R.id.player_forward_button);
             if (forwardButton != null)

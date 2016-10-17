@@ -47,16 +47,15 @@ public class MainActivity extends ServiceActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         startService(new Intent(this,PodcastPlayerService.class)
                 .setAction(PodcastPlayerService.ACTION_START));
+
         Downloader.updatePodcasts(this);
-        Log.d("MAIN_ACT","CREATE 1");
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Log.d("MAIN_ACT","CREATE 2");
         if (getSupportActionBar() != null)
             getSupportActionBar().setElevation(0);
-        Log.d("MAIN_ACT","CREATE 3");
         FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
         if (getSupportFragmentManager().findFragmentByTag(homeFragmentTag) == null) {
             trans.add(R.id.fragment_layout, new HomeFragment(), homeFragmentTag);
@@ -69,7 +68,6 @@ public class MainActivity extends ServiceActivity{
                 FirebaseCrash.report(e);
             }
         });
-        Log.d("MAIN_ACT","CREATE 4");
     }
 
 
@@ -174,6 +172,7 @@ public class MainActivity extends ServiceActivity{
     @Override
     protected void onResume() {
         super.onResume();
+
         if (bound && search == null)
             setupPlayerUI();
     }
@@ -188,7 +187,8 @@ public class MainActivity extends ServiceActivity{
         findViewById(R.id.splayer_layout).setVisibility(View.GONE);
         if (service.isStarted())
             manager.setSheetInterface(service.getEpisode());
-        else {
+        else
+            {
             SharedPreferences sp = getSharedPreferences(getString(R.string.file_setting),
                     Context.MODE_PRIVATE);
             int duration = sp.getInt(getString(R.string.listened_setting), -1);

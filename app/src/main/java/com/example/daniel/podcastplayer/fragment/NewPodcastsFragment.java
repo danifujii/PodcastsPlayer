@@ -73,7 +73,7 @@ public class NewPodcastsFragment extends Fragment {
         filter.addAction(Downloader.ACTION_DOWNLOADED);
         getActivity().registerReceiver(receiver,filter);
         LocalBroadcastManager.getInstance(getContext())
-                .registerReceiver(finishReceiver,new IntentFilter(PodcastPlayerService.ACTION_FINISH));
+                .registerReceiver(localReceiver,new IntentFilter(PodcastPlayerService.ACTION_FINISH));
 
         //Do this in case a download finishes while app is not active,
         //avoiding the broadcast receivers to work
@@ -86,7 +86,7 @@ public class NewPodcastsFragment extends Fragment {
         super.onPause();
         getActivity().unregisterReceiver(receiver);
         LocalBroadcastManager.getInstance(getContext())
-                .unregisterReceiver(finishReceiver);
+                .unregisterReceiver(localReceiver);
     }
 
     public void setRecyclerViewInfo(){
@@ -176,14 +176,10 @@ public class NewPodcastsFragment extends Fragment {
         snackbar.show();
     }
 
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
+    private BroadcastReceiver localReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch(intent.getAction()){
-                case (DownloadManager.ACTION_DOWNLOAD_COMPLETE):
-                    rv.getAdapter().notifyDataSetChanged();
-                    Downloader.removeDownload(intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,-1));
-                    break;
                 case (Downloader.ACTION_DOWNLOADED): {
                     setRecyclerViewInfo();
                     break;
@@ -196,11 +192,13 @@ public class NewPodcastsFragment extends Fragment {
         }
     };
 
-    private BroadcastReceiver finishReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(PodcastPlayerService.ACTION_FINISH))
+            if (intent.getAction().equals(DownloadManager.ACTION_DOWNLOAD_COMPLETE)) {
                 rv.getAdapter().notifyDataSetChanged();
+                Downloader.removeDownload(intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1));
+            }
         }
     };
 }
