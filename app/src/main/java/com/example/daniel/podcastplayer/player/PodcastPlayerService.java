@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -15,23 +14,16 @@ import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
-import android.media.session.MediaController;
-import android.media.session.MediaSession;
-import android.media.session.MediaSessionManager;
-import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.provider.SyncStateContract;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
@@ -44,14 +36,9 @@ import com.example.daniel.podcastplayer.activity.PlayerActivity;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.FileManager;
-import com.example.daniel.podcastplayer.data.Podcast;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-
-import static android.drm.DrmStore.Action.PLAY;
-import static android.provider.ContactsContract.Intents.Insert.ACTION;
 
 
 public class PodcastPlayerService extends Service {

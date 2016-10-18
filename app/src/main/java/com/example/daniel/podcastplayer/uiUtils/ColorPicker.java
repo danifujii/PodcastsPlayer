@@ -1,4 +1,4 @@
-package com.example.daniel.podcastplayer.activity;
+package com.example.daniel.podcastplayer.uiUtils;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;

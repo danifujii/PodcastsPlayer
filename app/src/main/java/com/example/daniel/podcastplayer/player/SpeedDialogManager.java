@@ -1,16 +1,11 @@
 package com.example.daniel.podcastplayer.player;
 
-import android.app.Dialog;
 import android.preference.PreferenceManager;
-import android.renderscript.Double2;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
-import com.example.daniel.podcastplayer.data.Episode;
 
 /**
  * Created by Daniel on 3/10/2016.

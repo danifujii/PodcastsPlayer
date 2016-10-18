@@ -12,8 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.daniel.podcastplayer.R;
-import com.example.daniel.podcastplayer.fragment.NewPodcastsFragment;
-import com.example.daniel.podcastplayer.fragment.SubscriptionsFragment;
 
 
 /**

@@ -1,29 +1,23 @@
 package com.example.daniel.podcastplayer.player;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
-import android.os.Bundle;
-import android.text.Layout;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextClock;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
-import com.example.daniel.podcastplayer.activity.ColorPicker;
 import com.example.daniel.podcastplayer.activity.PlayerActivity;
 import com.example.daniel.podcastplayer.activity.ServiceActivity;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
+import com.example.daniel.podcastplayer.uiUtils.ColorPicker;
 
 import java.io.File;
 

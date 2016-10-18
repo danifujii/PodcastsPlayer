@@ -1,22 +1,12 @@
 package com.example.daniel.podcastplayer;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.preference.DialogPreference;
-import android.preference.Preference;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
-import android.text.Layout;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.daniel.podcastplayer.activity.PlayerActivity;
 import com.example.daniel.podcastplayer.player.SpeedDialogManager;
-
-import org.w3c.dom.Text;
 
 /**
  * Created by Daniel on 3/10/2016.

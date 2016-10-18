@@ -1,24 +1,18 @@
 package com.example.daniel.podcastplayer.data;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import com.example.daniel.podcastplayer.download.Downloader;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Element;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.w3c.dom.Element;
 
 
 public class Podcast implements Parcelable, Downloader.OnImageDownloadReceiver{

@@ -1,6 +1,5 @@
 package com.example.daniel.podcastplayer.activity;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +9,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;

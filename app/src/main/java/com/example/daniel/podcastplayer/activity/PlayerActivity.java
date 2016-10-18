@@ -3,60 +3,36 @@ package com.example.daniel.podcastplayer.activity;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Build;
-import android.os.Handler;
-import android.os.IBinder;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.transition.Slide;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.Display;
-import android.view.DragEvent;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.FileManager;
-import com.example.daniel.podcastplayer.data.Podcast;
-import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
-import com.example.daniel.podcastplayer.player.PodcastPlayerService.PlayerBinder;
 import com.example.daniel.podcastplayer.player.SpeedDialogManager;
-
-
-import java.io.File;
+import com.example.daniel.podcastplayer.uiUtils.ColorPicker;
 
 public class PlayerActivity extends ServiceActivity implements View.OnTouchListener{
 

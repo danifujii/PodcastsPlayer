@@ -1,11 +1,5 @@
 package com.example.daniel.podcastplayer.data;
 
-import android.util.Log;
-
-import java.text.ParseException;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-
 public class Episode {
 
     private String epTitle;
@@ -16,6 +10,7 @@ public class Episode {
     private int podcastId;
     private boolean downloaded; //used for UI purposes mainly
     private boolean newEp;      //not listened episode
+    private String description;
 
     public Episode(int podcast){
         podcastId = podcast;
@@ -45,6 +40,8 @@ public class Episode {
 
     public boolean getNewEp() { return newEp; }
 
+    public String getDescription() { return description; }
+
     public void setListened(int listened){ this.listened = listened; }
 
     public void setLength(int length) {
@@ -66,4 +63,6 @@ public class Episode {
     }
 
     public void setNewEp(boolean newEp) { this.newEp = newEp; }
+
+    public void setDescription(String descr) { this.description = descr; }
 }

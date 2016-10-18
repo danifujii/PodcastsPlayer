@@ -48,4 +48,6 @@
     <string name="default_speed_setting_title">Velocidad de reproducción</string>
     <string name="delete_message">¿Quiere borrar este episodio?</string>
     <string name="no_result">Ningún podcast encontrado!</string>
+    <string name="delete_button">Borrar</string>
+    <string name="show_notes">Notas de episodio</string>
 </resources>

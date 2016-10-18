@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,7 +13,7 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper{
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "PodcastPlayerMov.db";
     private static DbHelper mInstance;
 
@@ -34,6 +33,7 @@ public class DbHelper extends SQLiteOpenHelper{
             + Tbls.COLUMN_LISTENED  + " integer NOT NULL, "
             + Tbls.COLUMN_FK_POD    + " integer NOT NULL, "
             + Tbls.COLUMN_NEW_EP    + " boolean NOT NULL, "
+            + Tbls.COLUMN_DESCR     + " text NOT NULL, "
             + " CONSTRAINT FK_Podcast FOREIGN KEY (" + Tbls.COLUMN_FK_POD + ") REFERENCES "
             + Tbls.NAME_PODCAST + "(" + Tbls.COLUMN_ID + ") ON DELETE CASCADE)";
 
@@ -74,6 +74,7 @@ public class DbHelper extends SQLiteOpenHelper{
         values.put(Tbls.COLUMN_DOWNLOADED,false);
         values.put(Tbls.COLUMN_LISTENED,"0");
         values.put(Tbls.COLUMN_NEW_EP,newEp);
+        values.put(Tbls.COLUMN_DESCR,e.getDescription());
         values.put(Tbls.COLUMN_FK_POD,podcastId);
         db.insert(Tbls.NAME_EPISODE, null, values);
         //db.close();
@@ -181,6 +182,7 @@ public class DbHelper extends SQLiteOpenHelper{
             e.setEpURL(c.getString(c.getColumnIndex(DbHelper.Tbls.COLUMN_EP_URL)));
             e.setListened(c.getInt(c.getColumnIndex(Tbls.COLUMN_LISTENED)));
             e.setNewEp(c.getInt(c.getColumnIndex(Tbls.COLUMN_NEW_EP))==1);
+            e.setDescription(c.getString(c.getColumnIndex(Tbls.COLUMN_DESCR)));
             episodes.add(e);
         }
         c.close();
@@ -238,6 +240,7 @@ public class DbHelper extends SQLiteOpenHelper{
         public static String COLUMN_DOWNLOADED = "downloaded";
         public static String COLUMN_LISTENED = "listened";
         public static String COLUMN_NEW_EP = "new_ep";
+        public static String COLUMN_DESCR = "description";
         public static String COLUMN_FK_POD = "podcastId";
     }
 }

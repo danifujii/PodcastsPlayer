@@ -7,27 +7,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.transition.Slide;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -39,6 +29,7 @@ import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.download.Downloader;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
+import com.example.daniel.podcastplayer.uiUtils.ColorPicker;
 
 import java.io.File;
 import java.util.List;
@@ -146,11 +137,12 @@ public class PodcastActivity extends ServiceActivity {
     protected void onResume() {
         super.onResume();
         IntentFilter filter = new IntentFilter();
-        filter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        filter.addAction(PodcastPlayerService.ACTION_FINISH);
         filter.addAction(Downloader.ACTION_DOWNLOADED);
-        registerReceiver(receiver,filter);
+        filter.addAction(FileManager.ACTION_DELETE);
+        registerReceiver(receiver,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         LocalBroadcastManager.getInstance(this)
-                .registerReceiver(localReceiver, new IntentFilter(PodcastPlayerService.ACTION_FINISH));
+                .registerReceiver(localReceiver, filter);
         if (bound)
             setupPlayerUI();
 
@@ -181,6 +173,9 @@ public class PodcastActivity extends ServiceActivity {
                 case (PodcastPlayerService.ACTION_FINISH):{
                     epsRV.getAdapter().notifyDataSetChanged();
                     break;
+                }
+                case (FileManager.ACTION_DELETE):{
+                    epsRV.getAdapter().notifyDataSetChanged();
                 }
             }
         }

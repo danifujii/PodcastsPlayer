@@ -1,38 +1,31 @@
 package com.example.daniel.podcastplayer.adapter;
 
-import android.app.Activity;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Environment;
+import android.graphics.Color;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.URLUtil;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.daniel.podcastplayer.activity.PlayerActivity;
+import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.activity.ServiceActivity;
+import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.download.Downloader;
-import com.example.daniel.podcastplayer.player.PlayerSheetManager;
+import com.example.daniel.podcastplayer.fragment.EpisodeBottomSheet;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
-import com.example.daniel.podcastplayer.R;
-import com.example.daniel.podcastplayer.data.Episode;
+import com.example.daniel.podcastplayer.uiUtils.EpisodeButtonController;
 
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -65,36 +58,14 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
     public void onBindViewHolder(final EpisodeAdapter.EpisodeViewHolder holder, int position) {
         final Context c = holder.dateTV.getContext();
         final Episode item = data.get(position);
+
         holder.nameTV.setText(item.getEpTitle());
         holder.dateTV.setText(getDateFormat(item.getEpDate()));
         holder.remainingTV.setVisibility(View.GONE);
 
-        holder.downloadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Episode ep = data.get(holder.getAdapterPosition());
-                if (!Downloader.isDownloading(ep.getEpURL())) {         //no esta descargando actualmente
-                    if (FileManager.getEpisodeFile(holder.downloadButton.getContext(),
-                            ep).exists()){                              //si encuentra el archivo, puede reproducir
-                        PodcastPlayerService player = activity.getService();
-                        if (player != null) {
-                            player.startPlayback(ep, activity);
-                            activity.setupPlayerUI();
-                        }
-                    }else {                                             //si no esta, comenzar descarga
-                        if (Downloader.isConnected(v.getContext(), false)) {
-                            Downloader.explicitDownloadEpisode(v.getContext(), ep
-                                    , EpisodeAdapter.this, holder.downloadButton);
-                            changeImageButton(holder.downloadButton, Icons.CANCEL.ordinal());
-                        } else Snackbar.make(v, activity.getString(R.string.error_no_connection),
-                                Snackbar.LENGTH_LONG).show();
-                    }
-                } else{
-                    Downloader.cancelDownload(holder.downloadButton.getContext(), ep.getEpURL());
-                    changeImageButton(holder.downloadButton, Icons.DOWNLOAD.ordinal());
-                }
-            }
-        });
+        //Controller no se usa, pero es fundamental setearlo ya que en el constructor se setea todo
+        final EpisodeButtonController controller = new EpisodeButtonController(holder.downloadButton, activity
+                , item, Color.BLACK);
 
         if (FileManager.getEpisodeFile(c,item).exists() && !Downloader.isDownloading(item.getEpURL())) {
             holder.layout.setOnLongClickListener(new View.OnLongClickListener() {
@@ -106,7 +77,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 FileManager.deleteFile(c, item);
-                                changeImageButton(holder.downloadButton, Icons.DOWNLOAD.ordinal());
+                                controller.changeImageButton(EpisodeButtonController.Icons.DOWNLOAD.ordinal());
                                 holder.remainingTV.setVisibility(View.INVISIBLE);
                             }
                         })
@@ -118,17 +89,21 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
                 }
             });
         }
+        holder.layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EpisodeBottomSheet sheet = new EpisodeBottomSheet();
+                sheet.setEpisode(item, activity);
+                sheet.show(activity.getSupportFragmentManager(), "bottom sheet");
+            }
+        });
 
         if (!Downloader.isDownloading(item.getEpURL())){
             if (FileManager.getEpisodeFile(c,item).exists()) {
-                changeImageButton(holder.downloadButton, Icons.PLAY.ordinal());
                 holder.remainingTV.setVisibility(View.VISIBLE);
                 holder.remainingTV.setText(getRemaining(item.getLength()-item.getListened(),c));
             }
-            else changeImageButton(holder.downloadButton, Icons.DOWNLOAD.ordinal());
         }
-        else
-            changeImageButton(holder.downloadButton, Icons.CANCEL.ordinal());
 
         if (difPodcasts) {
             holder.artworkIV.setVisibility(View.VISIBLE);
@@ -152,30 +127,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
     public Episode getItem(int position){
         return data.get(position);
     }
-
-    public enum Icons {DOWNLOAD, CANCEL, PLAY}
-    public void changeImageButton(ImageButton im, int type){
-        Icons icon = Icons.values()[type];
-        switch (icon){
-            case DOWNLOAD:{
-                im.setImageBitmap(BitmapFactory.decodeResource(
-                        im.getResources(), R.drawable.ic_file_download_black_24dp));
-                break;
-            }
-            case CANCEL:{
-                im.setImageBitmap(BitmapFactory.decodeResource(
-                        im.getResources(), R.drawable.ic_close_black_24dp));
-                break;
-            }
-            case PLAY:{
-                im.setImageBitmap(BitmapFactory.decodeResource(
-                        im.getResources(), R.drawable.ic_play_circle_outline_black_24dp));
-                break;
-            }
-        }
-    }
-
-
 
     @Override
     public int getItemCount() {

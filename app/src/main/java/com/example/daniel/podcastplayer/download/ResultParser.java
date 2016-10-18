@@ -1,7 +1,6 @@
 package com.example.daniel.podcastplayer.download;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.Podcast;
@@ -23,8 +22,6 @@ import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import static android.R.attr.duration;
 
 public class ResultParser {
 
@@ -96,6 +93,7 @@ public class ResultParser {
                     e.setEpDate(getDate(n.getElementsByTagName("pubDate").item(0).getTextContent()));
                     e.setLength(getMiliseconds(n.getElementsByTagName("itunes:duration").item(0)
                             .getTextContent()));
+                    e.setDescription(n.getElementsByTagName("description").item(0).getTextContent());
 
                     Element url = (Element) n.getElementsByTagName("enclosure").item(0);
                     //e.setLength(Integer.valueOf(url.getAttribute("length")));

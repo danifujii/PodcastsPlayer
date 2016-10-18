@@ -1,9 +1,9 @@
 package com.example.daniel.podcastplayer.activity;
 
+import android.os.Bundle;
 import android.preference.MultiSelectListPreference;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.DbHelper;

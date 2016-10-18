@@ -17,7 +17,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.ArraySet;
 import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.ImageButton;
@@ -28,6 +27,7 @@ import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.data.Podcast;
+import com.example.daniel.podcastplayer.uiUtils.EpisodeButtonController;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,7 +39,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -241,7 +240,7 @@ public class Downloader {
 
     //Download is done by user, pressing download
     public static void explicitDownloadEpisode(final Context c, final Episode e
-            , final EpisodeAdapter adapter, final ImageButton button){
+            , final EpisodeButtonController controller){
         if (isConnected(c, true))
             downloadEpisode(c, e, true);
         else{
@@ -258,7 +257,7 @@ public class Downloader {
                         .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                adapter.changeImageButton(button, EpisodeAdapter.Icons.DOWNLOAD.ordinal());
+                                controller.changeImageButton(EpisodeButtonController.Icons.DOWNLOAD.ordinal());
                             }
                         })
                         .create()

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/descr_layout"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="500dp"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/episode_header_layout"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="140dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:orientation="vertical"
+            android:background="@color/darkGray">
+
+            <TextView
+                android:id="@+id/episode_title_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif-light"
+                android:text="Episode very long name that is super long long long very long"/>
+
+            <TextView
+                android:id="@+id/episode_show_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/lightGray"
+                android:text="Here is a very long episode name that ensjdwaiojdoiajdiowjaiodjiowajoiawoda"
+                android:paddingTop="@dimen/activity_small_margin"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/options_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:paddingRight="@dimen/activity_small_margin">
+
+            <ImageButton
+                android:id="@+id/episode_queue_buttton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_queue_white_24dp"
+                android:background="@null"
+                android:text="@string/delete_button"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingRight="@dimen/activity_medium_margin"
+                android:paddingLeft="@dimen/activity_small_margin"
+                android:paddingBottom="@dimen/activity_medium_margin"
+                />
+
+            <ImageButton
+                android:id="@+id/episode_delete_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_delete_white_24dp"
+                android:background="@null"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingRight="@dimen/activity_medium_margin"
+                android:paddingLeft="@dimen/activity_small_margin"
+                android:paddingBottom="@dimen/activity_medium_margin"
+                />
+
+            <ImageButton
+                android:id="@+id/episode_play_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_play_circle_filled_white_24dp"
+                android:background="@null"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingRight="@dimen/activity_medium_margin"
+                android:paddingLeft="@dimen/activity_small_margin"
+                android:paddingBottom="@dimen/activity_medium_margin"
+                />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+
+
+    <ScrollView
+        android:padding="@dimen/activity_horizontal_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="350dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/episode_show_notes_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/show_notes"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="16sp"
+                android:paddingBottom="@dimen/activity_medium_margin"/>
+
+            <TextView
+                android:id="@+id/description_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/darkGray"
+                android:scrollbars="vertical"
+                android:linksClickable="true"
+                android:textColorLink="@color/colorPrimaryDark"
+                />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

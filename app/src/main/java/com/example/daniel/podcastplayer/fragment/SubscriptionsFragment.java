@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +17,6 @@ import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.activity.PodcastActivity;
 import com.example.daniel.podcastplayer.adapter.ImageAdapter;
 import com.example.daniel.podcastplayer.data.DbHelper;
-import com.example.daniel.podcastplayer.data.Podcast;
-
-import java.util.List;
 
 
 /**

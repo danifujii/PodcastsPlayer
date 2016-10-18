@@ -5,11 +5,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.example.daniel.podcastplayer.R;

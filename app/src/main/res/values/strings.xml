@@ -68,4 +68,7 @@
     <string name="transition_artwork" translatable="false">artworkTransition</string>
 
     <string name="no_result">No podcasts found!</string>
+
+    <string name="delete_button">Delete</string>
+    <string name="show_notes">Show notes</string>
 </resources>

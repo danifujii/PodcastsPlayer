@@ -6,11 +6,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -21,24 +19,19 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.daniel.podcastplayer.R;
-import com.example.daniel.podcastplayer.activity.PodcastActivity;
 import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.FileManager;
-import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.download.Downloader;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -69,11 +62,12 @@ public class NewPodcastsFragment extends Fragment {
         super.onResume();
         
         IntentFilter filter = new IntentFilter();
-        filter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        filter.addAction(PodcastPlayerService.ACTION_FINISH);
         filter.addAction(Downloader.ACTION_DOWNLOADED);
-        getActivity().registerReceiver(receiver,filter);
+        filter.addAction(FileManager.ACTION_DELETE);
+        getActivity().registerReceiver(receiver,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         LocalBroadcastManager.getInstance(getContext())
-                .registerReceiver(localReceiver,new IntentFilter(PodcastPlayerService.ACTION_FINISH));
+                .registerReceiver(localReceiver,filter);
 
         //Do this in case a download finishes while app is not active,
         //avoiding the broadcast receivers to work
@@ -185,6 +179,10 @@ public class NewPodcastsFragment extends Fragment {
                     break;
                 }
                 case (PodcastPlayerService.ACTION_FINISH):{
+                    rv.getAdapter().notifyDataSetChanged();
+                    break;
+                }
+                case (FileManager.ACTION_DELETE):{
                     rv.getAdapter().notifyDataSetChanged();
                     break;
                 }
