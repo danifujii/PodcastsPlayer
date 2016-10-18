@@ -162,7 +162,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         return null;
     }
 
-    private String getRemaining(int remaining, Context context){
+    public static String getRemaining(int remaining, Context context){
         int seconds = remaining / 1000;
         String minsText = context.getString(R.string.mins);
         int mins = seconds /60;

@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.activity.ServiceActivity;
+import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.FileManager;
@@ -36,6 +37,8 @@ import com.example.daniel.podcastplayer.download.Downloader;
 import com.example.daniel.podcastplayer.download.JuhaTagHandler;
 import com.example.daniel.podcastplayer.uiUtils.ColorPicker;
 import com.example.daniel.podcastplayer.uiUtils.EpisodeButtonController;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 
@@ -115,6 +118,9 @@ public class EpisodeBottomSheet extends BottomSheetDialogFragment{
             v.findViewById(R.id.episode_queue_buttton).setVisibility(View.GONE);
         }
         else{
+            TextView remainingTV = (TextView)v.findViewById(R.id.episode_remain_tv);
+            remainingTV.setVisibility(View.VISIBLE);
+            remainingTV.setText(EpisodeAdapter.getRemaining(episode.getLength()-episode.getListened(),getContext()));
             v.findViewById(R.id.episode_delete_button).setVisibility(View.VISIBLE);
             v.findViewById(R.id.episode_queue_buttton).setVisibility(View.VISIBLE);
         }

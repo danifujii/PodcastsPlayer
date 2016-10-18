@@ -30,8 +30,7 @@
                 android:maxLines="2"
                 android:textColor="@color/white"
                 android:textSize="18sp"
-                android:fontFamily="sans-serif-light"
-                android:text="Episode very long name that is super long long long very long"/>
+                android:fontFamily="sans-serif-light" />
 
             <TextView
                 android:id="@+id/episode_show_tv"
@@ -40,8 +39,18 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textColor="@color/lightGray"
-                android:text="Here is a very long episode name that ensjdwaiojdoiajdiowjaiodjiowajoiawoda"
                 android:paddingTop="@dimen/activity_small_margin"/>
+
+            <TextView
+                android:id="@+id/episode_remain_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/lightGray"
+                android:fontFamily="sans-serif-medium"
+                android:paddingTop="@dimen/activity_medium_margin"
+                android:visibility="gone"/>
 
         </LinearLayout>
 
@@ -94,9 +103,6 @@
         </LinearLayout>
 
     </RelativeLayout>
-
-
-
 
     <ScrollView
         android:padding="@dimen/activity_horizontal_margin"
