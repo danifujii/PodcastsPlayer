@@ -69,27 +69,25 @@ public class EpisodeButtonController implements View.OnClickListener{
 
     public void changeImageButton(int type){
         Icons icon = Icons.values()[type];
-        Drawable downloadDrawable = null;
         switch (icon){
             case DOWNLOAD:{
-                 downloadDrawable = new BitmapDrawable(act.getResources(),
-                        BitmapFactory.decodeResource(act.getResources(), R.drawable.ic_file_download_black_24dp));
+                button.setImageDrawable(
+                        ColorPicker.getColoredDrawable(act, buttonColor, BitmapFactory.decodeResource(button.getResources()
+                                , R.drawable.ic_file_download_black_24dp)));
                 break;
             }
             case CANCEL:{
-                downloadDrawable = new BitmapDrawable(act.getResources(),
-                        BitmapFactory.decodeResource(button.getResources(), R.drawable.ic_close_black_24dp));
+                button.setImageDrawable(
+                        ColorPicker.getColoredDrawable(act, buttonColor, BitmapFactory.decodeResource(button.getResources()
+                                , R.drawable.ic_close_black_24dp)));
                 break;
             }
             case PLAY:{
-                downloadDrawable = new BitmapDrawable(act.getResources(),
-                    BitmapFactory.decodeResource(button.getResources(), R.drawable.ic_play_circle_outline_black_24dp));
+                button.setImageDrawable(
+                        ColorPicker.getColoredDrawable(act, buttonColor, BitmapFactory.decodeResource(button.getResources()
+                                , R.drawable.ic_play_circle_outline_black_24dp)));
                 break;
             }
-        }
-        if (downloadDrawable != null) {
-            downloadDrawable.setColorFilter(buttonColor, PorterDuff.Mode.SRC_ATOP);
-            button.setImageDrawable(downloadDrawable);
         }
     }
 }

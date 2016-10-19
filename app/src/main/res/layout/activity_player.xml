@@ -12,7 +12,9 @@
         android:adjustViewBounds="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         />
+
 
     <TextView
         android:id="@+id/player_ep_tv"
@@ -82,7 +84,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:textSize="16sp" />
+                android:textSize="18sp"
+                android:textColor="@color/mediumGray"
+                android:text="00:55 / 2:00:12"/>
+
+            <ImageButton
+                android:id="@+id/queue_button"
+                android:layout_width="27dp"
+                android:layout_height="27dp"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_queue_music_black_36dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
 
         </LinearLayout>
         

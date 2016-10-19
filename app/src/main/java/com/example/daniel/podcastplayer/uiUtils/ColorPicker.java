@@ -1,7 +1,11 @@
 package com.example.daniel.podcastplayer.uiUtils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v7.graphics.Palette;
 
 /**
@@ -33,5 +37,11 @@ public class ColorPicker {
         Color.colorToHSV(color,hsv);
         hsv[2] *= 0.8f;
         return Color.HSVToColor(hsv);
+    }
+
+    public static Drawable getColoredDrawable(Context context, int color, Bitmap bitmap){
+        Drawable original = new BitmapDrawable(context.getResources(),bitmap);
+        original.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        return original;
     }
 }

@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -88,12 +89,15 @@ public class PodcastActivity extends ServiceActivity {
             manager.setSheetInterface(service.getEpisode());
 
         int artworkColor = ColorPicker.getArtworkColor(bitmap);
-        Toolbar toolbar = (Toolbar)findViewById(R.id.podcast_act_toolbar);
-        toolbar.setTitle(p.getPodcastName());
+        setTitle(p.getPodcastName());
+        if (getSupportActionBar()!= null)
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(artworkColor));
+            //Toolbar toolbar = (Toolbar)findViewById(R.id.podcast_act_toolbar);
+            //toolbar.setTitle(p.getPodcastName());
         if (artworkColor != 0x000000) {
             //((ViewGroup)findViewById(R.id.header_layout)).setBackgroundColor(artworkColor);
-            toolbar.setBackgroundColor(artworkColor);
-            if (Build.VERSION.SDK_INT >= 21)
+            //  toolbar.setBackgroundColor(artworkColor);
+             if (Build.VERSION.SDK_INT >= 21)
                 getWindow().setStatusBarColor(ColorPicker.getDarkerColor(artworkColor));
         }
     }

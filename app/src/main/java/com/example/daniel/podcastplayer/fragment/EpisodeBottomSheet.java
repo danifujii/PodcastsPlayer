@@ -1,25 +1,18 @@
 package com.example.daniel.podcastplayer.fragment;
 
 import android.app.DownloadManager;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,10 +28,9 @@ import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.download.Downloader;
 import com.example.daniel.podcastplayer.download.JuhaTagHandler;
+import com.example.daniel.podcastplayer.player.PlayerQueue;
 import com.example.daniel.podcastplayer.uiUtils.ColorPicker;
 import com.example.daniel.podcastplayer.uiUtils.EpisodeButtonController;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 
@@ -103,7 +95,8 @@ public class EpisodeBottomSheet extends BottomSheetDialogFragment{
             queueButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(getContext(),"Hey, it's coming soon!", Toast.LENGTH_SHORT).show();
+                    PlayerQueue.getInstance().addEpisode(episode);
+                    Toast.makeText(getContext(), getString(R.string.added), Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -147,6 +140,4 @@ public class EpisodeBottomSheet extends BottomSheetDialogFragment{
             }
         }
     };
-
-    //TODO Ajustar <ul> y <li> de HTML con puntitos y tabs
 }

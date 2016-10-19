@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -19,9 +20,11 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
@@ -29,6 +32,7 @@ import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.download.Downloader;
+import com.example.daniel.podcastplayer.player.PlayerQueue;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 
 import java.util.ArrayList;
@@ -95,6 +99,7 @@ public class NewPodcastsFragment extends Fragment {
 
     private void configSwipe(){
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 return false;
@@ -121,16 +126,32 @@ public class NewPodcastsFragment extends Fragment {
 
                     if (dX > 0){
                         Paint p = new Paint();
-                        p.setColor(ContextCompat.getColor(getContext(),R.color.green_done));
-                        RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX,(float) itemView.getBottom());
-                        c.drawRect(background,p);
-                        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_done_white_24dp);
-                        RectF icon_dest = new RectF((float) itemView.getLeft() + width ,(float) itemView.getTop() + width,(float) itemView.getLeft()+ 2*width,(float)itemView.getBottom() - width);
-                        c.drawBitmap(icon,null,icon_dest,p);
+                        if (dX > c.getWidth() / 3){
+                            p.setColor(ContextCompat.getColor(getContext(),R.color.red_delete));
+                            RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX,(float) itemView.getBottom());
+                            c.drawRect(background,p);
+                            Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_white_24dp);
+                            RectF icon_dest = new RectF((float) itemView.getLeft() + width ,(float) itemView.getTop() + width,(float) itemView.getLeft()+ 2*width,(float)itemView.getBottom() - width);
+                            c.drawBitmap(icon,null,icon_dest,p);
+                        }
+                        else{
+                            p.setColor(ContextCompat.getColor(getContext(),R.color.mediumGray));
+                            RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX,(float) itemView.getBottom());
+                            c.drawRect(background,p);
+                            Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_queue_white_24dp);
+                            RectF icon_dest = new RectF((float) itemView.getLeft() + width ,(float) itemView.getTop() + width,(float) itemView.getLeft()+ 2*width,(float)itemView.getBottom() - width);
+                            c.drawBitmap(icon,null,icon_dest,p);
+                        }
+
+                        if (!isCurrentlyActive && dX < c.getWidth() / 3)
+                            PlayerQueue.getInstance().addEpisode(((EpisodeAdapter) rv.getAdapter())
+                                    .getItem(viewHolder.getAdapterPosition()));
                     }
+
                 }
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             }
+
         };
         ItemTouchHelper helper = new ItemTouchHelper(simpleCallback);
         helper.attachToRecyclerView(rv);

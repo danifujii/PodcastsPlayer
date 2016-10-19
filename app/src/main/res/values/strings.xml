@@ -71,4 +71,9 @@
 
     <string name="delete_button">Delete</string>
     <string name="show_notes">Show notes</string>
+
+    <string name="queue">Queue</string>
+    <string name="done">Done</string>
+
+    <string name="added">Added</string>
 </resources>

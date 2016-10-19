@@ -53,6 +53,7 @@ public class FileManager {
                 if (c.delete()) {
                     Intent i = new Intent(ACTION_DELETE);
                     i.putExtra(EP_KEY_EXTRA, c.getName());
+                    context.sendBroadcast(i);
                     LocalBroadcastManager.getInstance(context).sendBroadcast(i);
                 }
             }

@@ -17,6 +17,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".activity.MainActivity" android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -25,14 +26,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.PodcastSearchActivity" />
-        <activity
-            android:name=".activity.PodcastActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.PodcastActivity" />
         <activity
             android:name=".activity.PlayerActivity"
             android:theme="@style/AppTheme.Translucent"
             android:launchMode="singleTask"/>
-        <activity android:name=".activity.SettingsActivity" />
+        <activity android:name=".activity.SettingsActivity"
+            android:parentActivityName=".activity.MainActivity"/>
 
         <service android:name=".player.PodcastPlayerService" />
 

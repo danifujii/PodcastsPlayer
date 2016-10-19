@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.FileManager;
+import com.example.daniel.podcastplayer.fragment.QueueDialog;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 import com.example.daniel.podcastplayer.player.SpeedDialogManager;
 import com.example.daniel.podcastplayer.uiUtils.ColorPicker;
@@ -44,29 +46,22 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
     private String length;
     private static boolean active = false;  //active is used to avoid checking the player playing
                                             // if the activity is not active
-
     //Swipe Down
     private ViewGroup layout;
 
     private int previousFingerPosition = 0;
-    private int baseLayoutPosition = 0;
     private int defaultViewHeight;
     private boolean isClosing = false;
-    private boolean isScrollingUp = false;
     private boolean isScrollingDown = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("PPS","On create Player Act");
         super.onCreate(savedInstanceState);
-        Log.d("PPS","On create Player Act Finsihed");
         setContentView(R.layout.activity_player);
-        Log.d("PPS","Set content view");
         manager = null; //No player sheet in here, so no sense to update such UI
 
         layout = (ViewGroup) findViewById(R.id.activity_player);
         layout.setOnTouchListener(this);
-        Log.d("PPS","Set On touch");
     }
 
     public void setupPlayerUI(){
@@ -84,7 +79,8 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
             ImageView artwork = (ImageView)findViewById(R.id.player_artwork_iv);
             Bitmap bitmap = FileManager.getBitmap(this, e.getPodcastId());
             artwork.setImageBitmap(bitmap);
-
+            int color = ColorPicker.getArtworkColor(bitmap);
+            int darkerColor = ColorPicker.getDarkerColor(color);
 
             TextView epTV = (TextView) findViewById(R.id.player_ep_tv);
             if (epTV != null)
@@ -97,6 +93,7 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
                     play.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_pause_black_48dp));
                 else
                     play.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_play_arrow_black_48dp));
+                    //play.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_play_arrow_black_48dp));
 
                 play.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -174,11 +171,10 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
             if (progressTV != null)
                 progressTV.setText(getTime(service.getProgress()) + divider + length);
 
-            int color = ColorPicker.getArtworkColor(bitmap);
             findViewById(R.id.player_ep_tv).setBackgroundColor(ColorPicker.getDarkerColor(color));
             findViewById(R.id.player_pod_tv).setBackgroundColor(ColorPicker.getDarkerColor(color));
             if (Build.VERSION.SDK_INT >= 21)
-                getWindow().setStatusBarColor(ColorPicker.getDarkerColor(color));
+                getWindow().setStatusBarColor(darkerColor);
 
             ImageButton speedButton = (ImageButton) findViewById(R.id.speed_button);
             if (Build.VERSION.SDK_INT>=23)
@@ -209,6 +205,14 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
                     }
                 });
             else speedButton.setVisibility(View.GONE);
+
+            findViewById(R.id.queue_button).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    QueueDialog dialog = new QueueDialog();
+                    dialog.show(getFragmentManager(),dialog.getTag());
+                }
+            });
         }
     }
 
@@ -259,7 +263,7 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
 
                 // Init finger and view position
                 previousFingerPosition = Y;
-                baseLayoutPosition = (int) layout.getY();
+                //baseLayoutPosition = (int) layout.getY();
                 break;
 
             case MotionEvent.ACTION_MOVE:

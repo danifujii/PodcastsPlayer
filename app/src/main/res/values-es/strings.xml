@@ -50,4 +50,6 @@
     <string name="no_result">Ningún podcast encontrado!</string>
     <string name="delete_button">Borrar</string>
     <string name="show_notes">Notas de episodio</string>
+    <string name="queue">Cola de reproducción</string>
+    <string name="added">Agregado</string>
 </resources>

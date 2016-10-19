@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/queue"
+            android:textSize="24sp"
+            android:textColor="@color/darkGray"
+            android:padding="@dimen/activity_medium_margin"
+            android:gravity="center_horizontal"
+            android:fontFamily="sans-serif-light"
+            />
+
+        <View
+            android:id="@+id/episode_divider"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/mediumGray"
+            />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/queue_rv"
+            android:layout_width="match_parent"
+            android:layout_height="300dp" />
+
+</LinearLayout>
+

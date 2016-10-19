@@ -61,8 +61,9 @@ public class SubscriptionsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Cursor c = DbHelper.getInstance(getContext()).getPodcastsCursor();
-        if (c.getCount() > 0)
+        if (c.getCount() > 0) {
             gv.setAdapter(new ImageAdapter(getContext(), c));
+        }
         else{
             c.close();
             gv.setVisibility(View.GONE);
