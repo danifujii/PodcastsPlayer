@@ -85,7 +85,6 @@ public class PodcastPlayerService extends Service {
                     rewindPlayback();
                     break;
             }
-
         } //else return START_REDELIVER_INTENT;
         return START_STICKY;
     }

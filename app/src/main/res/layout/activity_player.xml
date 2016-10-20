@@ -113,15 +113,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_fast_rewind_black_48dp"
-                android:background="@null"/>
+                android:background="?attr/selectableItemBackgroundBorderless"/>
 
             <ImageButton
                 android:id="@+id/player_play_button"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:src="@mipmap/ic_play"
                 android:scaleType="fitCenter"
-                android:background="@null"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_marginRight="@dimen/activity_medium_margin"
                 android:layout_marginLeft="@dimen/activity_medium_margin"/>
 
@@ -130,7 +130,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_fast_forward_black_48dp"
-                android:background="@null"/>
+                android:background="?attr/selectableItemBackgroundBorderless"/>
             
         </LinearLayout>
 

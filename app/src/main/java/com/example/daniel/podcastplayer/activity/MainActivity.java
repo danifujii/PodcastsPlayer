@@ -46,8 +46,8 @@ public class MainActivity extends ServiceActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startService(new Intent(this,PodcastPlayerService.class)
-                .setAction(PodcastPlayerService.ACTION_START));
+        //startService(new Intent(this,PodcastPlayerService.class)
+        //        .setAction(PodcastPlayerService.ACTION_START));
 
         Downloader.updatePodcasts(this);
         toolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -164,7 +164,7 @@ public class MainActivity extends ServiceActivity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopService(new Intent(this,PodcastPlayerService.class));
+        //stopService(new Intent(this,PodcastPlayerService.class));
     }
 
     @Override
