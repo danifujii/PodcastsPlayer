@@ -125,7 +125,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
     }
 
     public Episode getItem(int position){
-        return data.get(position);
+        return (position >= 0 && position < data.size()) ? data.get(position):null;
     }
 
     @Override

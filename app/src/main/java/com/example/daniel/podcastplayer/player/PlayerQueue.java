@@ -33,6 +33,7 @@ public class PlayerQueue {
             //Loading the queue
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             Set<String> result = prefs.getStringSet(context.getString(R.string.queueSet), null);
+
             if (result != null) {
                 Episode[] partial = new Episode[result.size()];
                 for (String s : result) {
@@ -49,11 +50,13 @@ public class PlayerQueue {
     }
 
     public void addEpisode(Episode e, Context context){ //context is used to save list
-        for (Episode ep : queue)
-            if (ep.getEpURL().equals(e.getEpURL()))
-                return;
-        queue.add(e);
-        saveQueue(context);
+        if (e != null) {
+            for (Episode ep : queue)
+                if (ep.getEpURL().equals(e.getEpURL()))
+                    return;
+            queue.add(e);
+            saveQueue(context);
+        }
     }
 
     public void removeEpisode(int position, Context context){
@@ -83,12 +86,13 @@ public class PlayerQueue {
     }
 
     //This is used when current one is finished
-    public Episode getNextEpisode(){
+    public Episode getNextEpisode(Context context){
         if(queue.size() > 0){
             Episode e = queue.get(0);
             queue.remove(0);
 
             current = null;     //setCurrent is called from the service
+            saveQueue(context);
             return e;
         }
         return null;
@@ -133,6 +137,5 @@ public class PlayerQueue {
         editor.apply();
     }
 
-    public Episode getCurrent() { return current; }
     //TODO Clear queue
 }

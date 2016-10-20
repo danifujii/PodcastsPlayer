@@ -1,13 +1,17 @@
 package com.example.daniel.podcastplayer.fragment;
 
+import android.animation.Animator;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -18,6 +22,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 
 import com.example.daniel.podcastplayer.R;
@@ -33,7 +38,8 @@ public class QueueDialog extends DialogFragment{
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setView(getActivity().getLayoutInflater().inflate(R.layout.queue_dialog_layout, null))
+        final View view = getActivity().getLayoutInflater().inflate(R.layout.queue_dialog_layout,null);
+        builder.setView(view)
                 .setPositiveButton(getString(R.string.done), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -43,6 +49,7 @@ public class QueueDialog extends DialogFragment{
         AlertDialog dialog = builder.create();
         return dialog;
     }
+
 
     @Override
     public void onResume() {

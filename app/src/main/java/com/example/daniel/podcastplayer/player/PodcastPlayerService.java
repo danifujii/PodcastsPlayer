@@ -149,7 +149,18 @@ public class PodcastPlayerService extends Service {
                 .cancel(notificationId);
 
         PlayerQueue queue = PlayerQueue.getInstance(this);
-        if (queue.getQueue().size()==0) {
+        if (queue.getQueue().size() > 0 && finished) {
+            //Save the progress of the one that finished
+            saveProgress(finished);
+            episode = null;
+            //Get next one and start playing it
+            Episode e = queue.getNextEpisode(this);         //get the next one to play
+            if (finishedPlaying)
+                startPlayback(e, this);                     //and start it
+            else startPlayback(e, this, false);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_CHANGED));
+        }
+        else{
             if (finished)
                 LocalBroadcastManager.getInstance(PodcastPlayerService.this)
                         .sendBroadcast(new Intent(ACTION_FINISH));
@@ -161,16 +172,6 @@ public class PodcastPlayerService extends Service {
                 mp = null;
                 episode = null;
             }
-        } else{
-            //Save the progress of the one that finished
-            saveProgress(finished);
-            episode = null;
-            //Get next one and start playing it
-            Episode e = queue.getNextEpisode();         //get the next one to play
-            if (finishedPlaying)
-                startPlayback(e, this);                     //and start it
-            else startPlayback(e, this, false);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_CHANGED));
         }
         finishedPlaying = false;
     }

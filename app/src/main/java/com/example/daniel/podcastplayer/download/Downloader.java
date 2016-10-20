@@ -317,19 +317,6 @@ public class Downloader {
                 downloadIDs.remove(getKey(id));
         }
         c.close();
-
-//        Set<Long> pendingDownloads = new HashSet<>();
-        //Get all current downloads
-  //      while (c.moveToNext()){
-    //        Long id = c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID));
-      //      if (downloadIDs.values().contains(id))          //If this download is from Stereo, add it to pending
-      //          pendingDownloads.add(id);
-      //  }
-      //  HashMap<String,Long> newDownloadIds = new HashMap<>();
-      //  for (Long l : pendingDownloads)                    //Make the hashSet of download again
-      //      newDownloadIds.put(getKey(l), l);
-      //  downloadIDs = newDownloadIds;
-      //  c.close();
     }
 
     private static String getKey(Long value){
