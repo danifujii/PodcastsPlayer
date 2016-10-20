@@ -21,6 +21,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.daniel.podcastplayer.R;
+import com.example.daniel.podcastplayer.activity.PlayerActivity;
+import com.example.daniel.podcastplayer.activity.ServiceActivity;
 import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
 import com.example.daniel.podcastplayer.adapter.QueueItemAdapter;
 import com.example.daniel.podcastplayer.data.Episode;
@@ -49,17 +51,25 @@ public class QueueDialog extends DialogFragment{
         final RecyclerView rv = (RecyclerView)getDialog().findViewById(R.id.queue_rv);
         if (rv != null){
             rv.setLayoutManager(new LinearLayoutManager(getActivity()));
-            rv.setAdapter(new QueueItemAdapter());
+            rv.setAdapter(new QueueItemAdapter((ServiceActivity)getActivity()));     //este casting deja de funcionar si en algun momento se usa este Dialog fuera de un Service
 
-            ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN
+                    , ItemTouchHelper.RIGHT) {
+                @Override
+                public boolean isLongPressDragEnabled() {
+                    return true;
+                }
+
                 @Override
                 public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                    ((QueueItemAdapter)recyclerView.getAdapter()).moveItem(viewHolder.getAdapterPosition(),
+                            target.getAdapterPosition());
                     return false;
                 }
 
                 @Override
                 public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                    PlayerQueue.getInstance().removeEpisode(viewHolder.getAdapterPosition());
+                    PlayerQueue.getInstance(getActivity()).removeEpisode(viewHolder.getAdapterPosition(), getActivity());
                     rv.getAdapter().notifyDataSetChanged();
                 }
 

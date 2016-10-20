@@ -46,9 +46,11 @@ public class PodcastPlayerService extends Service {
     public static final String ACTION_PLAY = "action_play";
     public static final String ACTION_START = "action_start";
     public static final String ACTION_PAUSE = "action_pause";
-    public static final String ACTION_FINISH = "action_finish";
     public static final String ACTION_REWIND = "action_rewind";
     public static final String ACTION_FORWARD = "action_forward";
+
+    public static final String ACTION_FINISH = "action_finish";
+    public static final String ACTION_CHANGED = "action_changed";
 
     private final static int skipForward = 30000;   //30 seconds
     private final static int rewind = 10000;   //10 seconds
@@ -62,6 +64,7 @@ public class PodcastPlayerService extends Service {
     private Episode episode = null;
 
     private boolean wasPlaying = false;
+    private boolean finishedPlaying = false;
 
     private int click = 0;
 
@@ -144,17 +147,32 @@ public class PodcastPlayerService extends Service {
         stopForeground(true);
         ((NotificationManager)getSystemService(NOTIFICATION_SERVICE))
                 .cancel(notificationId);
-        if (finished)
-            LocalBroadcastManager.getInstance(PodcastPlayerService.this)
-                    .sendBroadcast(new Intent(ACTION_FINISH));
-        if (mp!=null){
+
+        PlayerQueue queue = PlayerQueue.getInstance(this);
+        if (queue.getQueue().size()==0) {
+            if (finished)
+                LocalBroadcastManager.getInstance(PodcastPlayerService.this)
+                        .sendBroadcast(new Intent(ACTION_FINISH));
+            if (mp != null) {
+                saveProgress(finished);
+                abandonAudioFocus();
+                mp.stop();
+                mp.release();
+                mp = null;
+                episode = null;
+            }
+        } else{
+            //Save the progress of the one that finished
             saveProgress(finished);
-            abandonAudioFocus();
-            mp.stop();
-            mp.release();
-            mp = null;
             episode = null;
+            //Get next one and start playing it
+            Episode e = queue.getNextEpisode();         //get the next one to play
+            if (finishedPlaying)
+                startPlayback(e, this);                     //and start it
+            else startPlayback(e, this, false);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_CHANGED));
         }
+        finishedPlaying = false;
     }
 
     public void startPlayback(Episode e, Context context){
@@ -174,6 +192,7 @@ public class PodcastPlayerService extends Service {
                     //LocalBroadcastManager.getInstance(PodcastPlayerService.this)
                     //        .sendBroadcast(new Intent(ACTION_FINISH));
                     FileManager.deleteFile(context,episode);
+                    finishedPlaying = true;
                 }
             });
             mp.setOnErrorListener(new MediaPlayer.OnErrorListener() {
@@ -200,6 +219,7 @@ public class PodcastPlayerService extends Service {
                 mp.setDataSource(context,
                         Uri.parse(FileManager.getEpisodeFile(context, e).getAbsolutePath()));
                 mp.prepareAsync();
+                PlayerQueue.getInstance(this).setCurrent(e, this);
             } catch (IOException excep) {
                 excep.printStackTrace();
             }
@@ -210,6 +230,7 @@ public class PodcastPlayerService extends Service {
                 mp.start();
         }
         this.episode = e;
+
     }
 
     public void setPlaybackParams(){
@@ -349,7 +370,7 @@ public class PodcastPlayerService extends Service {
                             handler.postDelayed(r, 500);
                         }
                     }
-                    else startPlayback(true);
+                    else startPlayback(episode, PodcastPlayerService.this);
                 }
 
                 @Override
@@ -411,7 +432,6 @@ public class PodcastPlayerService extends Service {
     private BroadcastReceiver controlReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("RECEIVER_BROADCAST","MEDIA ACTION");
             if (Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())){
                 KeyEvent event = (KeyEvent)intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
                 if (event != null)
@@ -431,8 +451,9 @@ public class PodcastPlayerService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(AudioManager.ACTION_HEADSET_PLUG) && mp != null
-                    && intent.getIntExtra("state",4)==0)
-                mp.pause();
+                    && intent.getIntExtra("state",4)==0) {
+                pausePlayback();
+            }
         }
     };
 
@@ -441,10 +462,8 @@ public class PodcastPlayerService extends Service {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(FileManager.ACTION_DELETE)){
                 String name = intent.getStringExtra(FileManager.EP_KEY_EXTRA);
-                Log.d("PPS_SERVICE","Delete episode " + name );
                 if (episode != null && name.equals(URLUtil.guessFileName(episode.getEpURL(), null,null))) {
                     finishPlayback(true);
-                    Log.d("PPS","Delete episode MATCH!");
                 }
             }
         }

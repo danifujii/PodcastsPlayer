@@ -8,6 +8,8 @@ import android.os.Environment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.webkit.URLUtil;
 
+import com.example.daniel.podcastplayer.player.PlayerQueue;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -33,6 +35,7 @@ public class FileManager {
             Intent i = new Intent(ACTION_DELETE);
             i.putExtra(EP_KEY_EXTRA, URLUtil.guessFileName(e.getEpURL(), null, null));
             LocalBroadcastManager.getInstance(c).sendBroadcast(i);
+            PlayerQueue.getInstance(c).removeEpisode(e, c);
             return ep.delete();
         }
         return false;

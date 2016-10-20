@@ -54,6 +54,8 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
     private boolean isClosing = false;
     private boolean isScrollingDown = false;
 
+    private QueueDialog queueDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +72,10 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
         final ImageButton play = (ImageButton)findViewById(R.id.player_play_button);
 
         if (bound){
+
+            if (queueDialog != null)
+                queueDialog.dismiss();
+
             final Episode e = service.getEpisode();
             if (e == null){
                 finish();
@@ -129,7 +135,7 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
                 public void run() {
                     while (progressBar.getProgress() < progressBar.getMax()){
                         if (active && service.isPlaying()) {
-                            progressBar.setProgress(progressBar.getProgress() + 1);
+                            progressBar.setProgress(service.getProgress() + 1);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -209,8 +215,8 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
             findViewById(R.id.queue_button).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    QueueDialog dialog = new QueueDialog();
-                    dialog.show(getFragmentManager(),dialog.getTag());
+                    queueDialog = new QueueDialog();
+                    queueDialog.show(getFragmentManager(), queueDialog.getTag());
                 }
             });
         }
@@ -225,6 +231,7 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
         intentFilter.addAction(PodcastPlayerService.ACTION_FINISH);
         intentFilter.addAction(PodcastPlayerService.ACTION_PLAY);
         intentFilter.addAction(PodcastPlayerService.ACTION_PAUSE);
+        intentFilter.addAction(PodcastPlayerService.ACTION_CHANGED);
         LocalBroadcastManager.getInstance(this).registerReceiver(handler, intentFilter);
     }
 
@@ -368,6 +375,10 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
                 }
                 case(PodcastPlayerService.ACTION_PAUSE):{
                     changeButtonIcon(playButton);
+                    break;
+                }
+                case(PodcastPlayerService.ACTION_CHANGED):{
+                    setupPlayerUI();
                     break;
                 }
             }

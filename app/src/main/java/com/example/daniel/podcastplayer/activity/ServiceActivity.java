@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.player.PlayerSheetManager;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 
@@ -37,6 +38,7 @@ public abstract class ServiceActivity extends AppCompatActivity{
             intentFilter.addAction(PodcastPlayerService.ACTION_FINISH);
             intentFilter.addAction(PodcastPlayerService.ACTION_PAUSE);
             intentFilter.addAction(PodcastPlayerService.ACTION_PLAY);
+            intentFilter.addAction(PodcastPlayerService.ACTION_CHANGED);
             LocalBroadcastManager.getInstance(this)
                     .registerReceiver(manager.getHandler(), intentFilter);
         }

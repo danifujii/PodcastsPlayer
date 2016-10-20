@@ -144,8 +144,8 @@ public class NewPodcastsFragment extends Fragment {
                         }
 
                         if (!isCurrentlyActive && dX < c.getWidth() / 3)
-                            PlayerQueue.getInstance().addEpisode(((EpisodeAdapter) rv.getAdapter())
-                                    .getItem(viewHolder.getAdapterPosition()));
+                            PlayerQueue.getInstance(getContext()).addEpisode(((EpisodeAdapter) rv.getAdapter())
+                                    .getItem(viewHolder.getAdapterPosition()), getContext());
                     }
 
                 }

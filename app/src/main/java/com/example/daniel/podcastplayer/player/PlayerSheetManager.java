@@ -128,6 +128,9 @@ public class PlayerSheetManager {
                             .setImageBitmap(BitmapFactory.decodeResource(container.getResources(),
                                     R.drawable.ic_play_circle_outline_white_36dp));
                     break;
+                case(PodcastPlayerService.ACTION_CHANGED):
+                    setSheetInterface(container.getService().getEpisode());
+                    break;
             }
         }
     };

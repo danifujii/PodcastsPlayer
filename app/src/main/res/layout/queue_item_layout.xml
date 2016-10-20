@@ -2,7 +2,9 @@
 
 <RelativeLayout android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:id="@+id/queue_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/white">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal" android:layout_width="match_parent"
@@ -47,15 +49,6 @@
         </LinearLayout>
 
     </LinearLayout>
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/activity_small_margin"
-        android:src="@drawable/ic_reorder_black_24dp"
-        android:alpha="0.7"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"/>
 
     <View
         android:paddingTop="2dp"

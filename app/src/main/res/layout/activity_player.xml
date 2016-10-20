@@ -72,12 +72,13 @@
 
             <ImageButton
                 android:id="@+id/speed_button"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:src="@drawable/ic_speed"
-                android:background="@null"
-                android:scaleType="fitCenter"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="centerInside"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:padding="@dimen/activity_small_margin"/>
 
             <TextView
                 android:id="@+id/player_progress_tv"
@@ -86,16 +87,17 @@
                 android:layout_gravity="center_vertical"
                 android:textSize="18sp"
                 android:textColor="@color/mediumGray"
-                android:text="00:55 / 2:00:12"/>
+                />
 
             <ImageButton
                 android:id="@+id/queue_button"
-                android:layout_width="27dp"
-                android:layout_height="27dp"
-                android:background="@null"
-                android:scaleType="fitCenter"
+                android:layout_width="37dp"
+                android:layout_height="37dp"
+                android:scaleType="centerInside"
                 android:src="@drawable/ic_queue_music_black_36dp"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:padding="@dimen/activity_small_margin"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
 
         </LinearLayout>
         

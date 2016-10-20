@@ -95,8 +95,7 @@ public class EpisodeBottomSheet extends BottomSheetDialogFragment{
             queueButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    PlayerQueue.getInstance().addEpisode(episode);
-                    Toast.makeText(getContext(), getString(R.string.added), Toast.LENGTH_SHORT).show();
+                    PlayerQueue.getInstance(getContext()).addEpisode(episode, getContext());
                 }
             });
         }

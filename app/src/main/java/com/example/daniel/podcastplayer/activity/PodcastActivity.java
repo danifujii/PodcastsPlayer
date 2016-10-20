@@ -180,6 +180,7 @@ public class PodcastActivity extends ServiceActivity {
                 }
                 case (FileManager.ACTION_DELETE):{
                     epsRV.getAdapter().notifyDataSetChanged();
+                    break;
                 }
             }
         }
