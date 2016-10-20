@@ -35,6 +35,7 @@ import com.example.daniel.podcastplayer.download.Downloader;
 import com.example.daniel.podcastplayer.player.PlayerQueue;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,13 +121,17 @@ public class NewPodcastsFragment extends Fragment {
             @Override
             public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
+                    Episode e = ((EpisodeAdapter) rv.getAdapter()).getItem(viewHolder.getAdapterPosition());
+                    boolean exists = false;
+                    if (e != null)
+                        exists =  FileManager.getEpisodeFile(getActivity(), e).exists() && !Downloader.isDownloading(e.getEpURL());
                     View itemView = viewHolder.itemView;
                     float height = (float)itemView.getBottom() - (float)itemView.getTop();
                     float width = height / 3;
 
                     if (dX > 0){
                         Paint p = new Paint();
-                        if (dX > c.getWidth() / 3){
+                        if (dX > c.getWidth() / 3 || !exists){
                             p.setColor(ContextCompat.getColor(getContext(),R.color.red_delete));
                             RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX,(float) itemView.getBottom());
                             c.drawRect(background,p);
@@ -143,9 +148,9 @@ public class NewPodcastsFragment extends Fragment {
                             c.drawBitmap(icon,null,icon_dest,p);
                         }
 
-                        if (!isCurrentlyActive && dX < c.getWidth() / 3)
-                            PlayerQueue.getInstance(getContext()).addEpisode(((EpisodeAdapter) rv.getAdapter())
-                                    .getItem(viewHolder.getAdapterPosition()), getContext());
+                        if (!isCurrentlyActive && dX < c.getWidth() / 3 && exists) {
+                            PlayerQueue.getInstance(getContext()).addEpisode(e, getContext());
+                        }
                     }
 
                 }
