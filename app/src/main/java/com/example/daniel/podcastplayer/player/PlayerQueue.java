@@ -51,6 +51,9 @@ public class PlayerQueue {
 
     public void addEpisode(Episode e, Context context){ //context is used to save list
         if (e != null) {
+            if (current!=null && current.getEpURL().equals(e.getEpURL()))
+                return;
+
             for (Episode ep : queue)
                 if (ep.getEpURL().equals(e.getEpURL()))
                     return;

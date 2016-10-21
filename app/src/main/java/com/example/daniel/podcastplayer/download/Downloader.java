@@ -90,12 +90,10 @@ public class Downloader {
         new AsyncTask<URL,Void,List<Episode>>(){
             @Override
             protected List<Episode> doInBackground(URL... params) {
-                Log.d("PARSE_EP",params[0].getAuthority() + "-" + params[0].toString());
                 URL url = params[0];
                 if (params[0].getAuthority().equals(feedburnerURL))
                     try {
                         url = new URL(params[0].toString() + "?format=xml");
-                        Log.d("PARSE_EP",url.toString());
                     } catch (MalformedURLException e) { e.printStackTrace(); }
 
                 HttpURLConnection conn = null;

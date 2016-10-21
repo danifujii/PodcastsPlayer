@@ -247,7 +247,9 @@ public class PodcastPlayerService extends Service {
                     params.setSpeed(speed);
             } else params.setSpeed(1.0f);
             params.setPitch(1.0f);
-            mp.setPlaybackParams(params);
+            try{
+                mp.setPlaybackParams(params);
+            } catch (IllegalStateException e) { e.printStackTrace(); }
         }
     }
 
@@ -428,24 +430,6 @@ public class PodcastPlayerService extends Service {
             return PodcastPlayerService.this;
         }
     }
-
-    private BroadcastReceiver controlReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())){
-                KeyEvent event = (KeyEvent)intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-                if (event != null)
-                    switch (event.getAction()){
-                        case(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE):
-                            pausePlayback();
-                            break;
-                        case(KeyEvent.KEYCODE_MEDIA_FAST_FORWARD):
-                            forwardPlayback();
-                            break;
-                    }
-            }
-        }
-    };
 
     private BroadcastReceiver audioChangeReceiver = new BroadcastReceiver() {
         @Override

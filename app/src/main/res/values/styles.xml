@@ -27,7 +27,7 @@
         <item name="tabSelectedTextColor">@color/white</item>
     </style>
     <style name="TabTextAppearance" parent="TextAppearance.Design.Tab">
-        <item name="android:textColor">@color/lightGray</item>
+        <item name="android:textColor">#aaffffff</item>
     </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
