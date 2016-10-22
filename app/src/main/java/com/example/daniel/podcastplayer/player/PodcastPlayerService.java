@@ -96,7 +96,7 @@ public class PodcastPlayerService extends Service {
         File image = new File(getApplicationInfo().dataDir + "/Artwork", episode.getPodcastId() + ".png");
         Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
         android.support.v4.app.NotificationCompat.Builder notif = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_notif)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setLargeIcon(bitmap)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setContentTitle(episode.getEpTitle())
