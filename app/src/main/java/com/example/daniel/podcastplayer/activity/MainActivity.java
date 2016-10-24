@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -40,14 +41,16 @@ public class MainActivity extends ServiceActivity{
     private int searchButtonX;
     private int searchButtonY;
 
+    private boolean rotated = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //setTheme(R.style.AppTheme_NoActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //startService(new Intent(this,PodcastPlayerService.class)
-        //        .setAction(PodcastPlayerService.ACTION_START));
+        //Comenzarlo aca asi sigue corriendo en toda la ejecución, independiente de las actividades
+        startService(new Intent(this,PodcastPlayerService.class));
 
         Downloader.updatePodcasts(this);
         toolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -66,6 +69,8 @@ public class MainActivity extends ServiceActivity{
                 FirebaseCrash.report(e);
             }
         });
+
+        rotated = false;
     }
 
 
@@ -164,7 +169,14 @@ public class MainActivity extends ServiceActivity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //stopService(new Intent(this,PodcastPlayerService.class));
+        if (!rotated)
+            stopService(new Intent(this,PodcastPlayerService.class));
+    }
+
+    @Override
+    public void onBackPressed() {
+        rotated = false;
+        moveTaskToBack(true);
     }
 
     @Override
@@ -173,11 +185,6 @@ public class MainActivity extends ServiceActivity{
 
         if (bound && search == null)
             setupPlayerUI();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     @Override
@@ -251,5 +258,11 @@ public class MainActivity extends ServiceActivity{
         //animator.setStartDelay(100);
         animator.setDuration(300);
         animator.start();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        rotated = true;
     }
 }

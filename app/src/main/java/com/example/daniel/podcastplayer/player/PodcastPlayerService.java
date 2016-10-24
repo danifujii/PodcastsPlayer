@@ -85,36 +85,8 @@ public class PodcastPlayerService extends Service {
                     rewindPlayback();
                     break;
             }
-        } //else return START_REDELIVER_INTENT;
+        }
         return START_STICKY;
-    }
-
-    private Notification buildNotif(boolean paused){
-        PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
-                new Intent(getApplicationContext(), PlayerActivity.class),
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        File image = new File(getApplicationInfo().dataDir + "/Artwork", episode.getPodcastId() + ".png");
-        Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
-        android.support.v4.app.NotificationCompat.Builder notif = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat_name)
-                .setLargeIcon(bitmap)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setContentTitle(episode.getEpTitle())
-                .setTicker(episode.getEpTitle())
-                .setContentText(DbHelper.getInstance(this).getPodcast(episode.getPodcastId()).getPodcastArtist())
-                .setContentIntent(pi)
-                .setOngoing(!paused);   //poder swipearla cuando esta pausado
-        notif.addAction(R.drawable.ic_fast_rewind_black_24dp, "", PendingIntent.getService(this,0,
-                new Intent(this, PodcastPlayerService.class).setAction(ACTION_REWIND),0));
-        if (paused)
-            notif.addAction(R.drawable.ic_play_arrow_black_24dp, "", PendingIntent.getService(this,0,
-                    new Intent(this, PodcastPlayerService.class).setAction(ACTION_PLAY),0));
-        else
-            notif.addAction(R.drawable.ic_pause_black_24dp, "", PendingIntent.getService(this,0,
-                new Intent(this, PodcastPlayerService.class).setAction(ACTION_PAUSE),0));
-        notif.addAction(R.drawable.ic_fast_forward_black_24dp, "", PendingIntent.getService(this,0,
-                new Intent(this, PodcastPlayerService.class).setAction(ACTION_FORWARD),0));
-        return notif.build();
     }
 
     public PodcastPlayerService(){}
@@ -126,11 +98,6 @@ public class PodcastPlayerService extends Service {
                 new IntentFilter(AudioManager.ACTION_HEADSET_PLUG));
         LocalBroadcastManager.getInstance(this).registerReceiver(fileChangeReceiver,
                 new IntentFilter(FileManager.ACTION_DELETE));
-        //IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
-        //mediaFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
-        //registerReceiver(controlReceiver, mediaFilter);
-        //AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        //am.registerMediaButtonEventReceiver(RemoteControlReceiver);
     }
 
     @Override
@@ -139,7 +106,6 @@ public class PodcastPlayerService extends Service {
         finishPlayback(false);
         unregisterReceiver(audioChangeReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(fileChangeReceiver);
-        //unregisterReceiver(controlReceiver);
     }
 
     public void finishPlayback(boolean finished){
@@ -476,4 +442,35 @@ public class PodcastPlayerService extends Service {
             }
         }
     };
+
+
+    private Notification buildNotif(boolean paused){
+        PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
+                new Intent(getApplicationContext(), PlayerActivity.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        File image = new File(getApplicationInfo().dataDir + "/Artwork", episode.getPodcastId() + ".png");
+        Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
+        android.support.v4.app.NotificationCompat.Builder notif = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setLargeIcon(bitmap)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setContentTitle(episode.getEpTitle())
+                .setTicker(episode.getEpTitle())
+                .setContentText(DbHelper.getInstance(this).getPodcast(episode.getPodcastId()).getPodcastArtist())
+                .setContentIntent(pi)
+                .setOngoing(!paused);   //poder swipearla cuando esta pausado
+
+        notif.addAction(R.drawable.ic_fast_rewind_black_24dp, "", PendingIntent.getService(this,0,
+                new Intent(this, PodcastPlayerService.class).setAction(ACTION_REWIND),0));
+        if (paused)
+            notif.addAction(R.drawable.ic_play_arrow_black_24dp, "", PendingIntent.getService(this,0,
+                    new Intent(this, PodcastPlayerService.class).setAction(ACTION_PLAY),0));
+        else
+            notif.addAction(R.drawable.ic_pause_black_24dp, "", PendingIntent.getService(this,0,
+                    new Intent(this, PodcastPlayerService.class).setAction(ACTION_PAUSE),0));
+        notif.addAction(R.drawable.ic_fast_forward_black_24dp, "", PendingIntent.getService(this,0,
+                new Intent(this, PodcastPlayerService.class).setAction(ACTION_FORWARD),0));
+
+        return notif.build();
+    }
 }
