@@ -1,2 +1,2 @@
 # Stereo
-![Stereo](promo.jpg)
+![Stereo](stereo promo.jpg)
