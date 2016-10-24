@@ -63,7 +63,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         holder.dateTV.setText(getDateFormat(item.getEpDate()));
         holder.remainingTV.setVisibility(View.GONE);
 
-        //Controller no se usa, pero es fundamental setearlo ya que en el constructor se setea todo
+        //Controller no se usa, pero es fundamental setearlo ya que en el constructor se setea everything
         final EpisodeButtonController controller = new EpisodeButtonController(holder.downloadButton, activity
                 , item, Color.BLACK);
 

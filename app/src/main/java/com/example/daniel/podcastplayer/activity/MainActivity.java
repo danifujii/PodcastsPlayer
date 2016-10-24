@@ -176,7 +176,10 @@ public class MainActivity extends ServiceActivity{
     @Override
     public void onBackPressed() {
         rotated = false;
-        moveTaskToBack(true);
+        //evitar back normal, que llama a onDestroy cuando estoy en HomeFrag, para que no se pare el servicio
+        if (search == null)
+            moveTaskToBack(true);
+        else super.onBackPressed();
     }
 
     @Override
