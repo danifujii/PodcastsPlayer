@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -94,8 +93,10 @@ public class NewPodcastsFragment extends Fragment {
             getView().findViewById(R.id.np_message_tv).setVisibility(View.VISIBLE);
             rv.setVisibility(View.GONE);
         }
-        else
-            rv.setAdapter(new EpisodeAdapter(latest,true));
+        else {
+            rv.setAdapter(new EpisodeAdapter(latest, true));
+            rv.getAdapter().notifyDataSetChanged();
+        }
     }
 
     private void configSwipe(){
