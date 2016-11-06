@@ -93,7 +93,11 @@ public class ResultParser {
                     e.setEpDate(getDate(n.getElementsByTagName("pubDate").item(0).getTextContent()));
                     e.setLength(getMiliseconds(n.getElementsByTagName("itunes:duration").item(0)
                             .getTextContent()));
-                    e.setDescription(n.getElementsByTagName("description").item(0).getTextContent());
+                    if (n.getElementsByTagName("description").item(0) != null)
+                        e.setDescription(n.getElementsByTagName("description").item(0).getTextContent());
+                    else
+                        if (n.getElementsByTagName("itunes:summary").item(0) != null)
+                            e.setDescription(n.getElementsByTagName("itunes:summary").item(0).getTextContent());
 
                     Element url = (Element) n.getElementsByTagName("enclosure").item(0);
                     //e.setLength(Integer.valueOf(url.getAttribute("length")));
@@ -113,7 +117,8 @@ public class ResultParser {
     private int getMiliseconds(String duration){
         int result = 0;
         if (duration.indexOf(':') > 0) {
-            for (int i = 2; i >= 0; i--) {
+            int timeComponents = (duration.length() > 5) ? 2 : 1;   //it can come as 2(mins):30(secs)
+            for (int i = timeComponents; i >= 0; i--) {
                 result = result + getTimeComponent(duration) * (int) Math.pow(60, i);
                 duration = duration.substring(duration.indexOf(':') + 1);
             }

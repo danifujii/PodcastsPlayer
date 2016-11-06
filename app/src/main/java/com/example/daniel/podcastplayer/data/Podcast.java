@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.example.daniel.podcastplayer.download.Downloader;
 
@@ -132,7 +133,7 @@ public class Podcast implements Parcelable, Downloader.OnImageDownloadReceiver{
         dest.writeInt(podcastId);
         dest.writeString(podcastName);
         dest.writeString(podcastArtist);
-        if (feedUrl != null)
+        if (feedUrl != null) 
             dest.writeString(feedUrl.toString());
         else dest.writeString("");
         dest.writeString(artworkURL);

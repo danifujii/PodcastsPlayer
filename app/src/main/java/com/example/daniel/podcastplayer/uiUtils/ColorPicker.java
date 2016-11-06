@@ -8,10 +8,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.graphics.Palette;
 
-/**
- * Created by Daniel on 27/9/2016.
- */
-
 public class ColorPicker {
 
     public static int getArtworkColor(Bitmap artwork)
@@ -27,9 +23,19 @@ public class ColorPicker {
                 return artColor;
             else {
                 artColor = p.getDarkMutedColor(def);
-                return (artColor != def) ? artColor : p.getMutedColor(def);
+                if (artColor != def)
+                    return artColor;
+                else{
+                    artColor = p.getMutedColor(def);
+                    if (def != artColor)
+                        return artColor;
+                    else{
+                        return p.getDominantColor(def);
+                    }
+                }
             }
         }
+
     }
 
     public static int getDarkerColor(int color){
