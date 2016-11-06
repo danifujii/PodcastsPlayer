@@ -18,7 +18,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.webkit.URLUtil;
 import android.widget.ImageButton;
 
 import com.example.daniel.podcastplayer.R;
@@ -273,7 +272,7 @@ public class Downloader {
                     .setDescription(ep.getEpTitle())
                     .setDestinationInExternalFilesDir(context
                             , FileManager.episodePath(context, ep)
-                            , URLUtil.guessFileName(ep.getEpURL(), null, null));
+                            , ep.getFilename());
             if (onlyWifi)
                 request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
             else request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI

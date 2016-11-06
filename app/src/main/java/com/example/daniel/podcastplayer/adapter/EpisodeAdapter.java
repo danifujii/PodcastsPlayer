@@ -107,7 +107,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
 
         if (difPodcasts) {
             holder.artworkIV.setVisibility(View.VISIBLE);
-            holder.artworkIV.setImageBitmap(FileManager.getBitmap(c, item.getPodcastId()));
+            holder.artworkIV.setImageBitmap(FileManager.getBitmap(c, item.getPodcastId(), FileManager.THIRD_SIZE));
         }
     }
 

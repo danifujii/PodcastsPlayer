@@ -37,6 +37,8 @@ import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 import com.example.daniel.podcastplayer.player.SpeedDialogManager;
 import com.example.daniel.podcastplayer.uiUtils.ColorPicker;
 
+import java.io.File;
+
 public class PlayerActivity extends ServiceActivity implements View.OnTouchListener{
 
     private SeekBar progressBar;
@@ -84,7 +86,7 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
             }
 
             ImageView artwork = (ImageView)findViewById(R.id.player_artwork_iv);
-            Bitmap bitmap = FileManager.getBitmap(this, e.getPodcastId());
+            Bitmap bitmap = FileManager.getBitmap(this, e.getPodcastId(), FileManager.FULL_SIZE);
             artwork.setImageBitmap(bitmap);
             int color = ColorPicker.getArtworkColor(bitmap);
             int darkerColor = ColorPicker.getDarkerColor(color);

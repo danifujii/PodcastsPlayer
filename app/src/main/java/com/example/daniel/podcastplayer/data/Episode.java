@@ -1,5 +1,7 @@
 package com.example.daniel.podcastplayer.data;
 
+import android.webkit.URLUtil;
+
 public class Episode {
 
     private String epTitle;
@@ -41,6 +43,8 @@ public class Episode {
     public boolean getNewEp() { return newEp; }
 
     public String getDescription() { return description; }
+
+    public String getFilename() { return String.valueOf(epURL.hashCode()) + URLUtil.guessFileName(epURL, null, null); }
 
     public void setListened(int listened){ this.listened = listened; }
 

@@ -12,6 +12,7 @@ import android.widget.ImageView;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.data.DbHelper;
+import com.example.daniel.podcastplayer.data.FileManager;
 
 import java.io.File;
 
@@ -34,8 +35,7 @@ public class ImageAdapter extends CursorAdapter{
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         String id = cursor.getString(cursor.getColumnIndex(DbHelper.Tbls.COLUMN_ID));
-        File image = new File(context.getApplicationInfo().dataDir + "/Artwork", id + ".png");
-        Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
+        Bitmap bitmap = FileManager.getBitmap(context, Integer.valueOf(id), FileManager.HALF_SIZE);
         if (bitmap != null)
             ((ImageView)view).setImageBitmap(bitmap);
     }

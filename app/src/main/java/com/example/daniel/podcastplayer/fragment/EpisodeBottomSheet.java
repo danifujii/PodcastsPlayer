@@ -52,7 +52,8 @@ public class EpisodeBottomSheet extends BottomSheetDialogFragment{
         View v = inflater.inflate(R.layout.episode_desc_layout, container, false);
 
         if (episode != null) {
-            int color = ColorPicker.getDarkerColor(ColorPicker.getArtworkColor(FileManager.getBitmap(getContext(), episode.getPodcastId())));
+            int color = ColorPicker.getDarkerColor(ColorPicker.getArtworkColor(FileManager.getBitmap(getContext(), episode.getPodcastId()
+                    , FileManager.THIRD_SIZE)));
 
             TextView descrTV = (TextView) v.findViewById(R.id.description_tv);
             descrTV.setText(Html.fromHtml(episode.getDescription(),null,new JuhaTagHandler()));

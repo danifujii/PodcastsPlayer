@@ -27,9 +27,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.webkit.URLUtil;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.activity.PlayerActivity;
@@ -412,7 +409,7 @@ public class PodcastPlayerService extends Service {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(FileManager.ACTION_DELETE)){
                 String name = intent.getStringExtra(FileManager.EP_KEY_EXTRA);
-                if (episode != null && name.equals(URLUtil.guessFileName(episode.getEpURL(), null,null))) {
+                if (episode != null && name.equals(episode.getFilename())) {
                     finishPlayback(true);
                 }
             }

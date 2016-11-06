@@ -41,7 +41,8 @@ public class QueueItemAdapter extends RecyclerView.Adapter<QueueItemAdapter.Queu
         final Episode e = PlayerQueue.getInstance(holder.artworkIV.getContext()).getEpisode(position);
 
         if (e != null) {
-            holder.artworkIV.setImageBitmap(FileManager.getBitmap(holder.artworkIV.getContext(), e.getPodcastId()));
+            holder.artworkIV.setImageBitmap(FileManager.getBitmap(holder.artworkIV.getContext(),
+                    e.getPodcastId(), FileManager.THIRD_SIZE));
             holder.titleTV.setText(e.getEpTitle());
             holder.remainingTV.setText(EpisodeAdapter.getRemaining(e.getLength() - e.getListened(), holder.remainingTV.getContext()));
             holder.layout.setOnClickListener(new View.OnClickListener() {

@@ -17,6 +17,8 @@ import com.example.daniel.podcastplayer.activity.PlayerActivity;
 import com.example.daniel.podcastplayer.activity.ServiceActivity;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
+import com.example.daniel.podcastplayer.data.FileManager;
+import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.uiUtils.ColorPicker;
 
 import java.io.File;
@@ -35,9 +37,7 @@ public class PlayerSheetManager {
         if (splayerLayout != null){
             splayerLayout.setVisibility(View.VISIBLE);
 
-            File image = new File(container.getApplicationInfo().dataDir + "/Artwork",
-                    String.valueOf(e.getPodcastId()) + ".png");
-            Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
+            Bitmap bitmap = FileManager.getBitmap(container, e.getPodcastId(), FileManager.THIRD_SIZE);
             ImageView artworkIV = (ImageView)container.findViewById(R.id.splayer_art_iv);
             if (artworkIV != null) {
                 artworkIV.setImageBitmap(bitmap);
@@ -67,8 +67,10 @@ public class PlayerSheetManager {
             });
 
             TextView podTV = (TextView)container.findViewById(R.id.splayer_pod_tv);
-            podTV.setText(DbHelper.getInstance(container)
-                    .getPodcast(e.getPodcastId()).getPodcastName());
+            Podcast p = DbHelper.getInstance(container)
+                    .getPodcast(e.getPodcastId());
+            if (p != null)
+                podTV.setText(p.getPodcastName());
         }
     }
 
