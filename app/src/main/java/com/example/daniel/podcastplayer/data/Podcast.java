@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import com.example.daniel.podcastplayer.download.Downloader;
 
@@ -59,7 +58,7 @@ public class Podcast implements Parcelable, Downloader.OnImageDownloadReceiver{
     @Override
     public void receiveImage(Bitmap bitmap) {
         artwork = bitmap;
-        if (searchRecyclerView != null)
+        if (searchRecyclerView != null && artwork != null)
             searchRecyclerView.getAdapter().notifyDataSetChanged();
     }
 

@@ -67,6 +67,7 @@ public class MainActivity extends ServiceActivity{
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 FirebaseCrash.report(e);
+                finish();
             }
         });
 

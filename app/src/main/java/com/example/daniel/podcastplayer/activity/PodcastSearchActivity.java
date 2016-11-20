@@ -174,7 +174,7 @@ public class PodcastSearchActivity extends AppCompatActivity
 
     @Override
     public void receivePodcasts(List<Podcast> podcasts) {
-        if (podcasts.size() > 0) {
+        if (podcasts != null && podcasts.size() > 0) {
             Downloader.parseEpisodes(podcasts.get(0).getFeedUrl(),
                     podcasts.get(0).getPodcastId(), this);
             podcast = podcasts.get(0);  //this is now the complete one

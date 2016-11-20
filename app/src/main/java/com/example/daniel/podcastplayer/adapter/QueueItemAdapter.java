@@ -1,9 +1,6 @@
 package com.example.daniel.podcastplayer.adapter;
 
-import android.app.Service;
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,13 +8,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
-import com.example.daniel.podcastplayer.activity.PlayerActivity;
 import com.example.daniel.podcastplayer.activity.ServiceActivity;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.player.PlayerQueue;
-
-import java.io.File;
 
 public class QueueItemAdapter extends RecyclerView.Adapter<QueueItemAdapter.QueueViewHolder>{
 

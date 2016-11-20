@@ -91,8 +91,10 @@ public class ResultParser {
                     e.setEpTitle(n.getElementsByTagName("title").item(0).getTextContent());
 
                     e.setEpDate(getDate(n.getElementsByTagName("pubDate").item(0).getTextContent()));
-                    e.setLength(getMiliseconds(n.getElementsByTagName("itunes:duration").item(0)
-                            .getTextContent()));
+                    if (n.getElementsByTagName("itunes:duration").item(0) != null)
+                        e.setLength(getMiliseconds(n.getElementsByTagName("itunes:duration").item(0).getTextContent()));
+                    else
+                        e.setLength(getMiliseconds("0:00"));
                     if (n.getElementsByTagName("description").item(0) != null)
                         e.setDescription(n.getElementsByTagName("description").item(0).getTextContent());
                     else

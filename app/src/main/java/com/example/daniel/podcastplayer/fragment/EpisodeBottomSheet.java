@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.activity.ServiceActivity;

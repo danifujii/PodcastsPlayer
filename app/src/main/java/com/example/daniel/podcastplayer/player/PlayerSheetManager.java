@@ -21,8 +21,6 @@ import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.data.Podcast;
 import com.example.daniel.podcastplayer.uiUtils.ColorPicker;
 
-import java.io.File;
-
 public class PlayerSheetManager {
 
     private ServiceActivity container;

@@ -56,12 +56,14 @@ public class SearchFragment extends Fragment implements Downloader.OnPodcastPars
 
     @Override
     public void receivePodcasts(List<Podcast> podcast) {
-        progressBar.setVisibility(View.GONE);
-        if (podcast.size() > 0) {
-            rv.setAdapter(new PodResAdapter(podcast));
-            rv.setVisibility(View.VISIBLE);
-            getActivity().findViewById(R.id.empty_tv).setVisibility(View.GONE);
-        } else getActivity().findViewById(R.id.empty_tv).setVisibility(View.VISIBLE);
+        if (podcast != null){
+            progressBar.setVisibility(View.GONE);
+            if (podcast.size() > 0) {
+                rv.setAdapter(new PodResAdapter(podcast));
+                rv.setVisibility(View.VISIBLE);
+                getActivity().findViewById(R.id.empty_tv).setVisibility(View.GONE);
+            } else getActivity().findViewById(R.id.empty_tv).setVisibility(View.VISIBLE);
+        }
     }
 
     private void initCategoriesMap(){

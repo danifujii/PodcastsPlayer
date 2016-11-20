@@ -10,18 +10,15 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -36,8 +33,6 @@ import com.example.daniel.podcastplayer.fragment.QueueDialog;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 import com.example.daniel.podcastplayer.player.SpeedDialogManager;
 import com.example.daniel.podcastplayer.uiUtils.ColorPicker;
-
-import java.io.File;
 
 public class PlayerActivity extends ServiceActivity implements View.OnTouchListener{
 
@@ -278,7 +273,7 @@ public class PlayerActivity extends ServiceActivity implements View.OnTouchListe
 
             case MotionEvent.ACTION_MOVE:
                 if(!isClosing){
-                    int currentYPosition = (int) layout.getY();
+                    //int currentYPosition = (int) layout.getY();
                     if (previousFingerPosition < Y){
 
                         // First time android rise an event for "down" move

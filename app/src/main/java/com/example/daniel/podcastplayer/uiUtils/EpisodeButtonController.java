@@ -1,19 +1,13 @@
 package com.example.daniel.podcastplayer.uiUtils;
 
-import android.app.Activity;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.activity.ServiceActivity;
-import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
 import com.example.daniel.podcastplayer.data.Episode;
 import com.example.daniel.podcastplayer.data.FileManager;
 import com.example.daniel.podcastplayer.download.Downloader;

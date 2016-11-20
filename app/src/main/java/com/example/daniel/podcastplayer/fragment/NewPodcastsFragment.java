@@ -19,11 +19,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.daniel.podcastplayer.R;
 import com.example.daniel.podcastplayer.adapter.EpisodeAdapter;
@@ -34,7 +32,6 @@ import com.example.daniel.podcastplayer.download.Downloader;
 import com.example.daniel.podcastplayer.player.PlayerQueue;
 import com.example.daniel.podcastplayer.player.PodcastPlayerService;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

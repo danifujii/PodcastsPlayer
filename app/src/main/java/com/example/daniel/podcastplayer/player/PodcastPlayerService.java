@@ -41,7 +41,7 @@ import java.io.IOException;
 public class PodcastPlayerService extends Service {
 
     public static final String ACTION_PLAY = "action_play";
-    public static final String ACTION_START = "action_start";
+    //public static final String ACTION_START = "action_start";
     public static final String ACTION_PAUSE = "action_pause";
     public static final String ACTION_REWIND = "action_rewind";
     public static final String ACTION_FORWARD = "action_forward";
@@ -113,7 +113,7 @@ public class PodcastPlayerService extends Service {
         PlayerQueue queue = PlayerQueue.getInstance(this);
         if (queue.getQueue().size() > 0 && finished) {
             //Save the progress of the one that finished
-            saveProgress(finished);
+            saveProgress(true);
             episode = null;
             //Get next one and start playing it
             Episode e = queue.getNextEpisode(this);         //get the next one to play
@@ -218,13 +218,13 @@ public class PodcastPlayerService extends Service {
 
     private void startPlayback(boolean start){
         if (episode != null) {
+            int listened = DbHelper.getInstance(getApplicationContext()).getEpisodeListened(episode.getEpURL());
+            if (listened > 0)
+                mp.seekTo(listened);
             if (start && requestAudioFocus()) {
                 mp.start();
                 LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_PLAY));
             }
-            int listened = DbHelper.getInstance(getApplicationContext()).getEpisodeListened(episode.getEpURL());
-            if (listened > 0)
-                mp.seekTo(listened);
         }
     }
 

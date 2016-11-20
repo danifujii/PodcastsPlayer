@@ -3,18 +3,12 @@ package com.example.daniel.podcastplayer.player;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
-import android.util.ArraySet;
-import android.util.Log;
-import android.widget.TextView;
 
 import com.example.daniel.podcastplayer.R;
-import com.example.daniel.podcastplayer.activity.PlayerActivity;
 import com.example.daniel.podcastplayer.data.DbHelper;
 import com.example.daniel.podcastplayer.data.Episode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
