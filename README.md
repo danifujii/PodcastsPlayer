@@ -1,2 +1,2 @@
 # Stereo
-![Stereo](stereo promo.jpg)
+<img src='stereo promo.jpg'/>
